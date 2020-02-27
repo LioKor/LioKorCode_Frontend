@@ -7,12 +7,13 @@ let AssertionError = chai.AssertionError;
 function getErrorLineNumberString(e) {
     // works only in Firefox!
     /*  -2 because return of new Function.. is:
-    
+
         function anonymous(
         ) {
             'use strict'; return function sum(a, b) {    <----
     ...*/
-    return (!isNaN(e.lineNumber))? ('Строка ' + (e.lineNumber - 2) + ': '): '';
+
+    return (!isNaN(e.lineNumber))? ((e.lineNumber - 2) + ': '): '';
 }
 
 function runTest(f, test) {
@@ -21,14 +22,14 @@ function runTest(f, test) {
 
     let testSaved = JSON.parse(JSON.stringify(test[0])); // deep copy of an object
 
-    let timeStart = new Date();
+    let timeStart = performance.now();
     try {
         expect(f.apply(this, test[0])).to.eql(test[1]);
     } catch (e) {
         testPassed = false;
-        failText = e.toString();
+        failText = getErrorLineNumberString(e) + e.toString();
     }
-    let time = (new Date()) - timeStart;
+    let time = performance.now() - timeStart;
 
     try {
         expect(test[0]).to.eql(testSaved);
