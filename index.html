@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>LKJSE</title>
+    
+    <link rel="stylesheet" href="extensions/highlight/styles/default.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/hljs.css">
+</head>
+<body>
+    <div class="liokor-edu">
+        <div class="top">
+            <div class="logo"><strong>LK Edu Alpha</strong></div>
+            <div id="checkButton" class="control-button">Проверить (F9)</div>
+            <div id="terminateButton" class="control-button warning">Прервать проверку (Ctrl+F9)</div>
+            <div id="saveButton" class="control-button">Сохранить (Ctrl+S)</div>
+            <div id="closeButton" class="control-button danger">Вернуться (Esc)</div>
+        </div>
+        <div class="task-and-decision">
+            <div id="task" class="task">
+                <button id="hideTask"><-</button>
+                <!--<h2>Сумма чисел</h2>
+                Напишите функцию, возвращающую сумму двух аргументов.-->
+                <!--<h2>Максимальное количество посетителей</h2>
+                В почтовом отделении появилась проблема: иногда в отделении находится слишком много клиентов. Так много, что образуется огромная очередь. 
+                С целью решения проблемы, на входе были установлены датчики, которые регистрируют время входа и выхода посетителей. Таким образом, в конце рабочего дня можно считать два массива: массив со временами прихода и массив со временами ухода людей.
+                Напишите функцию, которая покажет, когда в отделении почты было наибольшее число клиентов.-->
+                <h2>Сумма массивов</h2>
+                Напишите функцию, которая получает в качестве аргументов 2 массива и возвращает массив, каждый элемент которого, равен сумме соответствующих элементов исходных массивов.
+                Если соответствующего элемента не существуюет (например, один из массивов короче) считать его равным 0.
+                Запрещается изменять исходные массивы.
+                <h3>Примеры:</h3>
+                <table id="examplesTable">
+                    <thead>
+                        <tr>
+                            <th>args</th>
+                            <th>return</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="decision">
+                <div id="editorBlock"></div>
+            </div>
+        </div>
+        <div class="check-info">
+            <div class="tests-info">
+                <div id="testsInfo">
+                </div>
+            </div>
+            <div id="timeInfo" class="time-info">
+                <table id="liokorEdu">
+                    <tr>
+                        <th colspan="2">Время работы:</th>
+                    </tr>
+                    <tr>
+                        <td>Total: </td>
+                        <td>${ s.total }</td>
+                    </tr>
+                    <tr>
+                        <td>Max: </td>
+                        <td>${ s.max }</td>
+                    </tr>
+                    <tr>
+                        <td>Average (${ amount }): </td>
+                        <td>${ s.average }</td>
+                    </tr>
+                    <tr>
+                        <td>Min: </td>
+                        <td>${ s.min }</td>
+                    </tr>
+                </table> 
+            </div>
+            <div class="source-code">
+                <pre><code id="sourceCode" class="js"></code></pre>
+            </div>
+        </div>
+
+        <script src="extensions/vue.min.js"></script>
+        <script src="extensions/ace-src-min/ace.js"></script>
+        <script src="extensions/highlight/highlight.pack.js"></script>
+        <script src="extensions/highlight-line-numbers.min.js"></script>
+            
+        <script src="scripts/ace-init.js"></script>
+        <script src="scripts/highlight-init.js"></script>
+        <script src="scripts/main.js"></script>
+    </div>
+</body>
+</html>
