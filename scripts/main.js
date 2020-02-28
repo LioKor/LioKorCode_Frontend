@@ -1,5 +1,9 @@
 'use strict';
 
+const VERSION = '0.1.0';
+const RELEASE_DATE = '28.02.2020';
+versionInfo.innerHTML = 'v. ' + VERSION;
+
 const EXECUTOR_SCRIPT_PATH = 'scripts/executor.js';
 
 let timeApp = new Vue({
@@ -136,16 +140,26 @@ try {
 }
 let blocksArr = createTestsInfo('testsInfo', 'examplesTable', tests);
 
+function saveCodeToLocalStorage(draftCode) {
+    localStorage.setItem('codeDraft', draftCode);
+}
+
+function loadCodeFromLocalStorage(editor) {
+    editor.setValue(localStorage.getItem('codeDraft'));
+    editor.execCommand("gotolineend");
+}
+
 let userCode;
 let checkingInProgress = false;
 function checkDecision() {
-    if (userCode !== editor.getValue()) {
-        // todo: code dublication
+    let editorValue = editor.getValue();
+    if (userCode !== editorValue) {
         checkingInProgress = true;
         terminateButton.style.display = 'inline-block';
         checkButton.style.display = 'none';
     
-        userCode = editor.getValue();
+        userCode = editorValue;
+        saveCodeToLocalStorage(userCode);
         
         for (let i = 0; i < blocksArr.length; i++) {
             blocksArr[i].classList.remove('success', 'error');
@@ -193,14 +207,13 @@ function executorMessage(e) {
 executorWorker.addEventListener('message', executorMessage);
 
 function terminateExecutor() {
-    // todo: code dublication
+    // todo: remove duplicated code (need function to create worker)
     executorWorker.terminate();
     executorWorker = new Worker(EXECUTOR_SCRIPT_PATH);
     executorWorker.addEventListener('message', executorMessage);
     
     userCode = null;
-    
-    // todo: code dublication
+
     checkingInProgress = false;
     terminateButton.style.display = 'none';
     checkButton.style.display = 'inline-block';
@@ -208,8 +221,11 @@ function terminateExecutor() {
     alert('Проверка остановлена!');
 }
 
-function saveDecision() {
-    alert('Сохранение временно недоступно!');
+function downloadCode() {
+    let editorCode = editor.getValue();
+    saveCodeToLocalStorage(editorCode);
+    let encodedCode = encodeURIComponent(editorCode);
+    downloadURI(`data:application/javascript,${encodedCode}`, "sum.js");
 }
 
 function closeSolver() {
@@ -228,7 +244,7 @@ hideTask.addEventListener('click', function () {
 
 checkButton.addEventListener('click', checkDecision);
 terminateButton.addEventListener('click', terminateExecutor);
-saveButton.addEventListener('click', saveDecision);
+saveButton.addEventListener('click', downloadCode);
 closeButton.addEventListener('click', closeSolver);
 window.addEventListener('keydown', function (e) {
     if (e.keyCode === 120) {
@@ -249,4 +265,6 @@ window.addEventListener('keydown', function (e) {
         closeSolver();
     }
 });
+
+loadCodeFromLocalStorage(editor);
 checkDecision();
