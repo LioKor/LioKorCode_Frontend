@@ -63,6 +63,58 @@ let timeApp = new Vue({
     }
 });
 
+let blocksArr;
+let taskApp = new Vue({
+    el: '#task',
+    data: {
+        name: null,
+        description: null,
+        tests: null
+    },
+    methods: {
+        load: function (name) {
+            let self = this;
+            request('GET', window.location.href.split('?')[0] + '/tasks/' + name, function (status, response) {
+                let task = JSON.parse(response);
+                self.name = task.name;
+                self.description = task.description;
+                self.tests = task.tests;
+
+                // todo: in editor app wait until tests are ready and insert this info
+                console.log('Args: ' + typeof(self.tests[0][0][0]));
+                console.log('Return: ' + self.tests[0][1]);
+
+                blocksArr = createTestsInfo('testsInfo', 'examplesTable', self.tests);
+            });
+        }
+    },
+    mounted: function () {
+        this.load('task_sum.json');
+    }
+});
+
+let editorApp = new Vue({
+    el: '#editorBlock',
+    data: {
+        aceEditor: null,
+    },
+    mounted: function () {
+        this.aceEditor = ace.edit('editorBlock');
+        this.aceEditor.setOptions({
+            fontSize: '12pt',
+        });
+
+        //editor.setTheme('ace/theme/dawn');
+        this.aceEditor.session.setMode('ace/mode/javascript');
+
+        this.aceEditor.setValue(`function sum(a, b) {
+        }`);
+        this.aceEditor.gotoLine(2);
+        this.aceEditor.navigateLineEnd();
+        this.aceEditor.focus();
+    }
+});
+
 let taskHidden = false;
 
 let executorWorker;
@@ -86,6 +138,7 @@ function createTestInfoBlock(number) {
 }
 
 function createTestsInfo(infoBlockId, examplesTableId, tests, examplesAmount = 2) {
+    // returns html elements that repesent test blocks (green and red)
     let infoBlock = document.getElementById(infoBlockId);
     let examplesTable = document.getElementById(examplesTableId);
     
@@ -113,33 +166,6 @@ function createTestsInfo(infoBlockId, examplesTableId, tests, examplesAmount = 2
     return blocksArr;
 }
 
-function requestTests() {
-    /*return '[\
-        [[1, 2], 3],\
-        [[-5, 6], 1],\
-        [[-1, 2], 1],\
-        [[100000, 1], 100001],\
-        [[999999, 1], 1000000],\
-        [[55, 0], 55]\
-    ]';*/
-    return '[\
-        [[[1, 2, 3], [3, 4, 5]], [4, 6, 8]],\
-        [[[-5, -6, -20, 0, 15], [1, 2, 3]], [-4, -4, -17, 0, 15]],\
-        [[[], []], []],\
-        [[[1, 2], [1]], [2, 2]],\
-        [[[], [1, 2]], [1, 2]]\
-    ]';
-}
-
-let tests_json = requestTests();
-let tests;
-try {
-    tests = JSON.parse(tests_json);
-} catch (e) {
-    alert('Incorrect tests were received!');
-}
-let blocksArr = createTestsInfo('testsInfo', 'examplesTable', tests);
-
 function saveCodeToLocalStorage(draftCode) {
     localStorage.setItem('codeDraft', draftCode);
 }
@@ -151,7 +177,7 @@ function loadCodeFromLocalStorage(editor) {
 
 let userCode;
 let checkingInProgress = false;
-function checkDecision() {
+function checkDecision(editor) {
     let editorValue = editor.getValue();
     if (userCode !== editorValue) {
         checkingInProgress = true;
@@ -165,8 +191,9 @@ function checkDecision() {
             blocksArr[i].classList.remove('success', 'error');
         }
         timeApp.resetAll();
-        
-        executorWorker.postMessage([0, userCode, tests[0]]);
+
+        // todo: duplicate code below
+        executorWorker.postMessage([0, userCode, taskApp.tests[0]]);
 
         sourceCode.innerHTML = userCode;
         hljs.highlightBlock(sourceCode);
@@ -184,8 +211,9 @@ function executorMessage(e) {
         block.classList.remove('error');
         
         let i = e.data[0] + 1;
-        if (i < tests.length) {
-            executorWorker.postMessage([i, userCode, tests[i]]);
+        if (i < taskApp.tests.length) {
+            // todo: duplicated code here
+            executorWorker.postMessage([i, userCode, taskApp.tests[i]]);
         } else {
             // todo: code dublication
             checkingInProgress = false;
@@ -217,8 +245,6 @@ function terminateExecutor() {
     checkingInProgress = false;
     terminateButton.style.display = 'none';
     checkButton.style.display = 'inline-block';
-    
-    alert('Проверка остановлена!');
 }
 
 function downloadCode() {
@@ -242,29 +268,30 @@ hideTask.addEventListener('click', function () {
         hideTask.innerHTML = '<-';
 });
 
-checkButton.addEventListener('click', checkDecision);
+checkButton.addEventListener('click', function () {
+    checkDecision(editorApp.aceEditor);
+});
 terminateButton.addEventListener('click', terminateExecutor);
 saveButton.addEventListener('click', downloadCode);
 closeButton.addEventListener('click', closeSolver);
 window.addEventListener('keydown', function (e) {
-    if (e.keyCode === 120) {
+    if (e.code === 'F9') {
         if (e.ctrlKey) {
             if (checkingInProgress) {
                 terminateExecutor();
             }
         } else {
             if (!checkingInProgress) {
-                checkDecision();
+                checkDecision(editorApp.aceEditor);
             }
         }
-    } else if (e.keyCode === 83 && e.ctrlKey) {
+    } else if (e.code === 'KeyS' && e.ctrlKey) {
         e.preventDefault();
-        saveDecision();
+        downloadCode();
         return false;
-    } else if (e.keyCode === 27) {
+    } else if (e.code === 'Escape') {
         closeSolver();
     }
 });
 
-loadCodeFromLocalStorage(editor);
-checkDecision();
+loadCodeFromLocalStorage(editorApp.aceEditor);
