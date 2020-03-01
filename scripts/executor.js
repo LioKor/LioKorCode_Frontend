@@ -37,11 +37,26 @@ function runTest(f, test) {
         testPassed = false;
         failText = 'Arguments have changed after test execution!'
     }
-    return [testPassed, time, failText];
+
+    return {
+        isPassed: testPassed,
+        failText: failText,
+        time: time
+    }
 }
 
 this.addEventListener('message', function(e) {
-    let f = new Function("'use strict'; return " + e.data[1])(); 
-    let testRes = runTest(f, e.data[2]);
-    this.postMessage([e.data[0], testRes[0], testRes[1], testRes[2]]);
+    let testNumber = e.data[0];
+    let code = e.data[1];
+    let tests = e.data[2];
+
+    let funcPos = code.search('function');
+    if (funcPos === -1) {
+        this.postMessage([testNumber, false, 0, 'Function was not found!']);
+    } else {
+        let functionCode = code.slice(funcPos);
+        let f = new Function("'use strict'; return " + functionCode)();
+        let testRes = runTest(f, tests);
+        this.postMessage([testNumber, testRes.isPassed, testRes.time, testRes.failText]);
+    }
 });

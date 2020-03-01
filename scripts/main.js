@@ -1,10 +1,16 @@
 'use strict';
 
+// todo: drag and drop to "upload"
+// todo: add throw check to test
+// todo: name or id of task on download
+
 const VERSION = '0.1.0';
 const RELEASE_DATE = '28.02.2020';
 versionInfo.innerHTML = 'v. ' + VERSION;
 
 const EXECUTOR_SCRIPT_PATH = 'scripts/executor.js';
+const EventBus = new Vue();
+let blocksArr;
 
 let timeApp = new Vue({
     el: '#liokorEdu',
@@ -63,7 +69,6 @@ let timeApp = new Vue({
     }
 });
 
-let blocksArr;
 let taskApp = new Vue({
     el: '#task',
     data: {
@@ -80,16 +85,14 @@ let taskApp = new Vue({
                 self.description = task.description;
                 self.tests = task.tests;
 
-                // todo: in editor app wait until tests are ready and insert this info
-                console.log('Args: ' + typeof(self.tests[0][0][0]));
-                console.log('Return: ' + self.tests[0][1]);
+                EventBus.$emit('commentFunction', self.tests[0][0], self.tests[0][1]);
 
                 blocksArr = createTestsInfo('testsInfo', 'examplesTable', self.tests);
             });
         }
     },
     mounted: function () {
-        this.load('task_sum.json');
+        this.load('task_arr_sum.json');
     }
 });
 
@@ -97,6 +100,21 @@ let editorApp = new Vue({
     el: '#editorBlock',
     data: {
         aceEditor: null,
+
+        LOCAL_STORAGE_NAME: 'codeDraft'
+    },
+    methods: {
+        saveToLocalStorage: function () {
+            localStorage.setItem(this.LOCAL_STORAGE_NAME, this.aceEditor.getValue());
+        },
+        downloadCode: function (save = true) {
+            if (save) {
+                this.saveToLocalStorage();
+            }
+            let editorCode = this.aceEditor.getValue();
+            let encodedCode = encodeURIComponent(editorCode);
+            downloadURI(`data:application/javascript,${encodedCode}`, 'task.js');
+        }
     },
     mounted: function () {
         this.aceEditor = ace.edit('editorBlock');
@@ -107,11 +125,26 @@ let editorApp = new Vue({
         //editor.setTheme('ace/theme/dawn');
         this.aceEditor.session.setMode('ace/mode/javascript');
 
-        this.aceEditor.setValue(`function sum(a, b) {
-        }`);
-        this.aceEditor.gotoLine(2);
-        this.aceEditor.navigateLineEnd();
-        this.aceEditor.focus();
+        EventBus.$on('commentFunction', (args, ret) => {
+            let comment = '';
+            let editorCode = localStorage.getItem(this.LOCAL_STORAGE_NAME);
+
+            if (editorCode === null) {
+                editorCode = '';
+                comment += '/**\n';
+                for (let arg of args) {
+                    comment += ` * @param {${typeof (arg)}}\n`;
+                }
+                if (ret !== null) {
+                    comment += ` * @returns {${typeof (ret)}}\n`;
+                }
+                comment += ' */\n';
+            }
+
+            this.aceEditor.setValue(comment + editorCode);
+            this.aceEditor.execCommand("gotolineend");
+            this.aceEditor.focus();
+        });
     }
 });
 
@@ -166,15 +199,6 @@ function createTestsInfo(infoBlockId, examplesTableId, tests, examplesAmount = 2
     return blocksArr;
 }
 
-function saveCodeToLocalStorage(draftCode) {
-    localStorage.setItem('codeDraft', draftCode);
-}
-
-function loadCodeFromLocalStorage(editor) {
-    editor.setValue(localStorage.getItem('codeDraft'));
-    editor.execCommand("gotolineend");
-}
-
 let userCode;
 let checkingInProgress = false;
 function checkDecision(editor) {
@@ -185,7 +209,7 @@ function checkDecision(editor) {
         checkButton.style.display = 'none';
     
         userCode = editorValue;
-        saveCodeToLocalStorage(userCode);
+        editorApp.saveToLocalStorage();
         
         for (let i = 0; i < blocksArr.length; i++) {
             blocksArr[i].classList.remove('success', 'error');
@@ -212,7 +236,7 @@ function executorMessage(e) {
         
         let i = e.data[0] + 1;
         if (i < taskApp.tests.length) {
-            // todo: duplicated code here
+            // todo: send all tests at once? or parallel better?
             executorWorker.postMessage([i, userCode, taskApp.tests[i]]);
         } else {
             // todo: code dublication
@@ -247,13 +271,6 @@ function terminateExecutor() {
     checkButton.style.display = 'inline-block';
 }
 
-function downloadCode() {
-    let editorCode = editor.getValue();
-    saveCodeToLocalStorage(editorCode);
-    let encodedCode = encodeURIComponent(editorCode);
-    downloadURI(`data:application/javascript,${encodedCode}`, "sum.js");
-}
-
 function closeSolver() {
     alert('Функционал в процессе реализации!');
 }
@@ -272,7 +289,7 @@ checkButton.addEventListener('click', function () {
     checkDecision(editorApp.aceEditor);
 });
 terminateButton.addEventListener('click', terminateExecutor);
-saveButton.addEventListener('click', downloadCode);
+saveButton.addEventListener('click', editorApp.downloadCode);
 closeButton.addEventListener('click', closeSolver);
 window.addEventListener('keydown', function (e) {
     if (e.code === 'F9') {
@@ -287,11 +304,9 @@ window.addEventListener('keydown', function (e) {
         }
     } else if (e.code === 'KeyS' && e.ctrlKey) {
         e.preventDefault();
-        downloadCode();
+        editorApp.downloadCode();
         return false;
     } else if (e.code === 'Escape') {
         closeSolver();
     }
 });
-
-loadCodeFromLocalStorage(editorApp.aceEditor);
