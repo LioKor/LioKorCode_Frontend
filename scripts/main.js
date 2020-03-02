@@ -79,7 +79,8 @@ let taskApp = new Vue({
     methods: {
         load: function (name) {
             let self = this;
-            request('GET', window.location.href.split('?')[0] + '/tasks/' + name, function (status, response) {
+            let taskUrl = getCurrentUrl() + '/tasks/' + name;
+            request('GET', taskUrl, function (status, response) {
                 let task = JSON.parse(response);
                 self.name = task.name;
                 self.description = task.description;
@@ -92,7 +93,7 @@ let taskApp = new Vue({
         }
     },
     mounted: function () {
-        this.load('task_arr_sum.json');
+        this.load('simple_sum.json');
     }
 });
 
@@ -114,6 +115,10 @@ let editorApp = new Vue({
             let editorCode = this.aceEditor.getValue();
             let encodedCode = encodeURIComponent(editorCode);
             downloadURI(`data:application/javascript,${encodedCode}`, 'task.js');
+        },
+        setText: function (s) {
+            this.aceEditor.setValue(s);
+            this.aceEditor.execCommand("gotolineend");
         }
     },
     mounted: function () {
@@ -309,4 +314,20 @@ window.addEventListener('keydown', function (e) {
     } else if (e.code === 'Escape') {
         closeSolver();
     }
+});
+
+mainBlock.addEventListener('drop', function (e) {
+    e.preventDefault();
+
+    if (e.dataTransfer.items) {
+        let file = e.dataTransfer.items[0].getAsFile();
+        file.text().then(function (s) {
+            editorApp.setText(s);
+        });
+    }
+});
+
+// prevent default browser drag&drop behavior
+mainBlock.addEventListener('dragover', function (e) {
+   e.preventDefault();
 });

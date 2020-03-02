@@ -1,3 +1,7 @@
+function getCurrentUrl() {
+    return window.location.href.split('?')[0];
+}
+
 function request(method, url, callback) {
     let xhr = new XMLHttpRequest();
     xhr.open(method, url);
