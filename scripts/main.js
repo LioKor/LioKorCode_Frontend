@@ -1,11 +1,10 @@
 'use strict';
 
-// todo: drag and drop to "upload"
 // todo: add throw check to test
-// todo: name or id of task on download
+// todo: save on task switch, file open and file save
 
-const VERSION = '0.1.0';
-const RELEASE_DATE = '28.02.2020';
+const VERSION = '0.2.0';
+const RELEASE_DATE = '02.03.2020';
 versionInfo.innerHTML = 'v. ' + VERSION;
 
 const EXECUTOR_SCRIPT_PATH = 'scripts/executor.js';
@@ -74,26 +73,38 @@ let taskApp = new Vue({
     data: {
         name: null,
         description: null,
-        tests: null
+        tests: null,
+
+        tasksList: null,
+        selectedTaskName: null
     },
     methods: {
         load: function (name) {
             let self = this;
             let taskUrl = getCurrentUrl() + '/tasks/' + name;
-            request('GET', taskUrl, function (status, response) {
-                let task = JSON.parse(response);
+            request('GET', taskUrl, function (status, data) {
+                let task = JSON.parse(data);
                 self.name = task.name;
                 self.description = task.description;
                 self.tests = task.tests;
 
-                EventBus.$emit('commentFunction', self.tests[0][0], self.tests[0][1]);
+                EventBus.$emit('taskChanged', self.selectedTaskName, self.tests[0][0], self.tests[0][1]);
 
                 blocksArr = createTestsInfo('testsInfo', 'examplesTable', self.tests);
             });
+        },
+        taskSelected: function () {
+            this.load(this.selectedTaskName);
         }
     },
     mounted: function () {
-        this.load('simple_sum.json');
+        let taskListUrl = getCurrentUrl() + '/tasks/list.json';
+        let self = this;
+        request('GET', taskListUrl, function (status, data) {
+            self.tasksList = JSON.parse(data);
+            self.selectedTaskName = self.tasksList[0];
+            self.taskSelected();
+        });
     }
 });
 
@@ -102,11 +113,38 @@ let editorApp = new Vue({
     data: {
         aceEditor: null,
 
-        LOCAL_STORAGE_NAME: 'codeDraft'
+        currentTaskName: null
     },
     methods: {
         saveToLocalStorage: function () {
-            localStorage.setItem(this.LOCAL_STORAGE_NAME, this.aceEditor.getValue());
+            if (this.currentTaskName) {
+                localStorage.setItem(this.currentTaskName, this.aceEditor.getValue());
+                return true;
+            } else {
+                return false;
+            }
+        },
+        loadFromLocalStorage: function (args, ret) {
+            if (this.currentTaskName) {
+                let code = localStorage.getItem(this.currentTaskName);
+
+                if (code === null) {
+                    code = '';
+
+                    code += '/**\n';
+                    for (let arg of args) {
+                        code += ` * @param {${typeof (arg)}}\n`;
+                    }
+                    if (ret !== null) {
+                        code += ` * @returns {${typeof (ret)}}\n`;
+                    }
+                    code += ' */\n';
+                }
+
+                this.aceEditor.setValue(code);
+                this.aceEditor.execCommand("gotolineend");
+                this.aceEditor.focus();
+            }
         },
         downloadCode: function (save = true) {
             if (save) {
@@ -114,7 +152,8 @@ let editorApp = new Vue({
             }
             let editorCode = this.aceEditor.getValue();
             let encodedCode = encodeURIComponent(editorCode);
-            downloadURI(`data:application/javascript,${encodedCode}`, 'task.js');
+            let downloadName = this.currentTaskName.split('.')[0];
+            downloadURI(`data:application/javascript,${encodedCode}`, downloadName + '.js');
         },
         setText: function (s) {
             this.aceEditor.setValue(s);
@@ -130,25 +169,9 @@ let editorApp = new Vue({
         //editor.setTheme('ace/theme/dawn');
         this.aceEditor.session.setMode('ace/mode/javascript');
 
-        EventBus.$on('commentFunction', (args, ret) => {
-            let comment = '';
-            let editorCode = localStorage.getItem(this.LOCAL_STORAGE_NAME);
-
-            if (editorCode === null) {
-                editorCode = '';
-                comment += '/**\n';
-                for (let arg of args) {
-                    comment += ` * @param {${typeof (arg)}}\n`;
-                }
-                if (ret !== null) {
-                    comment += ` * @returns {${typeof (ret)}}\n`;
-                }
-                comment += ' */\n';
-            }
-
-            this.aceEditor.setValue(comment + editorCode);
-            this.aceEditor.execCommand("gotolineend");
-            this.aceEditor.focus();
+        EventBus.$on('taskChanged', (name, args, ret) => {
+           this.currentTaskName = name;
+           this.loadFromLocalStorage(args, ret);
         });
     }
 });
@@ -176,16 +199,24 @@ function createTestInfoBlock(number) {
 }
 
 function createTestsInfo(infoBlockId, examplesTableId, tests, examplesAmount = 2) {
-    // returns html elements that repesent test blocks (green and red)
+    // todo: rewrite with vue, innerHTML to DOM
+    // returns html elements that represent test blocks (green and red)
+    let testsInfo = document.getElementById('testsInfo');
     let infoBlock = document.getElementById(infoBlockId);
     let examplesTable = document.getElementById(examplesTableId);
+
+    testsInfo.innerHTML = '';
+
+    let tableInner = examplesTable.innerHTML;
+    tableInner = tableInner.slice(0, tableInner.search('</thead>') + 8);
+    examplesTable.innerHTML = tableInner;
     
     let block;
     let blocksArr = [];
     for (let i = 0; i < tests.length; i++) {
         let test = tests[i];
         block = createTestInfoBlock(i + 1);
-        document.getElementById('testsInfo').appendChild(block);
+        testsInfo.appendChild(block);
         blocksArr.push(block);
         if (i < examplesAmount) {
             let args = '';
@@ -276,6 +307,21 @@ function terminateExecutor() {
     checkButton.style.display = 'inline-block';
 }
 
+function selectAndOpenFile() {
+   let fInput = document.createElement('input');
+   fInput.type = 'file';
+   fInput.click();
+
+   fInput.addEventListener('change', function (e) {
+       // todo: refactor with drag and drop
+       if (e.target.files) {
+           e.target.files[0].text().then(function (s) {
+               editorApp.setText(s);
+           })
+       }
+   });
+}
+
 function closeSolver() {
     alert('Функционал в процессе реализации!');
 }
@@ -296,6 +342,7 @@ checkButton.addEventListener('click', function () {
 terminateButton.addEventListener('click', terminateExecutor);
 saveButton.addEventListener('click', editorApp.downloadCode);
 closeButton.addEventListener('click', closeSolver);
+openButton.addEventListener('click', selectAndOpenFile);
 window.addEventListener('keydown', function (e) {
     if (e.code === 'F9') {
         if (e.ctrlKey) {

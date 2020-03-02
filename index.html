@@ -12,14 +12,21 @@
     <div class="liokor-edu" id="mainBlock">
         <div class="top">
             <div class="logo"><strong>LK JS Edu</strong> <span id="versionInfo"></span></div>
+            <div id="openButton" class="control-button">Открыть (Drag&Drop)</div>
+            <div id="saveButton" class="control-button">Сохранить (Ctrl+S)</div>
             <div id="checkButton" class="control-button">Проверить (F9)</div>
             <div id="terminateButton" style="display: none;" class="control-button warning">Прервать проверку (Ctrl+F9)</div>
-            <div id="saveButton" class="control-button">Сохранить (Ctrl+S)</div>
             <div id="closeButton" class="control-button danger">Вернуться (Esc)</div>
         </div>
         <div class="task-and-decision">
             <div id="task" class="task">
                 <button id="hideTask"><-</button>
+
+                <div>
+                    <select v-model="selectedTaskName" @change="taskSelected">
+                        <option v-for="taskName of tasksList">{{ taskName }}</option>
+                    </select>
+                </div>
 
                 <h2>{{ name }}</h2>
                 <h3>Описание</h3>
