@@ -1,21 +1,35 @@
 'use strict';
 
 // todo: add throw check to test
-// todo: save on task switch, file open and file save
+// todo: console.log to html (stdout block in html)
+// todo: large tests to default tasks (to better decision performance check)
+// todo: simple eval execution (to learn and debug) with console.log to html (code.replace('console.log', 'htmlLog'));
+// todo: time of each test?
 
-const VERSION = '0.2.0';
-const RELEASE_DATE = '02.03.2020';
+// todo: drag&drop decoration
+// todo: adaptive design
+
+const VERSION = '0.2.1';
+const RELEASE_DATE = '04.03.2020';
 versionInfo.innerHTML = 'v. ' + VERSION;
 
 const EXECUTOR_SCRIPT_PATH = 'scripts/executor.js';
 const EventBus = new Vue();
-let blocksArr;
 
-let timeApp = new Vue({
-    el: '#liokorEdu',
-    delimiters: ['${', '}'],
+let checkApp = new Vue({
+    el: '#checkArea',
+    delimiters: ['{{', '}}'],
     data: {
         amount: 0,
+
+        // describes if test passed or not, and if not - specifies and error
+        // format: {passed: null|true|false, errorText: ''}
+        testsInfo: [
+        ],
+
+        // string that stores the code which was tested (result is this.testsInfo)
+        checkedCode: 'wolf',
+
         ms: {
             total: 0,
             max: null,
@@ -30,6 +44,12 @@ let timeApp = new Vue({
         }
     },
     methods: {
+        resetTestsInfo(len = 0) {
+            this.testsInfo = [];
+            for (let i = 0; i < len; i++) {
+                this.testsInfo.push({passed: null, errorText: null})
+            }
+        },
         resetAll: function () {
             this.amount = 0;
             
@@ -42,6 +62,8 @@ let timeApp = new Vue({
             this.s.max = '-';
             this.s.average = '-';
             this.s.min = '-';
+
+            this.resetTestsInfo(this.testsInfo.length);
         },
         updateSeconds: function () {
             this.s.total = (this.ms.total / 1000).toFixed(3);
@@ -49,9 +71,9 @@ let timeApp = new Vue({
             this.s.average = (this.ms.average / 1000).toFixed(3);
             this.s.min = (this.ms.min / 1000).toFixed(3);
         },
-        add: function (time) {
+        addTime: function (time) {
             this.amount += 1;
-            
+
             this.ms.total += time;
             this.ms.average = this.ms.total / this.amount;
             if (time > this.ms.max || this.ms.max === null) {
@@ -59,12 +81,29 @@ let timeApp = new Vue({
             }
             if (time < this.ms.min || this.ms.min === null) {
                 this.ms.min = time;
-            }     
-            
+            }
+
             this.updateSeconds();
-            
+
             return (time / 1000).toFixed(3);
+        },
+
+        getTestInfoClass: function (test) {
+            return (test.passed !== null)? ((test.passed)? 'success': 'error'): '';
         }
+    },
+    watch: {
+        checkedCode: function(newCode) {
+            this.$refs.sourceCode.innerHTML = newCode;
+            hljs.highlightBlock(this.$refs.sourceCode);
+            hljs.lineNumbersBlock(this.$refs.sourceCode);
+        }
+    },
+    mounted: function () {
+        let self = this;
+        EventBus.$on('testsAmount', function (amount) {
+            self.resetTestsInfo(amount);
+        });
     }
 });
 
@@ -73,7 +112,7 @@ let taskApp = new Vue({
     data: {
         name: null,
         description: null,
-        tests: null,
+        tests: [],
 
         tasksList: null,
         selectedTaskName: null
@@ -89,8 +128,7 @@ let taskApp = new Vue({
                 self.tests = task.tests;
 
                 EventBus.$emit('taskChanged', self.selectedTaskName, self.tests[0][0], self.tests[0][1]);
-
-                blocksArr = createTestsInfo('testsInfo', 'examplesTable', self.tests);
+                EventBus.$emit('testsAmount', self.tests.length);
             });
         },
         taskSelected: function () {
@@ -128,7 +166,7 @@ let editorApp = new Vue({
             if (this.currentTaskName) {
                 let code = localStorage.getItem(this.currentTaskName);
 
-                if (code === null) {
+                if (code === null || code === '') {
                     code = '';
 
                     code += '/**\n';
@@ -170,8 +208,12 @@ let editorApp = new Vue({
         this.aceEditor.session.setMode('ace/mode/javascript');
 
         EventBus.$on('taskChanged', (name, args, ret) => {
-           this.currentTaskName = name;
-           this.loadFromLocalStorage(args, ret);
+            if (this.currentTaskName) {
+                // saving only if there's a task opened, otherwise at first load will save empty
+                this.saveToLocalStorage();
+            }
+            this.currentTaskName = name;
+            this.loadFromLocalStorage(args, ret);
         });
     }
 });
@@ -185,56 +227,6 @@ if (window.Worker) {
     alert('К сожалению, ваш браузер не поддерживается!');
 }
 
-function createTestInfoBlock(number) {
-    let mainBlock = document.createElement('div');
-    let numberLabel = document.createElement('label');
-    numberLabel.innerHTML = number;
-    let errorBlock = document.createElement('div');
-    errorBlock.classList.add('errorMessage');
-    
-    mainBlock.appendChild(numberLabel);
-    mainBlock.appendChild(errorBlock);
-    
-    return mainBlock;
-}
-
-function createTestsInfo(infoBlockId, examplesTableId, tests, examplesAmount = 2) {
-    // todo: rewrite with vue, innerHTML to DOM
-    // returns html elements that represent test blocks (green and red)
-    let testsInfo = document.getElementById('testsInfo');
-    let infoBlock = document.getElementById(infoBlockId);
-    let examplesTable = document.getElementById(examplesTableId);
-
-    testsInfo.innerHTML = '';
-
-    let tableInner = examplesTable.innerHTML;
-    tableInner = tableInner.slice(0, tableInner.search('</thead>') + 8);
-    examplesTable.innerHTML = tableInner;
-    
-    let block;
-    let blocksArr = [];
-    for (let i = 0; i < tests.length; i++) {
-        let test = tests[i];
-        block = createTestInfoBlock(i + 1);
-        testsInfo.appendChild(block);
-        blocksArr.push(block);
-        if (i < examplesAmount) {
-            let args = '';
-            let testArgs = test[0];
-            for (let j = 0; j < testArgs.length; j++) {
-                args += JSON.stringify(testArgs[j]);
-                if (j < testArgs.length - 1) {
-                    args += ', ';
-                }
-            }
-            let result = JSON.stringify(test[1]);
-            examplesTable.innerHTML += '<tr><td>' + args + '</td><td>' + result + '</td></tr>';
-        }
-    }
-    
-    return blocksArr;
-}
-
 let userCode;
 let checkingInProgress = false;
 function checkDecision(editor) {
@@ -246,34 +238,36 @@ function checkDecision(editor) {
     
         userCode = editorValue;
         editorApp.saveToLocalStorage();
-        
-        for (let i = 0; i < blocksArr.length; i++) {
-            blocksArr[i].classList.remove('success', 'error');
-        }
-        timeApp.resetAll();
+
+        checkApp.resetAll();
 
         // todo: duplicate code below
-        executorWorker.postMessage([0, userCode, taskApp.tests[0]]);
+        executorWorker.postMessage({
+            testIndex: 0,
+            test: taskApp.tests[0],
+            code: userCode
+        });
 
-        sourceCode.innerHTML = userCode;
-        hljs.highlightBlock(sourceCode);
-        hljs.lineNumbersBlock(sourceCode);
+        checkApp.checkedCode = userCode;
     } else {
         alert('Код не изменился с последней проверки!');
     }
 }
 function executorMessage(e) {
-    let block = blocksArr[e.data[0]];
-    timeApp.add(e.data[2]);
+    let testInfo = checkApp.testsInfo[e.data.testIndex];
+    checkApp.addTime(e.data.time);
     
-    if (e.data[1]) {
-        block.classList.add('success');
-        block.classList.remove('error');
+    if (e.data.passed) {
+        testInfo.passed = true;
         
-        let i = e.data[0] + 1;
+        let i = e.data.testIndex + 1;
         if (i < taskApp.tests.length) {
             // todo: send all tests at once? or parallel better?
-            executorWorker.postMessage([i, userCode, taskApp.tests[i]]);
+            executorWorker.postMessage({
+                testIndex: i,
+                test: taskApp.tests[i],
+                code: userCode
+            });
         } else {
             // todo: code dublication
             checkingInProgress = false;
@@ -281,9 +275,8 @@ function executorMessage(e) {
             checkButton.style.display = 'inline-block';
         }
     } else {
-        block.classList.remove('success');
-        block.classList.add('error');
-        block.children[1].innerHTML = e.data[3];
+        testInfo.passed = false;
+        testInfo.errorText = e.data.errorText;
         
         // todo: code dublication
         checkingInProgress = false;
@@ -313,9 +306,9 @@ function selectAndOpenFile() {
    fInput.click();
 
    fInput.addEventListener('change', function (e) {
-       // todo: refactor with drag and drop
        if (e.target.files) {
            e.target.files[0].text().then(function (s) {
+               editorApp.saveToLocalStorage();
                editorApp.setText(s);
            })
        }

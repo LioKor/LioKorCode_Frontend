@@ -39,15 +39,30 @@
                             <th>return</th>
                         </tr>
                     </thead>
+                    <tbody>
+                        <tr v-for="test in tests.slice(0, 2)">
+                            <td>
+                                <span v-for="(arg, i) in test[0]">
+                                    {{ arg }}{{ (i < test[0].length - 1)? ', ': '' }}
+                                </span>
+                            </td>
+                            <td>{{ test[1] }}</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
             <div class="decision" id="editorBlock">
                 <div id="aceEditor"></div>
             </div>
         </div>
-        <div class="check-info">
+
+        <div class="check-info" id="checkArea">
             <div class="tests-info">
                 <div id="testsInfo">
+                    <div v-for="(test, i) in testsInfo" :class="getTestInfoClass(test)">
+                        <label>{{ i + 1 }}</label>
+                        <div class="errorMessage">{{ test.errorText }}</div>
+                    </div>
                 </div>
             </div>
             <div id="timeInfo" class="time-info">
@@ -57,24 +72,24 @@
                     </tr>
                     <tr>
                         <td>Total: </td>
-                        <td>${ s.total }</td>
+                        <td>{{ s.total }}</td>
                     </tr>
                     <tr>
                         <td>Max: </td>
-                        <td>${ s.max }</td>
+                        <td>{{ s.max }}</td>
                     </tr>
                     <tr>
-                        <td>Average (${ amount }): </td>
-                        <td>${ s.average }</td>
+                        <td>Average ({{ amount }}): </td>
+                        <td>{{ s.average }}</td>
                     </tr>
                     <tr>
                         <td>Min: </td>
-                        <td>${ s.min }</td>
+                        <td>{{ s.min }}</td>
                     </tr>
                 </table> 
             </div>
             <div class="source-code">
-                <pre><code id="sourceCode" class="js"></code></pre>
+                <pre><code ref="sourceCode" class="js"></code></pre>
             </div>
         </div>
     </div>
@@ -85,7 +100,6 @@
     <script src="extensions/highlight-line-numbers.min.js"></script>
 
     <script src="scripts/utils.js"></script>
-    <script src="scripts/highlight-init.js"></script>
     <script src="scripts/main.js"></script>
 </body>
 </html>
