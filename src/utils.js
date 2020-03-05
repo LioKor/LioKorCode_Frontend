@@ -1,8 +1,8 @@
-function getCurrentUrl() {
+export function getCurrentUrl() {
     return window.location.href.split('?')[0];
 }
 
-function request(method, url, callback) {
+export function request(method, url, callback) {
     let xhr = new XMLHttpRequest();
     xhr.open(method, url);
     xhr.addEventListener('load', function () {
@@ -11,7 +11,7 @@ function request(method, url, callback) {
     xhr.send();
 }
 
-function downloadURI(uri, filename='script.js') {
+export function downloadURI(uri, filename='script.js') {
     let link = document.createElement('a');
     link.download = filename;
     link.href = uri;

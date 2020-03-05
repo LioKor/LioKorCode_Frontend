@@ -1,6 +1,7 @@
 'use strict';
 
-self.importScripts('../extensions/chai.js');
+import chai from 'chai/lib/chai';
+//self.importScripts('./extensions/chai.js');
 let expect = chai.expect;
 let AssertionError = chai.AssertionError;
 
@@ -45,7 +46,7 @@ function runTest(f, test) {
     }
 }
 
-this.addEventListener('message', function(e) {
+self.addEventListener('message', function(e) {
     let code = e.data.code;
 
     let result = {

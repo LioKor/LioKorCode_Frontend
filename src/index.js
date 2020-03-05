@@ -1,5 +1,17 @@
 'use strict';
 
+import './styles/hljs.css';
+import './styles/main.css';
+
+import Vue from 'vue/dist/vue.min';
+
+import TestWorker from './tester.worker.js';
+import { getCurrentUrl, request, downloadURI } from './utils.js';
+
+// todo: fix: hljs not highlighting + hljs webpack
+// todo: dist obfuscation
+// todo: webpack add build datetime const
+
 // todo: add throw check to test
 // todo: console.log to html (stdout block in html)
 // todo: large tests to default tasks (to better decision performance check)
@@ -9,11 +21,8 @@
 // todo: drag&drop decoration
 // todo: adaptive design
 
-const VERSION = '0.2.1';
-const RELEASE_DATE = '04.03.2020';
 versionInfo.innerHTML = 'v. ' + VERSION;
 
-const EXECUTOR_SCRIPT_PATH = 'scripts/executor.js';
 const EventBus = new Vue();
 
 let checkApp = new Vue({
@@ -220,12 +229,7 @@ let editorApp = new Vue({
 
 let taskHidden = false;
 
-let executorWorker;
-if (window.Worker) {
-    executorWorker = new Worker(EXECUTOR_SCRIPT_PATH);
-} else {
-    alert('К сожалению, ваш браузер не поддерживается!');
-}
+let testWorker = new TestWorker();
 
 let userCode;
 let checkingInProgress = false;
@@ -242,7 +246,7 @@ function checkDecision(editor) {
         checkApp.resetAll();
 
         // todo: duplicate code below
-        executorWorker.postMessage({
+        testWorker.postMessage({
             testIndex: 0,
             test: taskApp.tests[0],
             code: userCode
@@ -263,7 +267,7 @@ function executorMessage(e) {
         let i = e.data.testIndex + 1;
         if (i < taskApp.tests.length) {
             // todo: send all tests at once? or parallel better?
-            executorWorker.postMessage({
+            testWorker.postMessage({
                 testIndex: i,
                 test: taskApp.tests[i],
                 code: userCode
@@ -285,13 +289,13 @@ function executorMessage(e) {
     }
 }
 // todo: code dublication
-executorWorker.addEventListener('message', executorMessage);
+testWorker.addEventListener('message', executorMessage);
 
 function terminateExecutor() {
     // todo: remove duplicated code (need function to create worker)
-    executorWorker.terminate();
-    executorWorker = new Worker(EXECUTOR_SCRIPT_PATH);
-    executorWorker.addEventListener('message', executorMessage);
+    testWorker.terminate();
+    testWorker = new Worker(EXECUTOR_SCRIPT_PATH);
+    testWorker.addEventListener('message', executorMessage);
     
     userCode = null;
 
