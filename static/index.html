@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
 
     <title>LKJSE</title>
 </head>
@@ -13,15 +13,18 @@
             <div class="mobile-show"><div class="logo"><strong>LKJSE</strong></div></div>
             <div id="openButton" class="control-button">Open<span class="mobile-hide"> (Drag&Drop)</span></div>
             <div id="saveButton" class="control-button">Save<span class="mobile-hide"> (Ctrl+S)</span></div>
+            <div id="runButton" class="control-button">Run<span class="mobile-hide"> (F8)</span></div>
             <div id="checkButton" class="control-button">Check<span class="mobile-hide"> (F9)</span></div>
-            <div id="terminateButton" style="display: none;" class="control-button warning">Cancel check (Ctrl+F9)</div>
+            <div id="terminateButton" style="display: none;" class="control-button warning">Cancel check<span class="mobile-hide"> (Ctrl+F9)</span></div>
         </div>
         <div class="task-and-editor">
             <div id="taskBlock" class="task">
                 <div>
-                    <select v-model="selectedTaskName" @change="taskSelected">
-                        <option v-for="taskName of tasksList">{{ taskName }}</option>
-                    </select>
+                    <label><strong>Tasks:</strong>
+                        <select v-model="selectedTaskName" @change="taskSelected">
+                            <option v-for="taskName of tasksList">{{ taskName }}</option>
+                        </select>
+                    </label>
                 </div>
 
                 <h2>{{ name }}</h2>

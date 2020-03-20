@@ -13,15 +13,14 @@ import { getCurrentUrl, request, downloadURI } from './utils.js';
 
 // todo: console.log to html (stdout block in html)
 // todo: simple eval execution (to learn and debug) with console.log to html (code.replace('console.log', 'htmlLog'));
-// todo: time of each test?
 
 // todo: drag&drop decoration
-// todo: save current selected task
 
 // GLOBAL VARS
 let userCode;
 let checkingInProgress = false;
 let testWorker = createTestWorker();
+const EventBus = new Vue();
 
 let versionInfo = document.getElementById('versionInfo');
 let dragLine = document.getElementById('dragLine');
@@ -78,13 +77,10 @@ function slidingInit() {
             bodyEl.style.cursor = 'inherit';
 
             let leftPercentage = 0;
-            dragLine.style.width = '50px';
             if (editorBlock.style.display === 'none') {
                 leftPercentage = 100;
-                dragLine.style.width = '50px';
             } else if (taskBlock.style.display !== 'none') {
                 leftPercentage = taskBlock.style.width.slice(0, taskBlock.style.width.length - 1);
-                dragLine.style.width = null;
             }
 
             window.localStorage.setItem('leftPercentage', leftPercentage);
@@ -105,8 +101,6 @@ function slidingInit() {
     window.addEventListener('touchmove', slideEvent);
 }
 slidingInit();
-
-const EventBus = new Vue();
 
 let checkApp = new Vue({
     el: '#checkArea',
@@ -225,6 +219,7 @@ let taskApp = new Vue({
         },
         taskSelected: function () {
             this.load(this.selectedTaskName);
+            window.localStorage.setItem('currentTaskName', this.selectedTaskName);
         }
     },
     mounted: function () {
@@ -232,7 +227,12 @@ let taskApp = new Vue({
         let self = this;
         request('GET', taskListUrl, function (status, data) {
             self.tasksList = JSON.parse(data);
-            self.selectedTaskName = self.tasksList[0];
+            let savedTaskName = window.localStorage.getItem('currentTaskName');
+            if (self.tasksList.includes(savedTaskName)) {
+                self.selectedTaskName = savedTaskName;
+            } else {
+                self.selectedTaskName = self.tasksList[0];
+            }
             self.taskSelected();
         });
     }
@@ -311,28 +311,22 @@ let editorApp = new Vue({
 });
 
 function checkDecision(editor) {
-    let editorValue = editor.getValue();
-    if (userCode !== editorValue) {
-        checkingInProgress = true;
-        terminateButton.style.display = 'inline-block';
-        checkButton.style.display = 'none';
-    
-        userCode = editorValue;
-        editorApp.saveToLocalStorage();
+    userCode = editor.getValue();
 
-        checkApp.resetAll();
+    checkingInProgress = true;
+    terminateButton.style.display = 'inline-block';
+    checkButton.style.display = 'none';
 
-        // todo: duplicate code below
-        testWorker.postMessage({
-            testIndex: 0,
-            test: taskApp.tests[0],
-            code: userCode
-        });
+    editorApp.saveToLocalStorage();
 
-        checkApp.checkedCode = userCode;
-    } else {
-        alert('Код не изменился с последней проверки!');
-    }
+    checkApp.resetAll();
+
+    testWorker.postMessage({
+        tests: taskApp.tests,
+        code: userCode
+    });
+
+    checkApp.checkedCode = userCode;
 }
 function executorMessage(e) {
     let testInfo = checkApp.testsInfo[e.data.testIndex];
@@ -341,14 +335,8 @@ function executorMessage(e) {
     if (e.data.passed) {
         testInfo.passed = true;
         
-        let i = e.data.testIndex + 1;
-        if (i < taskApp.tests.length) {
-            testWorker.postMessage({
-                testIndex: i,
-                test: taskApp.tests[i],
-                code: userCode
-            });
-        } else {
+        let executedTestsAmount = e.data.testIndex + 1;
+        if (executedTestsAmount === taskApp.tests.length) {
             resetAfterCheck();
         }
     } else {
@@ -362,8 +350,6 @@ function executorMessage(e) {
 function terminateExecutor() {
     testWorker.terminate();
     testWorker = createTestWorker();
-    
-    userCode = null;
 
     resetAfterCheck();
 }
@@ -390,20 +376,13 @@ terminateButton.addEventListener('click', terminateExecutor);
 saveButton.addEventListener('click', editorApp.downloadCode);
 openButton.addEventListener('click', selectAndOpenFile);
 window.addEventListener('keydown', function (e) {
-    if (e.code === 'F9') {
-        if (e.ctrlKey) {
-            if (checkingInProgress) {
-                terminateExecutor();
-            }
-        } else {
-            if (!checkingInProgress) {
-                checkDecision(editorApp.aceEditor);
-            }
-        }
-    } else if (e.code === 'KeyS' && e.ctrlKey) {
+    if (e.ctrlKey && e.code === 'F9' && checkingInProgress) {
+        terminateExecutor();
+    } else if (e.code === 'F9' && !checkingInProgress) {
+        checkDecision(editorApp.aceEditor);
+    } else if (e.ctrlKey && e.code === 'KeyS') {
         e.preventDefault();
         editorApp.downloadCode();
-        return false;
     }
 });
 
@@ -416,6 +395,12 @@ mainBlock.addEventListener('drop', function (e) {
             editorApp.setText(s);
         });
     }
+});
+
+// auto save code every minute
+let autoSaveInterval = setInterval(() => { editorApp.saveToLocalStorage(); }, 60 * 1000);
+window.addEventListener('beforeunload', (e) =>{
+    editorApp.saveToLocalStorage();
 });
 
 // preventing default browser drag&drop behavior

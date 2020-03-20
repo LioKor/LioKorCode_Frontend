@@ -50,7 +50,7 @@ self.addEventListener('message', function(e) {
     let code = e.data.code;
 
     let result = {
-        testIndex: e.data.testIndex,
+        testIndex: 0,
         passed: false,
         time: 0,
         errorText: null
@@ -59,15 +59,25 @@ self.addEventListener('message', function(e) {
     let funcPos = code.search('function');
     if (funcPos === -1) {
         result.errorText = 'Function was not found!';
+        this.postMessage(result);
     } else {
         let functionCode = code.slice(funcPos);
         let f = new Function("'use strict'; return " + functionCode)();
-        let testRes = runTest(f, e.data.test);
 
-        result.passed = testRes.isPassed;
-        result.time = testRes.time;
-        result.errorText = testRes.failText;
+        for (let i = 0; i < e.data.tests.length; i++) {
+            let test = e.data.tests[i];
+            let testRes = runTest(f, test);
+
+            result.testIndex = i;
+            result.passed = testRes.isPassed;
+            result.time = testRes.time;
+            result.errorText = testRes.failText;
+
+            this.postMessage(result);
+
+            if (result.passed === false) {
+                break;
+            }
+        }
     }
-
-    this.postMessage(result);
 });
