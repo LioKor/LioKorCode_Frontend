@@ -1,10 +1,9 @@
 {
-  "name": "Сумма двух массивов",
-  "description": "Напишите функцию, которая получает в качестве аргументов 2 массива и возвращает массив, каждый элемент которого, равен сумме соответствующих элементов исходных массивов. Если соответствующего элемента не существует (например, один из массивов короче) считать его равным 0.",
+  "name": "Arrays sum",
+  "description": "Write a function that takes 2 arrays and returns an array every element of which is equal to sum of the corresponding elements of the original arrays. If there is no such element (e.g. one array is shorter) consider it equal to 0.",
   "argsDescription": "",
   "returnDescription": "",
-  "notes": "Запрещается изменять исходные массивы.",
-  "difficulty": 0,
+  "notes": "It is forbidden to change the original arrays",
   "tests": [
     [[[1, 2, 3], [3, 4, 5]], [4, 6, 8]],
     [[[-5, -6, -20, 0, 15], [1, 2, 3]], [-4, -4, -17, 0, 15]],

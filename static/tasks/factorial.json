@@ -1,10 +1,9 @@
 {
-  "name": "Факториал",
-  "description": "Напишите функцию, которая возвращает факториал числа n: n!.",
+  "name": "Factorial",
+  "description": "Write a function that returns a factorial of a number",
   "argsDescription": "0 <= n <= 20",
   "returnDescription": "",
-  "notes": "",
-  "difficulty": 1,
+  "notes": "f(n) = n!",
   "tests": [
     [[5], 120],
     [[0], 1],

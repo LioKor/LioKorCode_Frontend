@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>LKJSE</title>
 </head>
 <body>
     <div class="liokor-edu" id="mainBlock">
         <div class="top">
             <div class="logo"><strong>LK JS Edu</strong> <span id="versionInfo"></span></div>
-            <div id="openButton" class="control-button">Открыть (Drag&Drop)</div>
-            <div id="saveButton" class="control-button">Сохранить (Ctrl+S)</div>
-            <div id="checkButton" class="control-button">Проверить (F9)</div>
-            <div id="terminateButton" style="display: none;" class="control-button warning">Прервать проверку (Ctrl+F9)</div>
-            <div id="closeButton" class="control-button danger">Вернуться (Esc)</div>
+            <div id="openButton" class="control-button">Open (Drag&Drop)</div>
+            <div id="saveButton" class="control-button">Save (Ctrl+S)</div>
+            <div id="checkButton" class="control-button">Check (F9)</div>
+            <div id="terminateButton" style="display: none;" class="control-button warning">Cancel check (Ctrl+F9)</div>
         </div>
         <div class="task-and-decision">
-            <div id="task" class="task">
-                <button id="hideTask"><-</button>
-
+            <div id="taskBlock" class="task">
                 <div>
                     <select v-model="selectedTaskName" @change="taskSelected">
                         <option v-for="taskName of tasksList">{{ taskName }}</option>
@@ -25,9 +24,9 @@
                 </div>
 
                 <h2>{{ name }}</h2>
-                <h3>Описание</h3>
+                <h3>Description</h3>
                 <p>{{ description }}</p>
-                <h3>Примеры:</h3>
+                <h3>Examples:</h3>
                 <table id="examplesTable">
                     <thead>
                         <tr>
@@ -47,6 +46,9 @@
                     </tbody>
                 </table>
             </div>
+
+            <div id="dragLine" class="drag-line"><div class="dots">⋮</div></div>
+
             <div class="decision" id="editorBlock">
                 <div id="aceEditor"></div>
             </div>
@@ -64,7 +66,7 @@
             <div id="timeInfo" class="time-info">
                 <table id="liokorEdu">
                     <tr>
-                        <th colspan="2">Время работы:</th>
+                        <th colspan="2">Execution time:</th>
                     </tr>
                     <tr>
                         <td>Total: </td>

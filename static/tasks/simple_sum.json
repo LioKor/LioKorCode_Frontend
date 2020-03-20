@@ -1,10 +1,9 @@
 {
-  "name": "Сумма двух чисел",
-  "description": "Напишите функцию, которая возвращает сумму двух чисел.",
+  "name": "Simple sum",
+  "description": "Write a function that returns a sum of two numbers",
   "argsDescription": "",
   "returnDescription": "",
-  "notes": "",
-  "difficulty": 0,
+  "notes": "f(1, 2) = 3",
   "tests": [
     [[1, 2], 3],
     [[-5, 6], 1],

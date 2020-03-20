@@ -8,20 +8,80 @@ import Vue from 'vue/dist/vue.min';
 import TestWorker from './tester.worker.js';
 import { getCurrentUrl, request, downloadURI } from './utils.js';
 
-// todo: fix: hljs not highlighting + hljs webpack
 // todo: dist obfuscation
 // todo: webpack add build datetime const
 
-// todo: add throw check to test
 // todo: console.log to html (stdout block in html)
-// todo: large tests to default tasks (to better decision performance check)
 // todo: simple eval execution (to learn and debug) with console.log to html (code.replace('console.log', 'htmlLog'));
 // todo: time of each test?
 
 // todo: drag&drop decoration
 // todo: adaptive design
 
+let versionInfo = document.getElementById('versionInfo');
+let dragLine = document.getElementById('dragLine');
+//let taskBlock = document.getElementById('taskBlock');
+//let editorBlock = document.getElementById('editorBlock');
+
 versionInfo.innerHTML = 'v. ' + VERSION;
+
+function slidingInit() {
+    function applySlide(leftPercentage) {
+        if (leftPercentage <= 2) { // due to padding can't hide if only width is 0
+            taskBlock.style.display = 'none';
+            editorBlock.style.width = '100%';
+        } else if (leftPercentage >= 98) {
+            taskBlock.style.width = '100%';
+            editorBlock.style.display = 'none';
+        } else {
+            taskBlock.style.display = 'block';
+            taskBlock.style.width = leftPercentage + '%';
+
+            editorBlock.style.display = 'block';
+            editorBlock.style.width = (100 - leftPercentage) + '%';
+        }
+    }
+    applySlide(window.localStorage.getItem('leftPercentage') || 30);
+
+    let dragLineSlide = false;
+    let bodyEl = document.querySelector('body');
+
+    function startSlide() {
+        dragLineSlide = true;
+        bodyEl.style.userSelect = 'none';
+        bodyEl.style.cursor = 'pointer';
+    }
+    function endSlide() {
+        if (dragLineSlide) {
+            dragLineSlide = false;
+            bodyEl.style.userSelect = 'auto';
+            bodyEl.style.cursor = 'inherit';
+
+            let leftPercentage = 0;
+            if (editorBlock.style.display === 'none') {
+                leftPercentage = 100;
+            } else if (taskBlock.style.display !== 'none') {
+                leftPercentage = taskBlock.style.width.slice(0, taskBlock.style.width.length - 1);
+            }
+
+            window.localStorage.setItem('leftPercentage', leftPercentage);
+        }
+    }
+    function slideEvent(e) {
+        if (dragLineSlide) {
+            let percPos = Math.round(e.pageX / window.innerWidth * 100);
+            applySlide(percPos);
+        }
+    }
+
+    dragLine.addEventListener('mousedown', startSlide);
+    dragLine.addEventListener('touchstart', startSlide);
+    window.addEventListener('mouseup', endSlide);
+    window.addEventListener('touchend', endSlide);
+    window.addEventListener('mousemove', slideEvent);
+    window.addEventListener('touchmove', slideEvent);
+}
+slidingInit();
 
 const EventBus = new Vue();
 
@@ -37,7 +97,7 @@ let checkApp = new Vue({
         ],
 
         // string that stores the code which was tested (result is this.testsInfo)
-        checkedCode: 'wolf',
+        checkedCode: null,
 
         ms: {
             total: 0,
@@ -117,7 +177,7 @@ let checkApp = new Vue({
 });
 
 let taskApp = new Vue({
-    el: '#task',
+    el: '#taskBlock',
     data: {
         name: null,
         description: null,
@@ -227,8 +287,6 @@ let editorApp = new Vue({
     }
 });
 
-let taskHidden = false;
-
 let testWorker = new TestWorker();
 
 let userCode;
@@ -323,22 +381,11 @@ function closeSolver() {
     alert('Функционал в процессе реализации!');
 }
 
-hideTask.addEventListener('click', function () {
-    taskHidden = !taskHidden;
-    task.classList.toggle('hidden');
-    
-    if (taskHidden)
-        hideTask.innerHTML = '->';
-    else
-        hideTask.innerHTML = '<-';
-});
-
 checkButton.addEventListener('click', function () {
     checkDecision(editorApp.aceEditor);
 });
 terminateButton.addEventListener('click', terminateExecutor);
 saveButton.addEventListener('click', editorApp.downloadCode);
-closeButton.addEventListener('click', closeSolver);
 openButton.addEventListener('click', selectAndOpenFile);
 window.addEventListener('keydown', function (e) {
     if (e.code === 'F9') {
@@ -355,15 +402,13 @@ window.addEventListener('keydown', function (e) {
         e.preventDefault();
         editorApp.downloadCode();
         return false;
-    } else if (e.code === 'Escape') {
-        closeSolver();
     }
 });
 
 mainBlock.addEventListener('drop', function (e) {
     e.preventDefault();
 
-    if (e.dataTransfer.items) {
+    if (e.dataTransfer.items && e.dataTransfer.items[0]) {
         let file = e.dataTransfer.items[0].getAsFile();
         file.text().then(function (s) {
             editorApp.setText(s);
@@ -371,7 +416,7 @@ mainBlock.addEventListener('drop', function (e) {
     }
 });
 
-// prevent default browser drag&drop behavior
+// preventing default browser drag&drop behavior
 mainBlock.addEventListener('dragover', function (e) {
    e.preventDefault();
 });
