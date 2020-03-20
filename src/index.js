@@ -16,7 +16,12 @@ import { getCurrentUrl, request, downloadURI } from './utils.js';
 // todo: time of each test?
 
 // todo: drag&drop decoration
-// todo: adaptive design
+// todo: save current selected task
+
+// GLOBAL VARS
+let userCode;
+let checkingInProgress = false;
+let testWorker = createTestWorker();
 
 let versionInfo = document.getElementById('versionInfo');
 let dragLine = document.getElementById('dragLine');
@@ -25,17 +30,32 @@ let dragLine = document.getElementById('dragLine');
 
 versionInfo.innerHTML = 'v. ' + VERSION;
 
+function resetAfterCheck() {
+    checkingInProgress = false;
+    terminateButton.style.display = 'none';
+    checkButton.style.display = 'inline-block';
+}
+
+function createTestWorker() {
+    let testWorker = new TestWorker();
+    testWorker.addEventListener('message', executorMessage);
+    return testWorker;
+}
+
 function slidingInit() {
     function applySlide(leftPercentage) {
         if (leftPercentage <= 2) { // due to padding can't hide if only width is 0
             taskBlock.style.display = 'none';
             editorBlock.style.width = '100%';
+            dragLine.style.width = '50px';
         } else if (leftPercentage >= 98) {
             taskBlock.style.width = '100%';
             editorBlock.style.display = 'none';
+            dragLine.style.width = '50px';
         } else {
             taskBlock.style.display = 'block';
             taskBlock.style.width = leftPercentage + '%';
+            dragLine.style.width = null;
 
             editorBlock.style.display = 'block';
             editorBlock.style.width = (100 - leftPercentage) + '%';
@@ -58,10 +78,13 @@ function slidingInit() {
             bodyEl.style.cursor = 'inherit';
 
             let leftPercentage = 0;
+            dragLine.style.width = '50px';
             if (editorBlock.style.display === 'none') {
                 leftPercentage = 100;
+                dragLine.style.width = '50px';
             } else if (taskBlock.style.display !== 'none') {
                 leftPercentage = taskBlock.style.width.slice(0, taskBlock.style.width.length - 1);
+                dragLine.style.width = null;
             }
 
             window.localStorage.setItem('leftPercentage', leftPercentage);
@@ -287,10 +310,6 @@ let editorApp = new Vue({
     }
 });
 
-let testWorker = new TestWorker();
-
-let userCode;
-let checkingInProgress = false;
 function checkDecision(editor) {
     let editorValue = editor.getValue();
     if (userCode !== editorValue) {
@@ -324,42 +343,29 @@ function executorMessage(e) {
         
         let i = e.data.testIndex + 1;
         if (i < taskApp.tests.length) {
-            // todo: send all tests at once? or parallel better?
             testWorker.postMessage({
                 testIndex: i,
                 test: taskApp.tests[i],
                 code: userCode
             });
         } else {
-            // todo: code dublication
-            checkingInProgress = false;
-            terminateButton.style.display = 'none';
-            checkButton.style.display = 'inline-block';
+            resetAfterCheck();
         }
     } else {
         testInfo.passed = false;
         testInfo.errorText = e.data.errorText;
         
-        // todo: code dublication
-        checkingInProgress = false;
-        terminateButton.style.display = 'none';
-        checkButton.style.display = 'inline-block';
+        resetAfterCheck();
     }
 }
-// todo: code dublication
-testWorker.addEventListener('message', executorMessage);
 
 function terminateExecutor() {
-    // todo: remove duplicated code (need function to create worker)
     testWorker.terminate();
-    testWorker = new Worker(EXECUTOR_SCRIPT_PATH);
-    testWorker.addEventListener('message', executorMessage);
+    testWorker = createTestWorker();
     
     userCode = null;
 
-    checkingInProgress = false;
-    terminateButton.style.display = 'none';
-    checkButton.style.display = 'inline-block';
+    resetAfterCheck();
 }
 
 function selectAndOpenFile() {
@@ -375,10 +381,6 @@ function selectAndOpenFile() {
            })
        }
    });
-}
-
-function closeSolver() {
-    alert('Функционал в процессе реализации!');
 }
 
 checkButton.addEventListener('click', function () {

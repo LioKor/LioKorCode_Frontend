@@ -1,21 +1,52 @@
+$mobileWidth = 750px
+
 *
     box-sizing border-box
 body
     font-family Arial
     margin 0
-    touch-action none
 
 h2, h3, h4
     margin 15px 0
 
-div.task-and-decision
+.mobile-show
+    display none
+@media screen and (max-width: $mobileWidth) {
+    .mobile-hide {
+        display: none;
+    }
+    .mobile-show {
+        display: block;
+    }
+}
+    
+button
+    border 1px solid #BBB;
+    border-radius 5px;
+    padding 4px;
+    background-color #FAFAFA;
+    
+    transition 0.3s ease all;
+    
+button:hover
+    border-color orange
+    box-shadow 0 0 2px orange
+
+div.task-and-editor
     display flex
-    height 100%
+    height 60vh
+    touch-action none
     div.task
         padding 10px
-        overflow scroll
+        overflow-x hidden
+        overflow-y auto
         table
             max-width 500px
+            width 100%
+            border-collapse collapse
+            td, th
+                border 1px solid #BABABA
+                padding 5px
     div.drag-line
         position relative
 
@@ -30,133 +61,101 @@ div.task-and-decision
             width 50%
             margin auto
 
-#editorBlock {             
-    height: 60vh;
-}
+div.top
+    height 32px
+    line-height 32px
+    background-color #1A1A1A
+    color #EBEBEB
+    
+    display flex
 
-button {
-    border: 1px solid #BBB;
-    border-radius: 5px;
-    padding: 4px;
-    background-color: #FAFAFA;
-    
-    transition: 0.3s ease all;
-}
-button:hover {
-    border-color: orange;
-    box-shadow: 0 0 2px orange;
-}
+    div:before
+        height 100%
+        display inline-block
+        vertical-align middle
 
-button#hideTask {
-    width: 32px;
-    height: 32px;
-    border-radius: 16px;
-}
+    div.logo
+        padding 0 10px
+        margin-right 15px
+        @media screen and (max-width: $mobileWidth) {
+            margin-right 0
+        }
 
-div.top {
-    height: 32px;
-    line-height: 32px;
-    background-color: #1A1A1A;
-    color: #EBEBEB;
-    
-    display: flex;
-}
-div.top div::before {
-    height: 100%;
-    display: inline-block;
-    vertical-align: middle;
-}
-div.top div.logo {
-    padding: 0 10px;
-    margin-right: 15px;
-}
-div.top div.control-button {
-    padding: 0 10px;
-    cursor: pointer;
-    transition: 0.1s ease all;
-}
-div.top div.control-button:hover {
-    background-color: #2A9922;
-}
-div.top div.control-button.warning:hover {
-    background-color: #ffe344;
-    color: #1A1A1A;
-}
-div.top div.control-button.danger:hover {
-    background-color: #ff2e1f;
-}
+    div.control-button
+        padding 0 10px
+        cursor pointer
+        transition 0.1s ease all
 
-table#examplesTable {
-    width: 100%;
-    border-collapse: collapse;
-}
-table#examplesTable td,
-table#examplesTable th {
-    border: 1px solid #BABABA;
-    padding: 5px;
-}
+    div.control-button:hover
+        background-color #2A9922
 
-div.check-info {
-    border-top: 1px solid grey;
-    min-height: calc(40vh - 32px);
-    display: flex;
-    
-    background-color: #EEE;
-}
+    div.control-button.warning:hover
+        background-color #ffe344
+        color #1A1A1A
 
-div.tests-info {
-}
-       
-div.tests-info div div {
-    position: relative;
-    
-    background-color: #AAA;
-    border-bottom: 1px solid rgba(225, 225, 225, 0.5);
-    
-    width: 64px;
-    height: 32px;
-    line-height: 32px;
-    text-align: center;
-    
-    font-weight: bold;
-    
-    transition: 0.3s ease all;
-}
-div.tests-info div div.success {
-    background-color: #2a9922;
-}
-div.tests-info div div.error {
-    background-color: #ff2e1f;
-}
+    div.control-button.dangerhover
+        background-color #ff2e1f
 
-div.tests-info div div div.errorMessage {
-    position: absolute;
-    left: -564px;
-    top: 0;
+
+div.check-info
+    border-top 1px solid grey
+    min-height calc(40vh - 32px)
+    display flex
     
-    width: 500px;
-    opacity: 0;
-    
-    background-color: #ff2e1f;
-    
-    transition: 0.5s ease all;
-}
-div.tests-info div div.error:hover div.errorMessage {
-    opacity: 0.9;
-    left: 64px;
-}
-div.source-code {
-    width: 100%;
-}
-div.time-info {
-    padding: 5px;
-    min-width: 200px;
-    border-left: 1px solid #CCC;
-    border-right: 1px solid #CCC;
-}
-div.time-info table td:first-child {
-    text-decoration: underline;
-}
-div.time-info table td:last-child::after {
-    content: ' с';
-}
+    background-color #EEE
+
+
+div.tests-info
+    div
+        div
+            position relative
+
+            background-color #AAA
+            border-bottom 1px solid rgba(225, 225, 225, 0.5)
+
+            width 64px
+            height 32px
+            line-height 32px
+            text-align center
+
+            font-weight bold
+
+            transition 0.3s ease all
+
+        div.success
+            background-color #2a9922
+
+        div.error
+            background-color #ff2e1f
+
+
+        div div.errorMessage
+            position absolute
+            left -564px
+            top 0
+
+            width 500px
+            opacity 0
+
+            background-color #ff2e1f
+
+            transition 0.5s ease all
+
+        div.errorhover div.errorMessage
+            opacity 0.9
+            left 64px
+
+div.source-code
+    width 100%
+
+div.time-info
+    padding 5px
+    min-width 200px
+    border-left 1px solid #CCC
+    border-right 1px solid #CCC
+
+    table
+        tdfirst-child
+            text-decoration underline
+        tdlast-childafter
+            content ' с'
