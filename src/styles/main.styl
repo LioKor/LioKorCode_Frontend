@@ -1,10 +1,13 @@
 $mobileWidth = 750px
 
+.ace_text-input {position:absolute!important}
+
 *
     box-sizing border-box
 body
     font-family Arial
     margin 0
+    overflow-x hidden
 
 h2, h3, h4
     margin 15px 0
@@ -40,6 +43,7 @@ div.task-and-editor
         padding 10px
         overflow-x hidden
         overflow-y auto
+        width 30%
         table
             max-width 500px
             width 100%
@@ -47,7 +51,7 @@ div.task-and-editor
             td, th
                 border 1px solid #BABABA
                 padding 5px
-    div.drag-line
+    div.slide-line
         position relative
 
         background-color #E0E0E0
@@ -61,6 +65,10 @@ div.task-and-editor
             width 50%
             text-align center
             margin auto
+    div#editorBlock
+        width 70%
+        #aceEditor
+            width 100%
 
 div.top
     height 32px
@@ -69,6 +77,9 @@ div.top
     color #EBEBEB
     
     display flex
+
+    #versionInfo
+        cursor pointer
 
     div:before
         height 100%
@@ -95,7 +106,7 @@ div.top
         background-color #ffe344
         color #1A1A1A
 
-    div.control-button.dangerhover
+    div.control-button.danger:hover
         background-color #ff2e1f
 
 
@@ -105,6 +116,9 @@ div.check-info
     display flex
     
     background-color #EEE
+
+    div.source-code
+        overflow auto
 
 
 div.tests-info
@@ -133,22 +147,28 @@ div.tests-info
 
         div div.errorMessage
             position absolute
-            left -564px
+            left -100vw
             top 0
 
-            width 500px
+            width calc(100vw - 64px)
             opacity 0
 
             background-color #ff2e1f
 
             transition 0.5s ease all
 
-        div.errorhover div.errorMessage
+        div.error:hover div.errorMessage
             opacity 0.9
             left 64px
 
 div.source-code
     width 100%
+    background-color #f8f8f8
+    font-size 14px
+    > div
+        padding 0 10px
+        h3 > a
+            color black
 
 div.time-info
     padding 5px

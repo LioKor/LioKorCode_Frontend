@@ -1,20 +1,18 @@
 'use strict';
 
 import './styles/hljs.css';
-import './styles/main.css';
+import './styles/main.styl';
 
 import Vue from 'vue/dist/vue.min';
+import { BUILD_TIMESTAMP } from '../build_info';
 
-import TestWorker from './tester.worker.js';
-import { getCurrentUrl, request, downloadURI } from './utils.js';
+import TestWorker from './tester.worker';
+import { getCurrentUrl, request, downloadURI } from './utils';
+import { slidingInit } from './slideModule';
 
-// todo: dist obfuscation
-// todo: webpack add build datetime const
-
-// todo: console.log to html (stdout block in html)
-// todo: simple eval execution (to learn and debug) with console.log to html (code.replace('console.log', 'htmlLog'));
-
+// todo: while debug execution console.log to html (stdout block in html)
 // todo: drag&drop decoration
+// todo: move buttons' actions and functions to Vue
 
 // GLOBAL VARS
 let userCode;
@@ -22,12 +20,6 @@ let checkingInProgress = false;
 let testWorker = createTestWorker();
 const EventBus = new Vue();
 
-let versionInfo = document.getElementById('versionInfo');
-let dragLine = document.getElementById('dragLine');
-//let taskBlock = document.getElementById('taskBlock');
-//let editorBlock = document.getElementById('editorBlock');
-
-versionInfo.innerHTML = 'v. ' + VERSION;
 
 function resetAfterCheck() {
     checkingInProgress = false;
@@ -41,66 +33,73 @@ function createTestWorker() {
     return testWorker;
 }
 
-function slidingInit() {
-    function applySlide(leftPercentage) {
-        if (leftPercentage <= 2) { // due to padding can't hide if only width is 0
-            taskBlock.style.display = 'none';
-            editorBlock.style.width = '100%';
-            dragLine.style.width = '50px';
-        } else if (leftPercentage >= 98) {
-            taskBlock.style.width = '100%';
-            editorBlock.style.display = 'none';
-            dragLine.style.width = '50px';
-        } else {
-            taskBlock.style.display = 'block';
-            taskBlock.style.width = leftPercentage + '%';
-            dragLine.style.width = null;
+function checkDecision(editor) {
+    userCode = editor.getValue();
 
-            editorBlock.style.display = 'block';
-            editorBlock.style.width = (100 - leftPercentage) + '%';
-        }
-    }
-    applySlide(window.localStorage.getItem('leftPercentage') || 30);
+    checkingInProgress = true;
+    terminateButton.style.display = 'inline-block';
+    checkButton.style.display = 'none';
 
-    let dragLineSlide = false;
-    let bodyEl = document.querySelector('body');
+    editorApp.saveToLocalStorage();
 
-    function startSlide() {
-        dragLineSlide = true;
-        bodyEl.style.userSelect = 'none';
-        bodyEl.style.cursor = 'pointer';
-    }
-    function endSlide() {
-        if (dragLineSlide) {
-            dragLineSlide = false;
-            bodyEl.style.userSelect = 'auto';
-            bodyEl.style.cursor = 'inherit';
+    checkApp.resetAll();
 
-            let leftPercentage = 0;
-            if (editorBlock.style.display === 'none') {
-                leftPercentage = 100;
-            } else if (taskBlock.style.display !== 'none') {
-                leftPercentage = taskBlock.style.width.slice(0, taskBlock.style.width.length - 1);
-            }
+    testWorker.postMessage({
+        tests: taskApp.tests,
+        code: userCode
+    });
 
-            window.localStorage.setItem('leftPercentage', leftPercentage);
-        }
-    }
-    function slideEvent(e) {
-        if (dragLineSlide) {
-            let percPos = Math.round(e.pageX / window.innerWidth * 100);
-            applySlide(percPos);
-        }
-    }
-
-    dragLine.addEventListener('mousedown', startSlide);
-    dragLine.addEventListener('touchstart', startSlide);
-    window.addEventListener('mouseup', endSlide);
-    window.addEventListener('touchend', endSlide);
-    window.addEventListener('mousemove', slideEvent);
-    window.addEventListener('touchmove', slideEvent);
+    checkApp.checkedCode = userCode;
 }
-slidingInit();
+
+function executorMessage(e) {
+    let testInfo = checkApp.testsInfo[e.data.testIndex];
+    checkApp.addTime(e.data.time);
+
+    if (e.data.passed) {
+        testInfo.passed = true;
+
+        let executedTestsAmount = e.data.testIndex + 1;
+        if (executedTestsAmount === taskApp.tests.length) {
+            resetAfterCheck();
+        }
+    } else {
+        testInfo.passed = false;
+        testInfo.errorText = e.data.errorText;
+
+        resetAfterCheck();
+    }
+}
+
+function terminateExecutor() {
+    testWorker.terminate();
+    testWorker = createTestWorker();
+
+    resetAfterCheck();
+}
+
+function selectAndOpenFile() {
+   let fInput = document.createElement('input');
+   fInput.type = 'file';
+   fInput.click();
+
+   fInput.addEventListener('change', function (e) {
+       if (e.target.files) {
+           e.target.files[0].text().then(function (s) {
+               editorApp.saveToLocalStorage();
+               editorApp.setText(s);
+           })
+       }
+   });
+}
+
+function evalSourceCode() {
+    try {
+        eval(editorApp.aceEditor.getValue());
+    } catch (e) {
+        alert(e);
+    }
+}
 
 let checkApp = new Vue({
     el: '#checkArea',
@@ -138,12 +137,12 @@ let checkApp = new Vue({
         },
         resetAll: function () {
             this.amount = 0;
-            
+
             this.ms.total = 0;
             this.ms.max = null;
             this.ms.average = 0;
             this.ms.min = null;
-            
+
             this.s.total = '-';
             this.s.max = '-';
             this.s.average = '-';
@@ -180,6 +179,8 @@ let checkApp = new Vue({
     },
     watch: {
         checkedCode: function(newCode) {
+            this.$refs.projectDescription.style.display = 'none';
+            this.$refs.preSourceCode.style.display = 'block';
             this.$refs.sourceCode.innerHTML = newCode;
             hljs.highlightBlock(this.$refs.sourceCode);
             hljs.lineNumbersBlock(this.$refs.sourceCode);
@@ -189,6 +190,11 @@ let checkApp = new Vue({
         let self = this;
         EventBus.$on('testsAmount', function (amount) {
             self.resetTestsInfo(amount);
+        });
+        EventBus.$on('taskChanged', (name, args, ret) => {
+            this.$refs.projectDescription.style.display = 'block';
+            this.$refs.preSourceCode.style.display = 'none';
+            this.$refs.sourceCode.innerHTML = '';
         });
     }
 });
@@ -310,83 +316,27 @@ let editorApp = new Vue({
     }
 });
 
-function checkDecision(editor) {
-    userCode = editor.getValue();
-
-    checkingInProgress = true;
-    terminateButton.style.display = 'inline-block';
-    checkButton.style.display = 'none';
-
-    editorApp.saveToLocalStorage();
-
-    checkApp.resetAll();
-
-    testWorker.postMessage({
-        tests: taskApp.tests,
-        code: userCode
-    });
-
-    checkApp.checkedCode = userCode;
-}
-function executorMessage(e) {
-    let testInfo = checkApp.testsInfo[e.data.testIndex];
-    checkApp.addTime(e.data.time);
-    
-    if (e.data.passed) {
-        testInfo.passed = true;
-        
-        let executedTestsAmount = e.data.testIndex + 1;
-        if (executedTestsAmount === taskApp.tests.length) {
-            resetAfterCheck();
-        }
-    } else {
-        testInfo.passed = false;
-        testInfo.errorText = e.data.errorText;
-        
-        resetAfterCheck();
-    }
-}
-
-function terminateExecutor() {
-    testWorker.terminate();
-    testWorker = createTestWorker();
-
-    resetAfterCheck();
-}
-
-function selectAndOpenFile() {
-   let fInput = document.createElement('input');
-   fInput.type = 'file';
-   fInput.click();
-
-   fInput.addEventListener('change', function (e) {
-       if (e.target.files) {
-           e.target.files[0].text().then(function (s) {
-               editorApp.saveToLocalStorage();
-               editorApp.setText(s);
-           })
-       }
-   });
-}
-
-checkButton.addEventListener('click', function () {
+document.getElementById('checkButton').addEventListener('click', function () {
     checkDecision(editorApp.aceEditor);
 });
-terminateButton.addEventListener('click', terminateExecutor);
-saveButton.addEventListener('click', editorApp.downloadCode);
-openButton.addEventListener('click', selectAndOpenFile);
+document.getElementById('runButton').addEventListener('click', evalSourceCode);
+document.getElementById('terminateButton').addEventListener('click', terminateExecutor);
+document.getElementById('saveButton').addEventListener('click', editorApp.downloadCode);
+document.getElementById('openButton').addEventListener('click', selectAndOpenFile);
 window.addEventListener('keydown', function (e) {
     if (e.ctrlKey && e.code === 'F9' && checkingInProgress) {
         terminateExecutor();
     } else if (e.code === 'F9' && !checkingInProgress) {
         checkDecision(editorApp.aceEditor);
+    } else if (e.code === 'F8') {
+        evalSourceCode();
     } else if (e.ctrlKey && e.code === 'KeyS') {
         e.preventDefault();
         editorApp.downloadCode();
     }
 });
 
-mainBlock.addEventListener('drop', function (e) {
+document.getElementById('mainBlock').addEventListener('drop', function (e) {
     e.preventDefault();
 
     if (e.dataTransfer.items && e.dataTransfer.items[0]) {
@@ -396,14 +346,23 @@ mainBlock.addEventListener('drop', function (e) {
         });
     }
 });
-
-// auto save code every minute
-let autoSaveInterval = setInterval(() => { editorApp.saveToLocalStorage(); }, 60 * 1000);
-window.addEventListener('beforeunload', (e) =>{
-    editorApp.saveToLocalStorage();
-});
-
 // preventing default browser drag&drop behavior
 mainBlock.addEventListener('dragover', function (e) {
    e.preventDefault();
+});
+
+let versionInfo = document.getElementById('versionInfo');
+versionInfo.innerHTML = 'v. ' + VERSION;
+versionInfo.addEventListener('click', () => {
+    alert('Build date: ' + (new Date(BUILD_TIMESTAMP)).toLocaleDateString('en-GB'));
+});
+
+// activating sliding line (that divides task and editor)
+let slideLine = document.getElementById('slideLine');
+slidingInit(taskApp.$el, editorApp.$el, slideLine);
+
+// auto save code every minute and on page refresh
+let autoSaveInterval = setInterval(() => { editorApp.saveToLocalStorage(); }, 60 * 1000);
+window.addEventListener('beforeunload', (e) =>{
+    editorApp.saveToLocalStorage();
 });

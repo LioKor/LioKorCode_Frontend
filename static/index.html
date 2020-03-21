@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no">
 
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
     <title>LKJSE</title>
 </head>
 <body>
@@ -11,6 +13,7 @@
         <div class="top">
             <div class="mobile-hide"><div class="logo"><strong>LK JS Edu</strong> <span id="versionInfo"></span></div></div>
             <div class="mobile-show"><div class="logo"><strong>LKJSE</strong></div></div>
+
             <div id="openButton" class="control-button">Open<span class="mobile-hide"> (Drag&Drop)</span></div>
             <div id="saveButton" class="control-button">Save<span class="mobile-hide"> (Ctrl+S)</span></div>
             <div id="runButton" class="control-button">Run<span class="mobile-hide"> (F8)</span></div>
@@ -51,7 +54,7 @@
                 </table>
             </div>
 
-            <div id="dragLine" class="drag-line"><div class="dots">⋮</div></div>
+            <div id="slideLine" class="slide-line"><div class="dots">⋮</div></div>
 
             <div class="editor" id="editorBlock">
                 <div id="aceEditor"></div>
@@ -91,13 +94,25 @@
                 </table>
             </div>
             <div class="source-code">
-                <pre><code ref="sourceCode" class="js"></code></pre>
+                <div ref="projectDescription">
+                    <h3><a href="https://liokor.com" target="_blank">LioKor</a> JavaScript Education</h3>
+                    <p><strong>LKJSE</strong> assists JS learning by classic algorithmic practice. It consists of task book (html select), code editor (Ace) and testing engine.</p>
+                    <p>First function will be executed during checking. You may have other functions but they must be under the main one.</p>
+                    <p>"Run" button only evaluates all the written code with the eval(). So you need to call your function from your code and use alert() to debug.</p>
+                    <p>To see the reason of test failure - hover or touch the red test block.</p>
+                    <p>To see this text after check - change task.</p>
+                    <p>Your code is automatically saved to localStorage.</p>
+                    <h4>Created by <a href="https://liokor.com/@KoroLion" target="_blank">KoroLion</a> 2020</h4>
+                    <h4>Source code: <a href="https://github.com/KoroLion/lkjse" target="blank">https://github.com/KoroLion/lkjse</a></h4>
+                </div>
+                <pre ref="preSourceCode"><code ref="sourceCode" class="js"></code></pre>
             </div>
         </div>
     </div>
 
     <script src="extensions/ace-src-min/ace.js"></script>
     <script src="extensions/highlight/highlight.pack.js"></script>
+    <link rel="stylesheet" type="text/css" href="extensions/highlight/styles/github.css">
     <script src="extensions/highlight-line-numbers.min.js"></script>
 
     <script src="main.js"></script>

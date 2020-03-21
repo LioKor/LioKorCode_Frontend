@@ -3,4 +3,5 @@ node_modules
 dist
 
 yarn.lock
+build_info.js
 emsdk

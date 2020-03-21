@@ -62,7 +62,14 @@ self.addEventListener('message', function(e) {
         this.postMessage(result);
     } else {
         let functionCode = code.slice(funcPos);
-        let f = new Function("'use strict'; return " + functionCode)();
+        let f;
+        try {
+            f = new Function("'use strict'; return " + functionCode)();
+        } catch (e) {
+            result.errorText = 'Code is invalid: ' + e;
+            this.postMessage(result);
+            return;
+        }
 
         for (let i = 0; i < e.data.tests.length; i++) {
             let test = e.data.tests[i];
