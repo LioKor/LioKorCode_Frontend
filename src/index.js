@@ -204,6 +204,10 @@ let taskApp = new Vue({
     data: {
         name: null,
         description: null,
+        argsDescription: null,
+        returnDescription: null,
+        notes: null,
+
         tests: [],
 
         tasksList: null,
@@ -215,8 +219,13 @@ let taskApp = new Vue({
             let taskUrl = getCurrentUrl() + '/tasks/' + name;
             request('GET', taskUrl, function (status, data) {
                 let task = JSON.parse(data);
+
                 self.name = task.name;
                 self.description = task.description;
+                self.argsDescription = task.argsDescription;
+                self.returnDescription = task.returnDescription;
+                self.notes = task.notes;
+
                 self.tests = task.tests;
 
                 EventBus.$emit('taskChanged', self.selectedTaskName, self.tests[0][0], self.tests[0][1]);

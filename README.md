@@ -2,15 +2,18 @@
 
 **LKJSE** assists JS learning by classic algorithmic practice. It consists of task book (html select), code editor (Ace) and testing engine.
 
-#### Tips:
-* First function will be executed during checking. You may have other functions but they must be under the main one.
-* "Run" button only evaluates all the written code with the eval(). So you need to call your function from your code and use alert() to debug.
-* To see the reason of test failure - hover or touch the red test block.
-* To see this text after check - change task.
-* Your code is automatically saved to localStorage
+#### How to build:
+1. Install yarn https://yarnpkg.com/ (npm can be used too)
+2. Open terminal and navigate to project folder
+3. Install dependencies ```yarn```
+4. Build ```yarn build```
+5. After building copy content of ```dist``` folder to your web server
 
-#### Development and building
-* Open terminal and navigate to project folder
-* Install dependencies: ```yarn```
-* To start dev server type ```yarn dev```
-* To build: ```yarn build```
+#### Adding and customizing tasks:
+* Navigate to ```static/tasks```
+* ```list.json``` contains file names of tasks to be shown
+* In this folder can create new tasks (copy the existing one and use it as a template) or edit the existing ones
+* Don't forget to add the new task to ```list.json```
+
+#### Development:
+* Use ```yarn dev``` to start dev server
