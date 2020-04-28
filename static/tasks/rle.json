@@ -1,0 +1,14 @@
+{
+  "name": "RLE encoding",
+  "description": "Write a function that returns an RLE encoded string",
+  "argsDescription": "Input string does not contain digits.",
+  "returnDescription": "",
+  "notes": "",
+  "tests": [
+    [["WWWWWWOOOOOOOOOOOLLLLLLLLf"], "W6O11L8f1"],
+    [["LLION"], "L2I1O1N1"],
+    [["DDDDEESSSTINY"], "D4E2S3T1I1N1Y1"],
+    [[""], ""],
+    [["D"], "D1"]
+  ]
+}
