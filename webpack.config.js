@@ -1,19 +1,12 @@
 const path = require('path');
 const fs = require('fs');
+
 const webpack = require('webpack');
-const CopyPlugin = require('copy-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const jsObfuscator = require('webpack-obfuscator');
 
-fs.writeFileSync('./build_info.js', 'exports.BUILD_TIMESTAMP = ' + Date.now() + ';');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { VueLoaderPlugin } = require('vue-loader');
 
-let jsObfuscatorPlugin = new jsObfuscator({
-    compact: true,
-    deadCodeInjection: true,
-    deadCodeInjectionThreshold: 0.4,
-    rotateStringArray: true,
-    stringArrayEncoding: true,
-});
+fs.writeFileSync('./src/build_info.js', 'exports.BUILD_TIMESTAMP = ' + Date.now() + ';');
 
 module.exports = {
     entry: './src/index.js',
@@ -23,23 +16,25 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
     },
     plugins: [
-        jsObfuscatorPlugin,
-        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            template: 'src/index.html'
+        }),
+        new VueLoaderPlugin(),
         new webpack.DefinePlugin({
             VERSION: JSON.stringify(require('./package.json').version)
         }),
-        new CopyPlugin([
-            { from: 'static', to: './' }
-        ])
     ],
     devServer: {
-        contentBase: path.join(__dirname, 'dist'),
-        compress: true,
-        //host: '0.0.0.0',
         port: 9000
     },
     module: {
         rules: [
+            {
+              test: /\.vue$/,
+              use: [
+                  'vue-loader',
+              ]
+            },
             {
                 test: /\.css$/,
                 use: [

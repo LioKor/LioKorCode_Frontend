@@ -1,6 +1,4 @@
-$mobileWidth = 750px
-
-.ace_text-input {position:absolute!important}
+headerHeight = 32px
 
 *
     box-sizing border-box
@@ -37,7 +35,7 @@ button:hover
 
 div.task-and-editor
     display flex
-    height 60vh
+    height "calc(100vh - %s)" % headerHeight
     touch-action none
     div.task
         padding 10px
@@ -71,8 +69,8 @@ div.task-and-editor
             width 100%
 
 div.top
-    height 32px
-    line-height 32px
+    height headerHeight
+    line-height headerHeight
     background-color #1A1A1A
     color #EBEBEB
     
@@ -108,76 +106,3 @@ div.top
 
     div.control-button.danger:hover
         background-color #ff2e1f
-
-
-div.check-info
-    border-top 1px solid grey
-    min-height calc(40vh - 32px)
-    display flex
-    
-    background-color #EEE
-
-    div.source-code
-        overflow auto
-
-
-div.tests-info
-    div
-        div
-            position relative
-
-            background-color #AAA
-            border-bottom 1px solid rgba(225, 225, 225, 0.5)
-
-            width 64px
-            height 32px
-            line-height 32px
-            text-align center
-
-            font-weight bold
-
-            transition 0.3s ease all
-
-        div.success
-            background-color #2a9922
-
-        div.error
-            background-color #ff2e1f
-
-
-        div div.errorMessage
-            position absolute
-            left -100vw
-            top 0
-
-            width calc(100vw - 64px)
-            opacity 0
-
-            background-color #ff2e1f
-
-            transition 0.5s ease all
-
-        div.error:hover div.errorMessage
-            opacity 0.9
-            left 64px
-
-div.source-code
-    width 100%
-    background-color #f8f8f8
-    font-size 14px
-    > div
-        padding 0 10px
-        h3 > a
-            color black
-
-div.time-info
-    padding 5px
-    min-width 200px
-    border-left 1px solid #CCC
-    border-right 1px solid #CCC
-
-    table
-        td:first-child
-            text-decoration underline
-        td:last-child::after
-            content ' s'
