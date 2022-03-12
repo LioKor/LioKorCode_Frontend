@@ -28,7 +28,7 @@
       }
     },
     methods: {
-      showVersion: function() {
+      showVersion() {
         alert(`Build date: ${this.buildDate}`)
       }
     }

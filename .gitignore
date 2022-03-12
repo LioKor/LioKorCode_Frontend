@@ -4,4 +4,3 @@ dist
 
 yarn.lock
 src/build_info.js
-emsdk

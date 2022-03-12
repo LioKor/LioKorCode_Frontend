@@ -27,6 +27,9 @@ module.exports = {
     devServer: {
         port: 9000
     },
+    resolve: {
+        extensions: ['.ts', '.tsx', '.js'],
+    },
     module: {
         rules: [
             {
@@ -53,7 +56,11 @@ module.exports = {
                     'css-loader',
                     'stylus-loader'
                 ]
-            }
+            },
+            {
+                test: /\.tsx?$/,
+                loader: 'ts-loader',
+            },
         ],
     }
 };

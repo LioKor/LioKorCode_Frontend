@@ -1,8 +1,8 @@
 <template>
-  <div class="task-and-editor">
+  <div id="taskBlock" class="task-and-editor">
     <TaskInfo ref="taskInfo" />
 
-    <div id="slideLine" class="slide-line"><div class="dots">⋮</div></div>
+    <SlideLine el1="taskInfo" el2="editorBlock" mode="width" class="vertical"/>
 
     <Editor ref="editor" />
   </div>
@@ -11,16 +11,9 @@
 <script>
 import TaskInfo from "./TaskInfo.vue";
 import Editor from './Editor.vue'
-
-import { slidingInit } from '../../utils/slideModule';
+import SlideLine from '../SlideLine.vue'
 
 export default {
-  components: { TaskInfo, Editor },
-
-  mounted() {
-    // todo: refactor to Vue
-    const slideLine = document.getElementById('slideLine')
-    slidingInit(this.$refs.taskInfo.$el, this.$refs.editor.$el, slideLine)
-  }
+  components: { TaskInfo, Editor, SlideLine },
 }
 </script>
