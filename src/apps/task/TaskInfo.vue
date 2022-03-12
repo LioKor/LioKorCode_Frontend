@@ -25,7 +25,6 @@
       <p>{{ notes }}</p>
     </div>
 
-    <!--
     <h3>Test examples:</h3>
     <table id="examplesTable">
       <thead>
@@ -41,7 +40,6 @@
       </tr>
       </tbody>
     </table>
-    -->
   </div>
 </template>
 
@@ -75,11 +73,13 @@
       this.returnDescription = taskInfo.stdoutDescription;
       this.notes = taskInfo.hints;
       this.tests = taskInfo.tests;
+
+      console.log(this.name, this.description, this.argsDescription, this.returnDescription, this.notes, this.tests)
     },
     methods: {
       async getTask(id) {
         //const response = this.api.get(`/task/${id}`);
-        const response = await fetch(`/task/${id}`, {method: 'GET'})
+        const response = await fetch(`http://code.liokor.com/api/v1/task/${id}`, {method: 'GET'})
         if (!response.ok) {
           alert("Не получилось получить задание")
           return {};

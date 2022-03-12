@@ -36,7 +36,7 @@
         /*const response = await this.api.post('/tasks/1/solutions', {
           sourceCode: code
         });*/
-        const response = await fetch(`/tasks/1/solutions`, {
+        const response = await fetch(`http://code.liokor.com/api/v1/tasks/1/solutions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

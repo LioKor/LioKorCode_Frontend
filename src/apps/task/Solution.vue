@@ -29,7 +29,7 @@
       this.api = new ApiRequest('http://code.liokor.com/api/v1');
       const solutionsInfo = this.getSolutions(1);
 
-      /*solutionsInfo.forEach(solution => {
+      solutionsInfo.forEach(solution => {
         switch (solution.checkResult) {
           case 0:
             solution.status = 'passed';
@@ -46,14 +46,14 @@
         }
         solution.receivedDatetime = "20.02.2022 17:45";
       });
-       */
 
       this.solutions = solutionsInfo;
+      console.log(this.solutions)
     },
     methods: {
       async getSolutions(id) {
         //const response = this.api.get(`/tasks/${id}/solutions`);
-        const response = await fetch(`/tasks/${id}/solutions`, {method: 'GET'})
+        const response = await fetch(`http://code.liokor.com/api/v1/tasks/${id}/solutions`, {method: 'GET'})
         if (!response.ok) {
           alert("Не получилось получить решения")
           return [];
