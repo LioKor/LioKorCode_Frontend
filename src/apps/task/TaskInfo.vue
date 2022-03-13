@@ -29,8 +29,8 @@
     <table id="examplesTable">
       <thead>
       <tr>
-        <th>args</th>
-        <th>return</th>
+        <th>stdin</th>
+        <th>stdout</th>
       </tr>
       </thead>
       <tbody>
@@ -62,10 +62,10 @@
         api: null, // TODO: non-reactive
       }
     },
-    mounted() {
+    async mounted() {
       this.api = new ApiRequest('http://code.liokor.com/api/v1');
 
-      const taskInfo = this.getTask(1);
+      const taskInfo = await this.getTask(1);
 
       this.name = taskInfo.name;
       this.description = taskInfo.description;
@@ -73,20 +73,18 @@
       this.returnDescription = taskInfo.stdoutDescription;
       this.notes = taskInfo.hints;
       this.tests = taskInfo.tests;
-
-      console.log(this.name, this.description, this.argsDescription, this.returnDescription, this.notes, this.tests)
     },
     methods: {
       async getTask(id) {
         //const response = this.api.get(`/task/${id}`);
-        const response = await fetch(`http://code.liokor.com/api/v1/task/${id}`, {method: 'GET'})
+        const response = await fetch(`/api/v1/task/${id}`, { method: 'GET' })
+
         if (!response.ok) {
           alert("Не получилось получить задание")
           return {};
         }
 
-        const res = await response.json();
-        return res;
+        return response.json();
       },
     }
   }

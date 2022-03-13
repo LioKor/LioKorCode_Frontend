@@ -2,12 +2,12 @@
   <div id="solutions">
     <table>
       <tr v-for="solution in solutions">
-        <td v-if="solution.status === 'passed'" class="passed">{{ solution.id }}</td>
-        <td v-else-if="solution.status === 'checking'" class="checking">{{ solution.id }}</td>
-        <td v-else-if="solution.status === 'error'" class="error">{{ solution.id }}</td>
+        <td v-if="solution.status === 'passed'" class="passed">{{ solution.Id }}</td>
+        <td v-else-if="solution.status === 'checking'" class="checking">{{ solution.Id }}</td>
+        <td v-else-if="solution.status === 'error'" class="error">{{ solution.Id }}</td>
 
         <td>{{ solution.receivedDatetime }}</td>
-        <td>{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>
+        <td>{{ solution.TestsPassed }} / {{ solution.TestsTotal }}</td>
       </tr>
     </table>
   </div>
@@ -25,12 +25,12 @@
         api: null,
       }
     },
-    mounted() {
+    async mounted() {
       this.api = new ApiRequest('http://code.liokor.com/api/v1');
-      const solutionsInfo = this.getSolutions(1);
+      const solutionsInfo = await this.getSolutions(1);
 
       solutionsInfo.forEach(solution => {
-        switch (solution.checkResult) {
+        switch (solution.CheckResult) {
           case 0:
             solution.status = 'passed';
             break;
@@ -53,14 +53,13 @@
     methods: {
       async getSolutions(id) {
         //const response = this.api.get(`/tasks/${id}/solutions`);
-        const response = await fetch(`http://code.liokor.com/api/v1/tasks/${id}/solutions`, {method: 'GET'})
+        const response = await fetch(`/api/v1/tasks/${id}/solutions`, {method: 'GET'})
         if (!response.ok) {
           alert("Не получилось получить решения")
           return [];
         }
 
-        const res = await response.json();
-        return res;
+        return response.json();
       },
     }
   }

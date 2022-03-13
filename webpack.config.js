@@ -25,7 +25,10 @@ module.exports = {
         }),
     ],
     devServer: {
-        port: 9000
+        port: 9000,
+        proxy: {
+            '/api': 'http://code.liokor.com'
+        }
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
