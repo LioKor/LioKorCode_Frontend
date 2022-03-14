@@ -1,4 +1,30 @@
-<style>
+<style lang="stylus">
+  .slide-line
+    position relative
+    display flex
+    justify-content center
+    align-content center
+    align-items center
+
+    background-color #E0E0E0
+
+    font-size 20px
+
+  .slide-line.vertical
+    cursor ew-resize
+    height 100%
+    width 15px
+
+  .slide-line.vertical:before
+    content "⋮"
+
+  .slide-line.horizontal
+    cursor ns-resize
+    width 100%
+    height 15px
+
+  .slide-line.horizontal:before
+    content "⋯"
 </style>
 
 <template>

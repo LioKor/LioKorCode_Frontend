@@ -1,7 +1,11 @@
+<style lang="stylus">
+  .editor
+    height 100%
+</style>
+
 <template>
   <div id="editorBlock">
     <div  id="aceEditor" class="editor"></div>
-    <button class="sendSolution" @click="sendSolution">Отправить решение</button>
   </div>
 </template>
 
@@ -14,6 +18,7 @@
     data() {
       return {
         api: null,
+        aceEditor: null
       }
     },
     mounted() {
@@ -28,30 +33,6 @@
       this.aceEditor.session.setMode('ace/mode/c_cpp');
 
       this.aceEditor.setValue(localStorage.getItem('code') || "");
-    },
-    methods: {
-      async sendSolution() {
-        const code = this.aceEditor.getValue();
-        localStorage.setItem('code', code);
-        /*const response = await this.api.post('/tasks/1/solutions', {
-          sourceCode: code
-        });*/
-        const response = await fetch(`http://code.liokor.com/api/v1/tasks/1/solutions`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({sourceCode: code}),
-        });
-        if (!response.ok) {
-          alert("Не удалось отправить решение");
-        }
-
-        const res = await response.json();
-        alert('Решеие отправлено. Результат: \n' + JSON.stringify(res));
-
-        //location.reload();
-      },
     }
   }
 </script>

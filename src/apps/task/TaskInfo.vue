@@ -1,24 +1,16 @@
 <template>
   <div id="taskInfo" class="task">
-    <div>
-      <label><strong>Tasks:</strong>
-        <select v-model="selectedTaskName" @change="taskSelected">
-          <option v-for="taskName of tasksList">{{ taskName }}</option>
-        </select>
-      </label>
-    </div>
-
     <h2>{{ name }}</h2>
     <h3>Description</h3>
     <p>{{ description }}</p>
 
-    <div v-if="argsDescription">
-      <h4>Args description</h4>
-      <p>{{ argsDescription }}</p>
+    <div v-if="stdinDescription">
+      <h4>stdin description</h4>
+      <p>{{ stdinDescription }}</p>
     </div>
-    <div v-if="returnDescription">
-      <h4>Return description</h4>
-      <p>{{ returnDescription }}</p>
+    <div v-if="stdoutDescription">
+      <h4>stdout description</h4>
+      <p>{{ stdoutDescription }}</p>
     </div>
     <div v-if="notes">
       <h4>Notes</h4>
@@ -51,8 +43,8 @@
       return {
         name: null,
         description: null,
-        argsDescription: null,
-        returnDescription: null,
+        stdinDescription: null,
+        stdoutDescription: null,
         notes: null,
 
         tests: [],
@@ -69,15 +61,15 @@
 
       this.name = taskInfo.name;
       this.description = taskInfo.description;
-      this.argsDescription = taskInfo.stdinDescription;
-      this.returnDescription = taskInfo.stdoutDescription;
+      this.stdinDescription = taskInfo.stdinDescription;
+      this.stdoutDescription = taskInfo.stdoutDescription;
       this.notes = taskInfo.hints;
       this.tests = taskInfo.tests;
     },
     methods: {
       async getTask(id) {
         //const response = this.api.get(`/task/${id}`);
-        const response = await fetch(`/api/v1/task/${id}`, { method: 'GET' })
+        const response = await fetch(`/api/v1/tasks/${id}`, { method: 'GET' })
 
         if (!response.ok) {
           alert("Не получилось получить задание")

@@ -53,7 +53,7 @@ module.exports = {
                 use: { loader: 'worker-loader' }
             },
             {
-                test: /\.styl$/,
+                test: /\.styl(us)?$/,
                 use: [
                     'style-loader',
                     'css-loader',
