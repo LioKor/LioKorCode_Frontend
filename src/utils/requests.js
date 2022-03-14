@@ -46,7 +46,7 @@ export default class ApiRequest {
     }
 
     get(path, data = {}) {
-        return this.request('GET', path/* + '?' + toArgs(data)*/, {});
+        return this.request('GET', path + '?' + toArgs(data), {});
     }
     post(path, data = {}) {
         return this.request('POST', path, data);

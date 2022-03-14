@@ -1,3 +1,5 @@
+@require 'constants.styl'
+
 headerHeight = 32px
 
 *
@@ -7,6 +9,9 @@ body
     margin 0
     overflow-y hidden
     max-height 100vh
+
+    background rgba(0, 0, 0, 0) linear-gradient(30deg, rgb(21, 49, 49) 0%, rgb(46, 20, 60) 60%, rgb(93, 78, 37) 100%) repeat scroll 0% 0%;
+    transition background-color ease 0.3s
 
 h2, h3, h4
     margin 15px 0
@@ -107,18 +112,20 @@ div.top
             margin-right 0
         }
 
-    div.control-button
+    .control-button
+        color white
+        text-decoration none
         padding 0 10px
         cursor pointer
         transition 0.1s ease all
         user-select none
 
-    div.control-button:hover
+    .control-button:hover
         background-color #2A9922
 
-    div.control-button.warning:hover
+    .control-button.warning:hover
         background-color #ffe344
         color #1A1A1A
 
-    div.control-button.danger:hover
+    .control-button.danger:hover
         background-color #ff2e1f

@@ -12,7 +12,6 @@
 <script>
   import 'ace-builds'
   import 'ace-builds/webpack-resolver'
-  import ApiRequest from "../../utils/requests";
 
   export default {
     data() {
@@ -22,8 +21,6 @@
       }
     },
     mounted() {
-      this.api = new ApiRequest('http://code.liokor.com/api/v1');
-
       this.aceEditor = ace.edit('aceEditor');
       this.aceEditor.setOptions({
         fontSize: '12pt',

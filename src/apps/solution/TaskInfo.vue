@@ -36,9 +36,15 @@
 </template>
 
 <script>
-  import ApiRequest from "../../utils/requests";
+  import api from './../../utils/api';
 
   export default {
+    props: {
+      id: {
+        type: Number,
+        required: true
+      }
+    },
     data() {
       return {
         name: null,
@@ -50,14 +56,10 @@
         tests: [],
 
         tasksList: null,
-
-        api: null, // TODO: non-reactive
       }
     },
     async mounted() {
-      this.api = new ApiRequest('http://code.liokor.com/api/v1');
-
-      const taskInfo = await this.getTask(1);
+      const taskInfo = await this.getTask(this.$props.id);
 
       this.name = taskInfo.name;
       this.description = taskInfo.description;
@@ -68,8 +70,7 @@
     },
     methods: {
       async getTask(id) {
-        //const response = this.api.get(`/task/${id}`);
-        const response = await fetch(`/api/v1/tasks/${id}`, { method: 'GET' })
+        const response = await api.get(`/tasks/${id}`);
 
         if (!response.ok) {
           alert("Не получилось получить задание")
