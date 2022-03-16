@@ -33,6 +33,8 @@
       this.aceEditor.session.setMode('ace/mode/c_cpp');
 
       this.aceEditor.setValue(localStorage.getItem('code') || "");
+
+      console.log(this.$root.storage.str);
     }
   }
 </script>

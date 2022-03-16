@@ -40,6 +40,6 @@
         this.$refs.header.checkDone()
         alert('Решение отправлено. Результат: \n' + JSON.stringify(res));
       }
-    }
+    },
   }
 </script>

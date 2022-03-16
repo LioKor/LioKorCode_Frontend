@@ -29,12 +29,15 @@ export async function request(method, url, data = {}) {
 }
 
 function toArgs(data) {
-    return Object.keys(data).map(key =>
+    let str = Object.keys(data).map(key =>
         encodeURIComponent(key) + '=' + encodeURIComponent(data[key])
     ).join('&');
+    if (str.length > 0)
+        str = '?' + str
+    return str;
 }
 
-export default class ApiRequest {
+export default class ApiRequests {
     apiUrl = undefined;
 
     constructor(apiUrl) {
@@ -46,7 +49,7 @@ export default class ApiRequest {
     }
 
     get(path, data = {}) {
-        return this.request('GET', path/* + '?' + toArgs(data)*/, {});
+        return this.request('GET', path + toArgs(data), {});
     }
     post(path, data = {}) {
         return this.request('POST', path, data);

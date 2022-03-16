@@ -15,7 +15,8 @@
   "dependencies": {
     "ace-builds": "^1.4.14",
     "html-webpack-plugin": "^5.5.0",
-    "vue": "^3.2.31"
+    "vue": "^3.2.31",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
