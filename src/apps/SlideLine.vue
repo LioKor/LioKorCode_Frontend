@@ -1,28 +1,29 @@
 <style lang="stylus">
+  line-width = 15px
+  line-color = #E0E0E0
+  points-font-size = 20px
+
   .slide-line
     position relative
     display flex
     justify-content center
-    align-content center
     align-items center
 
-    background-color #E0E0E0
+    background-color line-color
 
-    font-size 20px
+    font-size points-font-size
 
   .slide-line.vertical
     cursor ew-resize
     height 100%
-    width 15px
-
+    width line-width
   .slide-line.vertical:before
     content "⋮"
 
   .slide-line.horizontal
     cursor ns-resize
     width 100%
-    height 15px
-
+    height line-width
   .slide-line.horizontal:before
     content "⋯"
 </style>
@@ -52,16 +53,16 @@
       el2: {
         type: String,
         required: true,
-      },
-      mode: {
-        type: String,
-        default: "width",
-        validator: val => ['width', 'height'].indexOf(val) !== -1,
       }
     },
     mounted() {
       this.leftBlock = document.getElementById(this.el1);
       this.rightBlock = document.getElementById(this.el2);
+      if (this.$el.classList.contains('horizontal')) {
+        this.mode = "height";
+      } else if (this.$el.classList.contains('vertical')) {
+        this.mode = "width";
+      }
 
       this.isInSlide = false;
       this.el = this.$el;

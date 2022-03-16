@@ -9,12 +9,12 @@
   <div id="taskBlock" class="task-and-editor">
     <TaskInfo ref="taskInfo" :id="parseInt($route.params.id)"/>
 
-    <SlideLine el1="taskInfo" el2="editorBlock" mode="width" class="vertical"/>
+    <SlideLine el1="taskInfo" el2="editorBlock" class="vertical"/>
 
     <Editor ref="editor"/>
   </div>
 
-  <SlideLine el1="taskBlock" el2="solutions" mode="height" class="horizontal"/>
+  <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
 
   <Solutions ref="solutions"/>
 </template>
