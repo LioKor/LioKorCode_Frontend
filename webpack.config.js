@@ -1,12 +1,9 @@
 const path = require('path');
-const fs = require('fs');
 
 const webpack = require('webpack');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
-
-fs.writeFileSync('./src/build_info.js', 'exports.BUILD_TIMESTAMP = ' + Date.now() + ';');
 
 module.exports = {
     entry: './src/index.js',
@@ -21,11 +18,24 @@ module.exports = {
         }),
         new VueLoaderPlugin(),
         new webpack.DefinePlugin({
+            BUILD_TIMESTAMP: Date.now(),
             VERSION: JSON.stringify(require('./package.json').version)
         }),
     ],
     devServer: {
         port: 9000,
+        historyApiFallback: {
+            rewrites: [
+                {
+                    from: /.(js|png)$/,
+                    to: (context) => {
+                        const path = context.parsedUrl.pathname.split('/')
+                        return `/${path[path.length - 1]}`
+                    }
+                },
+                { from: /^\/#/, to: '/index.html' },
+            ]
+        },
         proxy: {
             '/api': 'http://code.liokor.com'
         }
@@ -47,6 +57,10 @@ module.exports = {
                     'style-loader',
                     'css-loader',
                 ],
+            },
+            {
+                test: /\.png$/,
+                loader: 'file-loader'
             },
             {
                 test: /\.worker.js$/,
