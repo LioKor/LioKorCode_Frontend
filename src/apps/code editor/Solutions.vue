@@ -7,20 +7,18 @@
   <div id="solutions">
     <table>
       <tr v-for="solution in solutions">
-        <td v-if="solution.status === 'passed'" class="passed">{{ solution.Id }}</td>
-        <td v-else-if="solution.status === 'checking'" class="checking">{{ solution.Id }}</td>
-        <td v-else-if="solution.status === 'error'" class="error">{{ solution.Id }}</td>
+        <td v-if="solution.status === 'passed'" class="passed">{{ solution.id }}</td>
+        <td v-else-if="solution.status === 'checking'" class="checking">{{ solution.id }}</td>
+        <td v-else-if="solution.status === 'error'" class="error">{{ solution.id }}</td>
 
         <td>{{ solution.receivedDatetime }}</td>
-        <td>{{ solution.TestsPassed }} / {{ solution.TestsTotal }}</td>
+        <td>{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>
       </tr>
     </table>
   </div>
 </template>
 
 <script>
-  import api from './../../utils/api';
-
   export default {
     data() {
       return {
@@ -28,7 +26,7 @@
       }
     },
     async mounted() {
-      let solutionsInfo = await this.getSolutions(this.$route.params.id);
+      let solutionsInfo = await this.getSolutions(1);
       solutionsInfo = solutionsInfo.slice(solutionsInfo.length - 5, solutionsInfo.length).reverse()
 
       solutionsInfo.forEach(solution => {
@@ -37,6 +35,7 @@
       });
 
       this.solutions = solutionsInfo;
+      console.log(solutionsInfo);
     },
     methods: {
       addSolution(solution) {
@@ -45,13 +44,11 @@
         solution.status = this.getSolutionStatusClass(solution.checkResult);
 
         // todo: remove this code after backend is fixed
-        solution.Id = '?'
+        solution.id = '?'
         solution.receivedDatetime = "20.02.2022 17:45";
-        solution.TestsPassed = solution.testsPassed;
-        solution.TestsTotal = solution.testsTotal;
         // end of removal
 
-        this.solutions.splice(0, 0, solution);
+        this.solutions.unshift(solution);
       },
       getSolutionStatusClass(status) {
         let cls = 'error';
@@ -64,13 +61,13 @@
         return cls;
       },
       async getSolutions(id) {
-        const response = await api.get(`/tasks/${id}/solutions`);
-        if (!response.ok) {
+        const solutions = await this.$store.state.api.getSolutions(id);
+        if (!solutions.ok_) {
           alert("Не получилось получить решения")
           return [];
         }
 
-        return response.json();
+        return solutions;
       },
     }
   }

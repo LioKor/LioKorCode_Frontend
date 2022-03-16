@@ -16,7 +16,6 @@
   export default {
     data() {
       return {
-        api: null,
         aceEditor: null
       }
     },
@@ -26,12 +25,14 @@
         fontSize: '12pt',
       });
 
+      this.aceEditor.on('change', () => {
+        localStorage.setItem('code', this.aceEditor.getValue());
+      })
+
       //this.aceEditor.setTheme('ace/theme/dawn');
       this.aceEditor.session.setMode('ace/mode/c_cpp');
 
       this.aceEditor.setValue(localStorage.getItem('code') || "");
-
-      console.log(this.$root.storage.str);
     }
   }
 </script>

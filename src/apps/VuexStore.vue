@@ -2,13 +2,12 @@
 
 <script>
   import Vuex from 'vuex'
-  import {User} from "../models/models";
-  import ApiRequests from "../utils/requests";
+  import Api from "./api.js";
 
-  export const Store = new Vuex.Store({
+  const Store = new Vuex.Store({
     state: {
-      user: new User(),
-      api: new ApiRequests('http://localhost:9000/api/v1'),
+      user: {},
+      api: new Api('/api/v1'),
     },
     getters: {
       SET_USER: state => {
@@ -25,12 +24,13 @@
     },
     actions: {
       GET_USER: async (state, _) => {
-        const response = await this.state.api.get('/user');
-        const res = response.json();
-        if (!response.ok)
+        const userData = await this.api.getUser();
+        if (!userData.ok_)
           return;
-        state.commit('SET_USER', res);
+        state.commit('SET_USER', userData);
       }
     }
   });
+
+  export default Store;
 </script>

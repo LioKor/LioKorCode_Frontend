@@ -36,8 +36,6 @@
 </template>
 
 <script>
-  import api from './../../utils/api';
-
   export default {
     props: {
       id: {
@@ -70,14 +68,13 @@
     },
     methods: {
       async getTask(id) {
-        const response = await api.get(`/tasks/${id}`);
+        const taskInfo = await this.$store.state.api.getTask(id);
 
-        if (!response.ok) {
+        if (!taskInfo.ok_) {
           alert("Не получилось получить задание")
           return {};
         }
-
-        return response.json();
+        return taskInfo;
       },
     }
   }

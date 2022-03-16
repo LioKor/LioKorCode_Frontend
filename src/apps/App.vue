@@ -7,9 +7,9 @@
 
 <script>
   import Header from './Header.vue'
-  import Task from './solution/Task.vue'
+  import Task from './code editor/Task.vue'
   import SlideLine from './SlideLine.vue'
-  import Solution from './solution/Solutions.vue'
+  import Solution from './code editor/Solutions.vue'
 
   export default {
     components: { Header, Task, SlideLine, Solution },

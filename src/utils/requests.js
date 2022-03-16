@@ -8,7 +8,7 @@ import { getCookie } from './utils';
  * @param {object} data post/put/delete dict, that will be JSONed
  * @returns {Promise<object>} returns fetch's response
  */
-export async function request(method, url, data = {}) {
+export function request(method, url, data = {}) {
     let params = {};
     if (!['GET', 'HEAD'].includes(method) && data) {
         params = {
@@ -48,16 +48,27 @@ export default class ApiRequests {
         return request(method, this.apiUrl + path, data);
     }
 
-    get(path, data = {}) {
-        return this.request('GET', path + toArgs(data), {});
+    async _ResponseToJson(response) {
+        let data = {};
+        try {
+            data = await response.json();
+            data.ok_ = response.ok;
+        } catch {
+            data.ok_ = false;
+        }
+        return data;
     }
-    post(path, data = {}) {
-        return this.request('POST', path, data);
+
+    async get(path, data = {}) {
+        return await this._ResponseToJson(await this.request('GET', path + toArgs(data), {}));
     }
-    put(path, data = {}) {
-        return this.request('PUT', path, data);
+    async post(path, data = {}) {
+        return await this._ResponseToJson(await this.request('POST', path, data));
     }
-    delete(path, data = {}) {
-        return this.request('DELETE', path, data);
+    async put(path, data = {}) {
+        return await this._ResponseToJson(await this.request('PUT', path, data));
+    }
+    async delete(path, data = {}) {
+        return await this._ResponseToJson(await this.request('DELETE', path, data));
     }
 }

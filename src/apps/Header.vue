@@ -12,8 +12,8 @@
 <!--    <div id="openButton" class="control-button">Open<span class="mobile-hide"> (Drag&Drop)</span></div>-->
 <!--    <div id="saveButton" class="control-button">Save<span class="mobile-hide"> (Ctrl+S)</span></div>-->
 <!--    <div id="runButton" class="control-button">Run<span class="mobile-hide"> (F8)</span></div>-->
-    <div class="control-button" v-show="!checkInProgress" @click=checkBegin>Check<span class="mobile-hide"> (F9)</span></div>
-    <div class="control-button warning" v-show="checkInProgress" :disabled="checkInProgress">Checking...</div>
+    <div class="control-button" v-show="!isCheckInProgress" @click=checkBegin>Check<span class="mobile-hide"> (F9)</span></div>
+    <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Checking...</div>
 
     <router-link to="/signin" class="control-button">Logout</router-link>
 <!--    <div id="terminateButton" style="display: none;" class="control-button warning">Cancel check<span class="mobile-hide"> (Ctrl+F9)</span></div>-->
@@ -26,7 +26,7 @@
       return {
         version: VERSION,
         buildDate: (new Date(BUILD_TIMESTAMP)).toLocaleDateString('en-GB'),
-        checkInProgress: false,
+        isCheckInProgress: false,
       }
     },
     methods: {
@@ -34,13 +34,13 @@
         alert(`Build date: ${this.buildDate}`)
       },
       checkBegin() {
-        if (this.checkInProgress === false) {
-          this.checkInProgress = true;
-          this.$emit('check-event');
+        if (this.isCheckInProgress === false) {
+          this.isCheckInProgress = true;
+          this.$emit('startCheck');
         }
       },
       checkDone() {
-        this.checkInProgress = false;
+        this.isCheckInProgress = false;
       },
     },
     mounted() {
