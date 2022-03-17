@@ -4,11 +4,15 @@
   #taskBlock
     background-color white
 
-  div.task-and-editor
+  .code-editor-page
+    height 100%
+    color textColor1
+
+  .task-and-editor
     display flex
     height "calc(100vh - %s)" % headerHeight
     touch-action none
-    div.task
+    .task
       padding 10px
       overflow-x hidden
       overflow-y auto
@@ -27,19 +31,21 @@
 </style>
 
 <template>
-  <Header ref="header" @startCheck="checkSolution"/>
+  <div class="code-editor-page">
+    <Header ref="header" @startCheck="checkSolution"/>
 
-  <div id="taskBlock" class="task-and-editor">
-    <TaskInfo ref="taskInfo" :id="parseInt($route.params.id)"/>
+    <div id="taskBlock" class="task-and-editor">
+      <TaskInfo ref="taskInfo" :id="parseInt($route.params.id)"/>
 
-    <SlideLine el1="taskInfo" el2="editorBlock" class="vertical"/>
+      <SlideLine el1="taskInfo" el2="editorBlock" class="vertical"/>
 
-    <Editor ref="editor"/>
+      <Editor ref="editor"/>
+    </div>
+
+    <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
+
+    <Solutions ref="solutions"/>
   </div>
-
-  <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
-
-  <Solutions ref="solutions"/>
 </template>
 
 <script>

@@ -29,7 +29,7 @@
         localStorage.setItem('code', this.aceEditor.getValue());
       })
 
-      //this.aceEditor.setTheme('ace/theme/dawn');
+      this.aceEditor.setTheme('ace/theme/monokai');
       this.aceEditor.session.setMode('ace/mode/c_cpp');
 
       this.aceEditor.setValue(localStorage.getItem('code') || "");

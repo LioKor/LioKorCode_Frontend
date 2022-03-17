@@ -1,6 +1,8 @@
 <style lang="stylus">
+  @import "../styles/constants.styl"
+
   line-width = 15px
-  line-color = #E0E0E0
+  line-color = monokai-bg-lightest
   points-font-size = 20px
 
   .slide-line

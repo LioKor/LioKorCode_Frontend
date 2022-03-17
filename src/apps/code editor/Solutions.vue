@@ -1,7 +1,10 @@
 <style lang="stylus">
+  @import "../../styles/constants.styl"
+
   #solutions
-    background-color white
+    background monokai-bg
     position relative
+    overflow-y scroll
     table
       width 50%
       border-collapse collapse
@@ -9,17 +12,17 @@
         td
           text-align center
           padding 10px
-          border 1px solid lightgray
+          border 1px solid monokai-bg-light
         td.passed
-          background #91bd8f
+          background #355d35
         td.checking
-          background #f5eab7
+          background #594f33
         td.error
-          background #e8a29e
+          background #5d3b39
 </style>
 
 <template>
-  <div id="solutions">
+  <div id="solutions" class="scrollable">
     <table>
       <tr v-for="solution in solutions">
         <td v-if="solution.status === 'passed'" class="passed">{{ solution.id }}</td>

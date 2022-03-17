@@ -1,5 +1,15 @@
+<style lang="stylus">
+  @import "../../styles/constants.styl"
+
+  #taskInfo
+    background monokai-bg
+    td
+    th
+      border 1px solid monokai-bg-lightest
+</style>
+
 <template>
-  <div id="taskInfo" class="task">
+  <div id="taskInfo" class="task scrollable">
     <h2>{{ name }}</h2>
     <h3>Description</h3>
     <p>{{ description }}</p>
