@@ -1,6 +1,49 @@
 <style lang="stylus">
+  @import "../styles/constants.styl"
+
   #versionSpan
     cursor pointer
+
+  .top
+    height headerHeight
+    line-height headerHeight
+    background-color #1A1A1A
+    color #EBEBEB
+
+    display flex
+
+    #versionInfo
+      cursor pointer
+
+    div:before
+      height 100%
+      display inline-block
+      vertical-align middle
+
+    div.logo
+      padding 0 10px
+      margin-right 15px
+      @media screen and (max-width: $mobileWidth) {
+        margin-right 0
+      }
+
+    .control-button
+      color white
+      text-decoration none
+      padding 0 10px
+      cursor pointer
+      transition 0.1s ease all
+      user-select none
+
+    .control-button:hover
+      background-color #2A9922
+
+    .control-button.warning:hover
+      background-color #ffe344
+      color #1A1A1A
+
+    .control-button.danger:hover
+      background-color #ff2e1f
 </style>
 
 <template>

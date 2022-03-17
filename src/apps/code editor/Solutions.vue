@@ -1,6 +1,21 @@
 <style lang="stylus">
   #solutions
     background-color white
+    position relative
+    table
+      width 50%
+      border-collapse collapse
+      tr
+        td
+          text-align center
+          padding 10px
+          border 1px solid lightgray
+        td.passed
+          background #91bd8f
+        td.checking
+          background #f5eab7
+        td.error
+          background #e8a29e
 </style>
 
 <template>

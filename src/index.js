@@ -3,17 +3,17 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import App from './apps/App.vue'
 import Store from './apps/VuexStore.vue'
-import Task from './apps/code editor/Task.vue'
+import Task from './apps/code editor/Page.vue'
 import SignIn from './apps/SignIn.vue'
 import SignUp from './apps/SignUp.vue'
-import TaskList from './apps/tasks/TaskList.vue'
+import TaskList from './apps/task previews/Page.vue'
 import Page404 from './apps/Page404.vue'
 
 import './styles/main.styl'
 
 const routes = [
     { path: '/', component: TaskList },
-    { path: '/tasks/:id', component: Task },
+    { path: '/task/:id', component: Task },
     { path: '/signin', component: SignIn },
     { path: '/signup', component: SignUp },
     { path: '/:pathMatch(.*)*', component: Page404 }

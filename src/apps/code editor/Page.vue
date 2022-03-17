@@ -1,6 +1,29 @@
 <style lang="stylus">
+  @import "../../styles/constants.styl"
+
   #taskBlock
     background-color white
+
+  div.task-and-editor
+    display flex
+    height "calc(100vh - %s)" % headerHeight
+    touch-action none
+    div.task
+      padding 10px
+      overflow-x hidden
+      overflow-y auto
+      width 30%
+      table
+        max-width 500px
+        width 100%
+        border-collapse collapse
+        td, th
+          border 1px solid #BABABA
+          padding 5px
+    div#editorBlock
+      width 70%
+      #aceEditor
+        width 100%
 </style>
 
 <template>
