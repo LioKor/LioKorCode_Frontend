@@ -3,10 +3,11 @@
 <script>
   import Vuex from 'vuex'
   import Api from "./api.js";
+  import {User} from "../models/user";
 
   const Store = new Vuex.Store({
     state: {
-      user: {},
+      user: new User(),
       api: new Api('/api/v1'),
     },
     getters: {
@@ -15,20 +16,18 @@
       },
     },
     mutations: {
-      SET_USER: (state, user) => {
-        state.user.set(user);
+      SET_USER: (state, userData) => {
+        state.user.set(userData);
       },
       SET_USER_CHOSENROOMID: (state, id) => {
-        return state.user.setChosenRoomId(id)
+        state.user.setChosenRoomId(id)
       },
     },
     actions: {
       GET_USER: async (state, _) => {
-        const userData = await this.api.getUser();
-        if (!userData.ok_)
-          return;
+        const userData = await state.state.api.getUser();
         state.commit('SET_USER', userData);
-      }
+      },
     }
   });
 

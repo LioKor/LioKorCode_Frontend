@@ -3,6 +3,7 @@
 
   taskHeight = 200px
   taskWidth = 300px
+  shadow = -5px 5px 10px colorShadow
 
   .preview
     overflow visible
@@ -34,6 +35,7 @@
     background-position-x 100%
     border color3 1px solid
     transition background-position-x 0.2s ease
+    box-shadow shadow
     z-index -1
   .preview:hover:before
     background-position-x 0
@@ -57,7 +59,6 @@
       task: {},
     },
     mounted() {
-      console.log(this.task);
     },
     methods: {
     }

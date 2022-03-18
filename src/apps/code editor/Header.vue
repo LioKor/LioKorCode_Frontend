@@ -28,6 +28,7 @@
       background headerBG
       box-shadow shadow
       > *
+        color textColor1
         text-decoration none
         letter-spacing 2px
         cursor pointer
@@ -82,11 +83,11 @@
     <div class="topLine">
       <div class="mobile-hide"><div class="logo"><strong>LioKor Code</strong> <span id="versionSpan" @click="showVersion">{{ version }}</span></div></div>
       <div class="mobile-show"><div class="logo"><strong>LK Code</strong></div></div>
-      <router-link to="/" class="control-button">Tasks</router-link>
+      <router-link to="/">Tasks</router-link>
       <div class="control-button" v-show="!isCheckInProgress" @click=checkBegin>Check<span class="mobile-hide"> (F9)</span></div>
       <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Checking...</div>
 
-      <router-link to="/signin" class="right">Профиль</router-link>
+      <router-link to="/profile" class="right">Профиль</router-link>
 
 <!--      <router-link to="#">Туда</router-link>-->
 <!--      <router-link to="#">Сюда</router-link>-->
@@ -106,6 +107,7 @@
         isCheckInProgress: false,
       }
     },
+
     methods: {
       showVersion() {
         alert(`Build date: ${this.buildDate}`)
@@ -120,6 +122,7 @@
         this.isCheckInProgress = false;
       },
     },
+
     mounted() {
       window.addEventListener('keydown', (ev) => {
         if (ev.key === 'F9') {

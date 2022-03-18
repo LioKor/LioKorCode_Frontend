@@ -55,7 +55,6 @@
       });
 
       this.solutions = solutionsInfo;
-      console.log(solutionsInfo);
     },
     methods: {
       addSolution(solution) {

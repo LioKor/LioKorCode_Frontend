@@ -29,6 +29,7 @@
       background headerBG
       box-shadow shadow
       *
+        color textColor1
         text-decoration none
         letter-spacing 2px
         cursor pointer
@@ -119,7 +120,7 @@
       <router-link to="#">Сюда</router-link>
       <router-link to="#">Обратно</router-link>
 
-      <router-link to="#" class="right">Твоё имя</router-link>
+      <router-link to="/profile" class="right">Профиль</router-link>
     </div>
     <div class="sidePart">
       <div>Выполнено: 1/5</div>

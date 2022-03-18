@@ -5,6 +5,7 @@ import App from './apps/App.vue'
 import Store from './apps/VuexStore.vue'
 import Task from './apps/code editor/Page.vue'
 import SignIn from './apps/SignIn.vue'
+import Profile from './apps/Profile.vue'
 import SignUp from './apps/SignUp.vue'
 import TaskList from './apps/task previews/Page.vue'
 import Page404 from './apps/Page404.vue'
@@ -16,16 +17,17 @@ const routes = [
     { path: '/task/:id', component: Task },
     { path: '/signin', component: SignIn },
     { path: '/signup', component: SignUp },
+    { path: '/profile', component: Profile },
     { path: '/:pathMatch(.*)*', component: Page404 }
 ]
 const router = createRouter({
     history: createWebHistory(),
     routes: routes,
-})
+});
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(router)
-app.use(Store)
+app.use(router);
+app.use(Store);
 
-app.mount('#app')
+app.mount('#app');

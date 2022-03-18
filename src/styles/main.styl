@@ -1,9 +1,9 @@
 @require 'constants.styl'
 @require 'scrollbars.styl'
+@require 'forms.styl'
 
 *
     box-sizing border-box
-    color textColor1
 
 body
     font-family Arial
@@ -18,13 +18,13 @@ h2, h3, h4
     margin 15px 0
 
 .mobile-show
-    display none
-@media screen and (max-width: $mobileWidth) {
+    display none !important
+@media screen and (max-width: 700px) {
     .mobile-hide {
-        display: none;
+        display: none !important;
     }
     .mobile-show {
-        display: block;
+        display: inline-block !important;
     }
 }
 

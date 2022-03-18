@@ -1,5 +1,4 @@
 <style lang="stylus">
-  @require './../styles/forms.styl'
 </style>
 
 <template>
@@ -15,30 +14,28 @@
           <form id="signupForm" novalidate>
             <div class="form-group" id="usernameGroup">
               <label>ЛОГИН*<span class="error-text" id="usernameErrorText"></span></label>
-              <input name="username" type="text" class="form-control" required>
+              <input v-model="username" type="text" class="form-control" required>
               <div class="muted">Минимум 3 символа, только буквы, цифры и _</div>
-              <div class="muted">Будет использоваться как часть адреса: login@liokor.ru</div>
             </div>
             <div class="form-group" id="passwordGroup">
               <label>ПАРОЛЬ*<span class="error-text" id="passwordErrorText"></span></label>
-              <input name="password" type="password" class="form-control" required>
+              <input v-model="password" type="password" class="form-control" required>
               <div class="muted">{{ passwordRequirements }}</div>
             </div>
             <div class="form-group" id="passwordConfirmGroup">
               <label>ПОДТВЕРЖДЕНИЕ ПАРОЛЯ*<span class="error-text" id="passwordConfirmErrorText"></span></label>
-              <input name="passwordConfirm" type="password" class="form-control" required>
+              <input v-model="passwordConfirm" type="password" class="form-control" required>
             </div>
             <div class="form-group" id="fullnameGroup">
               <label>ПОЛНОЕ ИМЯ<span class="error-text" id="fullnameErrorText"></span></label>
-              <input name="fullname" type="text" class="form-control" placeholder="Иван Иванов">
-              <div class="muted">Будет отображаться у получателей писем</div>
+              <input v-model="fullname" type="text" class="form-control" placeholder="Иван Иванов">
             </div>
             <div class="form-group" id="reserveEmailGroup">
               <label>ЗАПАСНОЙ EMAIL<span class="error-text" id="reserveEmailErrorText"></span></label>
-              <input name="reserveEmail" type="email" class="form-control" placeholder="wolf@liokor.ru">
+              <input v-model="email" type="email" class="form-control" placeholder="wolf@liokor.ru">
               <div class="muted">Используется для восстановления пароля, если не указан - восстановить пароль крайне сложно</div>
               <div class="form-group">
-                <input type="submit" class="btn" value="Создать">
+                <div @click="signUp" class="btn">Создать</div>
                 <div class="muted">Уже с нами? <router-link to="/signin" class="router-link">Войти</router-link></div>
               </div>
             </div>
@@ -53,6 +50,35 @@
   import Logo from './Logo.vue'
 
   export default {
-    components: { Logo }
+    components: { Logo },
+
+    data() {
+      return {
+        username: "",
+        email: "",
+        password: "",
+        passwordConfirm: "",
+        fullname: "",
+      }
+    },
+
+    methods: {
+      async signUp() {
+        //todo: username and email validations
+
+        if (this.password !== this.passwordConfirm) {
+          alert("Пароли не совпадают");
+          return;
+        }
+
+        const response = await this.$store.state.api.signUp(this.username, this.email, this.password, this.fullname);
+        if (!response.ok_) {
+          alert("Не удалось создать пользователя");
+          return;
+        }
+
+        this.$router.push('/profile');
+      }
+    }
   }
 </script>
