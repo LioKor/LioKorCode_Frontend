@@ -1,8 +1,10 @@
 <style lang="stylus">
   @import "../../styles/constants.styl"
 
+  background = linear-gradient(20deg, color1, color3)
+
   #solutions
-    background monokai-bg
+    background background
     position relative
     overflow-y scroll
     table
@@ -14,11 +16,11 @@
           padding 10px
           border 1px solid monokai-bg-light
         td.passed
-          background #355d35
+          background #2e502e
         td.checking
-          background #594f33
+          background #483f29
         td.error
-          background #5d3b39
+          background #4b302e
 </style>
 
 <template>

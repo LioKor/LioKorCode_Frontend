@@ -2,19 +2,29 @@
   .previews-container
     display flex
     flex-wrap wrap
+    position relative
+
+  .header
+    z-index 999
 </style>
 
 <template>
+  <Header></Header>
+
+  <div class="two-previews previews-container">
+    <TaskPreview v-for="task in tasks.slice(0, 2)" :task="task"></TaskPreview>
+  </div>
   <div class="previews-container">
-    <TaskPreview v-for="task in tasks" :task="task"></TaskPreview>
+    <TaskPreview v-for="task in tasks.slice(1)" :task="task"></TaskPreview>
   </div>
 </template>
 
 <script>
   import TaskPreview from "./TaskPreview.vue";
+  import Header from "./Header.vue";
 
   export default {
-    components: { TaskPreview },
+    components: { Header, TaskPreview },
 
     data() {
       return {

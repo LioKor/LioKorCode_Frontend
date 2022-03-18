@@ -5,7 +5,7 @@
 
 <template>
   <div id="editorBlock">
-    <div  id="aceEditor" class="editor"></div>
+    <div id="aceEditor" class="editor"></div>
   </div>
 </template>
 
@@ -29,7 +29,7 @@
         localStorage.setItem('code', this.aceEditor.getValue());
       })
 
-      this.aceEditor.setTheme('ace/theme/monokai');
+      this.aceEditor.setTheme('ace/theme/ambiance');
       this.aceEditor.session.setMode('ace/mode/c_cpp');
 
       this.aceEditor.setValue(localStorage.getItem('code') || "");

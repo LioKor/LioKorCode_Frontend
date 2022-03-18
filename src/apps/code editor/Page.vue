@@ -52,7 +52,7 @@
   import TaskInfo from "./TaskInfo.vue";
   import Editor from './Editor.vue';
   import Solutions from './Solutions.vue';
-  import Header from './../Header.vue';
+  import Header from './Header.vue';
 
   import SlideLine from '../SlideLine.vue';
 

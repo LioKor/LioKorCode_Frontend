@@ -1,8 +1,10 @@
 <style lang="stylus">
   @import "../../styles/constants.styl"
 
+  background = linear-gradient(30deg, #0e2028 0%, #2e3f44 40%, #0c2129 100%) repeat scroll 0% 0%;
+
   #taskInfo
-    background monokai-bg
+    background background
     td
     th
       border 1px solid monokai-bg-lightest

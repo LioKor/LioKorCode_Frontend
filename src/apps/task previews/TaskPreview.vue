@@ -1,20 +1,18 @@
 <style lang="stylus">
   @import "../../styles/constants.styl"
 
+  taskHeight = 200px
+  taskWidth = 300px
+
   .preview
-    min-width 200px
-    max-width 300px
-    height 150px
-    padding 10px
-    margin 10px
-    background linear-gradient(30deg, color3, color2)
-    background-size 200%
-    background-position-x 100%
-    border color3 1px solid
-    border-radius 20px
-    overflow hidden
+    overflow visible
+    position relative
+    width taskWidth
+    height taskHeight
+    padding 20px 60px
+    margin 30px
     text-decoration none
-    transition background-position-x 0.2s ease
+    z-index 0
     .id
       margin-right 10px
     .title
@@ -23,8 +21,26 @@
     .description
       color textColor3
       padding 10px
-  .preview:hover
+  .preview:before
+    content ""
+    position absolute
+    left 0
+    right 0
+    top 0
+    bottom 0
+    transform skew(-30deg)
+    background linear-gradient(30deg, color3, color2)
+    background-size 200%
+    background-position-x 100%
+    border color3 1px solid
+    transition background-position-x 0.2s ease
+    z-index -1
+  .preview:hover:before
     background-position-x 0
+  .preview:first-child:before
+    left -300%
+  .preview:last-child:before
+    right -300%
 </style>
 
 <template>

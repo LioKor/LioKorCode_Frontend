@@ -2,7 +2,8 @@
   @import "../styles/constants.styl"
 
   line-width = 15px
-  line-color = monokai-bg-lightest
+  line-color = color3
+  points-color = textColor1
   points-font-size = 20px
 
   .slide-line
@@ -14,6 +15,8 @@
     background-color line-color
 
     font-size points-font-size
+  .slide-line:before
+    color points-color
 
   .slide-line.vertical
     cursor ew-resize
