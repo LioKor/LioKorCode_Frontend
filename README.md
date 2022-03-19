@@ -1,19 +1,17 @@
-## LioKor JavaScript Education
+## LioKor Code
 
-**LKJSE** assists JS learning by classic algorithmic practice. It consists of task book (html select), code editor (Ace) and testing engine.
+System for teaching developers
 
 #### How to build:
-1. Install yarn https://yarnpkg.com/ (npm can be used too)
-2. Open terminal and navigate to project folder
-3. Install dependencies ```yarn```
-4. Build ```yarn build```
-5. After building copy content of ```dist``` folder to your web server
-
-#### Adding and customizing tasks:
-* Navigate to ```static/tasks```
-* ```list.json``` contains file names of tasks to be shown
-* In this folder can create new tasks (copy the existing one and use it as a template) or edit the existing ones
-* Don't forget to add the new task to ```list.json```
+1. `yarn`
+2. `yarn dist`
 
 #### Development:
-* Use ```yarn dev``` to start dev server
+1. `yarn`
+2. `yarn dev`
+
+*OR*
+
+1. `docker run -d -t -p 9000:9000 --mount type=bind,source="$(pwd)"/,target=/app node`
+2. Open Docker CLI
+3. `cd app && yarn && yarn dev`
