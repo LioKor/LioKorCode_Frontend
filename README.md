@@ -12,6 +12,5 @@ System for teaching developers
 
 *OR*
 
-1. `docker run -d -t -p 9000:9000 --mount type=bind,source="$(pwd)"/,target=/app node`
-2. Open Docker CLI
-3. `cd app && yarn && yarn dev`
+1. `docker pull node`
+2. run commands from .sh scripts

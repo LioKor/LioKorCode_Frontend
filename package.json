@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "npx webpack-cli serve --mode development",
-    "build": "npx webpack-cli build"
+    "dist": "npx webpack-cli build"
   },
   "dependencies": {
     "ace-builds": "^1.4.14",

@@ -1,0 +1,1 @@
+docker run --mount type=bind,source="$(pwd)"/,target=/app node /bin/bash -c "cd app && yarn && yarn dist"
