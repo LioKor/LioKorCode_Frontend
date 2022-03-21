@@ -46,7 +46,7 @@
 </style>
 
 <template>
-  <router-link :to="'/task/' + task.id" id="taskPreview" class="preview">
+  <router-link :to="'/task' + pathModifier + '/' + task.id" id="taskPreview" class="preview">
     <span class="id">{{ task.id }}</span><span class="title">{{ task.name }}</span>
     <div class="description">{{ task.description }}</div>
     <!--div class="scale" style="--scale: {{ task.hardness }};"></div-->
@@ -57,6 +57,7 @@
   export default {
     props: {
       task: {},
+      pathModifier: ""
     },
     mounted() {
     },

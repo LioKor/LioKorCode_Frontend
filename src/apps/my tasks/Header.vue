@@ -63,70 +63,16 @@
         transition all 0.2s ease
       *:hover:before
         background-position-y 0
-
-    .sidePart
-      z-index 2
-      position relative
-      margin-left auto
-      width 60%
-      margin-right -20%
-      padding-right 20%
-      height sidePartHeight
-      right 0
-    .sidePart:after
-      content ""
-      background headerBG
-      border-bottom-left-radius borderRadiusBottom
-      box-shadow shadow
-      border-left empColor solid 3px
-      border-top transparent solid borderRadiusTop*2
-      position absolute
-      left 0
-      right 0
-      top -1px
-      bottom 0
-      transform skew(degree)
-      z-index -1
-    .sidePart:before
-      content ""
-      position absolute
-      width borderRadiusTop
-      height borderRadiusTop
-      left (- borderRadiusTop - sidePartHeight/4 + borderRadiusTop/4)
-      top 0
-      background  linear-gradient(to bottom, headerBG, transparent) 50% 0 / 100% 10px no-repeat, radial-gradient(circle at 0 100%, transparent 55%, black 70%, empColor 70% 72%, headerBG 78%) no-repeat
-      transform skew(degree)
-
-    .sidePart
-      padding-top 50px
-      div
-        margin 15px 40px 15px 0
-        font-size 25px
-        color textColor3
-      div:nth-child(1)
-        margin-left 20px
-      div:nth-child(2)
-        margin-left 40px
-      div:nth-child(3)
-        margin-left 60px
-      div:nth-child(4)
-        margin-left 80px
 </style>
 
 <template>
   <div class="header">
     <div class="topLine">
-      <router-link to="/tasks/edit">Мои задания</router-link>
+      <router-link to="/">Задания</router-link>
       <router-link to="#">Сюда</router-link>
       <router-link to="#">Обратно</router-link>
 
       <router-link to="/profile" class="right">Профиль</router-link>
-    </div>
-    <div class="sidePart">
-      <div>Выполнено: 1/5</div>
-      <div>Осталось: 10</div>
-      <div>Оценка: 4</div>
-      <div>Курс: 3/20</div>
     </div>
   </div>
 </template>
