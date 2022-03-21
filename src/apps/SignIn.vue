@@ -53,7 +53,7 @@
           alert("Логин или пароль не подходят");
           return;
         }
-
+        await this.$store.dispatch('GET_USER');
         this.$router.push('/profile');
       }
     }

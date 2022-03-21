@@ -10,7 +10,6 @@
     components: {  },
 
     async mounted() {
-      await this.$store.dispatch('GET_USER');
     },
   }
 </script>

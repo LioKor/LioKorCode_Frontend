@@ -15,7 +15,7 @@
     <TaskPreview v-for="task in tasks.slice(0, 2)" :task="task"></TaskPreview>
   </div>
   <div class="previews-container">
-    <TaskPreview v-for="task in tasks.slice(1)" :task="task"></TaskPreview>
+    <TaskPreview v-for="task in tasks.slice(2)" :task="task"></TaskPreview>
   </div>
 </template>
 

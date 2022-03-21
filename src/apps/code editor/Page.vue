@@ -35,7 +35,7 @@
     <Header ref="header" @startCheck="checkSolution"/>
 
     <div id="taskBlock" class="task-and-editor">
-      <TaskInfo ref="taskInfo" :id="parseInt($route.params.id)"/>
+      <TaskInfo ref="taskInfo" :id="taskId"/>
 
       <SlideLine el1="taskInfo" el2="editorBlock" class="vertical"/>
 
@@ -44,7 +44,7 @@
 
     <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
 
-    <Solutions ref="solutions"/>
+    <Solutions ref="solutions" :id="taskId"/>
   </div>
 </template>
 
@@ -60,20 +60,34 @@
   export default {
     components: { Header, TaskInfo, Editor, Solutions, SlideLine },
 
+    data() {
+      return {
+        taskId: parseInt(this.$route.params.taskId),
+      }
+    },
+
     methods: {
       checkSolution: async function() {
+        if (!this.$store.state.user.isLogined) {
+          this.$refs.header.checkError();
+          return;
+        }
+
+        this.$refs.header.checkBegin();
+        const solutionUid = this.$refs.solutions.addEmptySolution();
         const code = this.$refs.editor.aceEditor.getValue();
-        const checkInfo = await this.$store.state.api.sendSolution(1, {
+        const preCheckInfo = await this.$store.state.api.sendSolution(this.taskId, {
           sourceCode: code
         });
-        if (!checkInfo.ok_) {
+        if (!preCheckInfo.ok_) {
           alert("Не удалось отправить решение");
           this.$refs.header.checkDone();
           return;
         }
 
+        const checkInfo = await this.$store.state.api.getSolution(this.taskId, preCheckInfo.id);
         this.$refs.header.checkDone();
-        this.$refs.solutions.addSolution(checkInfo);
+        this.$refs.solutions.replaceSolution(solutionUid, checkInfo);
       }
     }
   }

@@ -84,8 +84,9 @@
       <div class="mobile-hide"><div class="logo"><strong>LioKor Code</strong> <span id="versionSpan" @click="showVersion">{{ version }}</span></div></div>
       <div class="mobile-show"><div class="logo"><strong>LK Code</strong></div></div>
       <router-link to="/">Tasks</router-link>
-      <div class="control-button" v-show="!isCheckInProgress" @click=checkBegin>Check<span class="mobile-hide"> (F9)</span></div>
+      <div class="control-button" v-show="!isCheckInProgress && !isCheckError" @click=checkStartEmit>Check<span class="mobile-hide"> (F9)</span></div>
       <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Checking...</div>
+      <div class="control-button danger" v-show="isCheckError" :disabled="isCheckError">Need auth</div>
 
       <router-link to="/profile" class="right">Профиль</router-link>
 
@@ -105,6 +106,7 @@
         version: VERSION,
         buildDate: (new Date(BUILD_TIMESTAMP)).toLocaleDateString('en-GB'),
         isCheckInProgress: false,
+        isCheckError: false,
       }
     },
 
@@ -112,21 +114,26 @@
       showVersion() {
         alert(`Build date: ${this.buildDate}`)
       },
-      checkBegin() {
+      checkStartEmit() {
         if (this.isCheckInProgress === false) {
-          this.isCheckInProgress = true;
           this.$emit('startCheck');
         }
       },
+      checkBegin() {
+        this.isCheckInProgress = true;
+      },
       checkDone() {
         this.isCheckInProgress = false;
+      },
+      checkError() {
+        this.isCheckError = true;
       },
     },
 
     mounted() {
       window.addEventListener('keydown', (ev) => {
         if (ev.key === 'F9') {
-          this.checkBegin()
+          this.checkStartEmit();
         }
       });
     }

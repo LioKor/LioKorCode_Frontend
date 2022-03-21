@@ -14,25 +14,25 @@
           <form id="signupForm" novalidate>
             <div class="form-group" id="usernameGroup">
               <label>ЛОГИН*<span class="error-text" id="usernameErrorText"></span></label>
-              <input v-model="username" type="text" class="form-control" required>
+              <input v-model="username" type="text" class="form-control" required autocomplete="on">
               <div class="muted">Минимум 3 символа, только буквы, цифры и _</div>
             </div>
             <div class="form-group" id="passwordGroup">
               <label>ПАРОЛЬ*<span class="error-text" id="passwordErrorText"></span></label>
-              <input v-model="password" type="password" class="form-control" required>
-              <div class="muted">{{ passwordRequirements }}</div>
+              <input v-model="password" type="password" class="form-control" required autocomplete="off">
+              <div class="muted">В пароле должно быть много всяких символов, но его надо не забыть</div>
             </div>
             <div class="form-group" id="passwordConfirmGroup">
               <label>ПОДТВЕРЖДЕНИЕ ПАРОЛЯ*<span class="error-text" id="passwordConfirmErrorText"></span></label>
-              <input v-model="passwordConfirm" type="password" class="form-control" required>
+              <input v-model="passwordConfirm" type="password" class="form-control" required autocomplete="off">
             </div>
             <div class="form-group" id="fullnameGroup">
               <label>ПОЛНОЕ ИМЯ<span class="error-text" id="fullnameErrorText"></span></label>
-              <input v-model="fullname" type="text" class="form-control" placeholder="Иван Иванов">
+              <input v-model="fullname" type="text" class="form-control" placeholder="Иван Иванов" autocomplete="on">
             </div>
             <div class="form-group" id="reserveEmailGroup">
               <label>ЗАПАСНОЙ EMAIL<span class="error-text" id="reserveEmailErrorText"></span></label>
-              <input v-model="email" type="email" class="form-control" placeholder="wolf@liokor.ru">
+              <input v-model="email" type="email" class="form-control" placeholder="wolf@liokor.ru" autocomplete="on">
               <div class="muted">Используется для восстановления пароля, если не указан - восстановить пароль крайне сложно</div>
               <div class="form-group">
                 <div @click="signUp" class="btn">Создать</div>
@@ -76,7 +76,7 @@
           alert("Не удалось создать пользователя");
           return;
         }
-
+        await this.$store.dispatch('GET_USER');
         this.$router.push('/profile');
       }
     }

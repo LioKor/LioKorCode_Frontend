@@ -51,11 +51,10 @@ export default class ApiRequests {
     async _ResponseToJson(response) {
         let data = {};
         try {
-            data = await response.json();
-            data.ok_ = response.ok;
+            data = JSON.parse(await response.text());
         } catch {
-            data.ok_ = false;
         }
+        data.ok_ = response.ok;
         return data;
     }
 

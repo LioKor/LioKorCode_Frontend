@@ -16,9 +16,11 @@
           padding 10px
           border 1px solid monokai-bg-light
         td.passed
-          background #2e502e
+          background #365e36
         td.checking
-          background #483f29
+          background #72633d
+        td.notFull
+          background #5b3e31
         td.error
           background #4b302e
 </style>
@@ -29,6 +31,7 @@
       <tr v-for="solution in solutions">
         <td v-if="solution.status === 'passed'" class="passed">{{ solution.id }}</td>
         <td v-else-if="solution.status === 'checking'" class="checking">{{ solution.id }}</td>
+        <td v-else-if="solution.status === 'notFull'" class="notFull">{{ solution.id }}</td>
         <td v-else-if="solution.status === 'error'" class="error">{{ solution.id }}</td>
 
         <td>{{ solution.receivedDatetime }}</td>
@@ -40,49 +43,74 @@
 
 <script>
   export default {
+    props: {
+      id: {
+        type: Number,
+        required: true
+      }
+    },
+
     data() {
       return {
         solutions: [],
+        addedSolutions: 0, //todo: non-reactive
       }
     },
+
     async mounted() {
-      let solutionsInfo = await this.getSolutions(1);
-      solutionsInfo = solutionsInfo.slice(solutionsInfo.length - 5, solutionsInfo.length).reverse()
+      if (!this.$store.state.user.isLogined) {
+        return;
+      }
+
+      let solutionsInfo = await this.getSolutions(this.$props.id);
+      solutionsInfo = solutionsInfo.slice(solutionsInfo.length - 5, solutionsInfo.length).reverse();
 
       solutionsInfo.forEach(solution => {
-        solution.status = this.getSolutionStatusClass(solution.CheckResult);
-        solution.receivedDatetime = "20.02.2022 17:45";
+        solution.status = this.getSolutionStatusClass(solution.checkResult, solution.testsPassed);
       });
 
       this.solutions = solutionsInfo;
     },
+
     methods: {
-      addSolution(solution) {
+      addEmptySolution() {
+        const solution = {};
+        solution.status = 'checking';
+        solution.id = '?';
+        solution.receivedDatetime = "?.?.? ?:?";
+
+        solution.uid_ = this.addedSolutions++;
+
         this.solutions = this.solutions.slice(0, this.solutions.length - 1);
-
-        solution.status = this.getSolutionStatusClass(solution.checkResult);
-
-        // todo: remove this code after backend is fixed
-        solution.id = '?'
-        solution.receivedDatetime = "20.02.2022 17:45";
-        // end of removal
-
         this.solutions.unshift(solution);
+
+        return solution.uid_;
       },
-      getSolutionStatusClass(status) {
-        let cls = 'error';
-        if (status === 0) {
-          cls = 'passed'
-        } else if (status === 1) {
-          cls = 'checking'
+      replaceSolution(uid, solution) {
+        const idx = this.solutions.findIndex((sol) => sol.uid_ === uid);
+        if (idx === -1) {
+          return;
         }
 
+        solution.status = this.getSolutionStatusClass(solution.checkResult, solution.testsPassed);
+        this.solutions[idx] = solution;
+      },
+      getSolutionStatusClass(status, testsPassed) {
+        let cls = 'error';
+        if (status === 0) {
+          cls = 'passed';
+        } else if (status === 1) {
+          cls = 'checking';
+        } else if (testsPassed > 0) {
+          cls = 'notFull';
+        }
         return cls;
       },
       async getSolutions(id) {
         const solutions = await this.$store.state.api.getSolutions(id);
+
         if (!solutions.ok_) {
-          alert("Не получилось получить решения")
+          alert("Не получилось получить решения");
           return [];
         }
 

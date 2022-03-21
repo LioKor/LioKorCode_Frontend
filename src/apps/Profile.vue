@@ -36,10 +36,10 @@
                   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
                       <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
                   </svg>
-                  <span>
+                  <!--span>
                     Кодить<br>
                     дальше
-                  </span>
+                  </span-->
               </router-link>
 
               <div class="title">
@@ -55,6 +55,10 @@
                   <form id="editProfileForm" novalidate>
                       <input name="avatarDataURL" type="hidden" id="avatarDataURL">
 
+                      <div class="form-group" id="usernameGroup">
+                        <label>ЛОГИН<span class="error-text" id="usernameErrorText"></span></label>
+                        <input name="username" type="text" class="form-control" :value="username">
+                      </div>
                       <div class="form-group" id="fullnameGroup">
                           <label>ПОЛНОЕ ИМЯ<span class="error-text" id="fullnameErrorText"></span></label>
                           <input name="fullname" type="text" class="form-control" :value="fullname">
@@ -65,7 +69,7 @@
                           <!-- <div class="muted">Необходимо будет подтвердить на старом и новом ящиках</div> -->
                       </div>
                       <div class="form-group">
-                        <div class="btn">Сохранить</div>
+                        <div class="btn" @click="updateUserInfo">Сохранить</div>
                       </div>
                       <div class="form-group">
                           <router-link :to="'/user/'+username+'/password'" class="btn" id="changePasswordButton">Сменить пароль</router-link>
@@ -89,7 +93,7 @@
 
     data() {
       return {
-        username: this.$store.state.user.name,
+        username: this.$store.state.user.username,
         email: this.$store.state.user.email,
         avatarUrl: this.$store.state.user.avatarUrl,
         fullname: this.$store.state.user.fullname,
@@ -97,17 +101,29 @@
     },
 
     methods: {
+      async updateUserInfo() {
+        const response = await this.$store.state.api.updateUser({
+          username: this.username,
+          email: this.email,
+          avatarUrl: this.avatarUrl,
+          fullname: this.fullname,
+        });
+        if (!response.ok_) {
+          alert("Не удалось изменить данные");
+          return;
+        }
+        alert("Данные изменены");
+        this.$router.push('/signin');
+      },
       async signOut() {
         const response = await this.$store.state.api.signOut();
         if (!response.ok_) {
           alert("Не удалось выйти из аккаунта. Пiпався, розбiйник? А всё...");
           return;
         }
+        await this.$store.dispatch('DELETE_USER');
         this.$router.push('/signin');
       }
     },
-
-    mounted() {
-    }
   }
 </script>

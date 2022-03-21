@@ -1,33 +1,15 @@
 import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
 
 import App from './apps/App.vue'
-import Store from './apps/VuexStore.vue'
-import Task from './apps/code editor/Page.vue'
-import SignIn from './apps/SignIn.vue'
-import Profile from './apps/Profile.vue'
-import SignUp from './apps/SignUp.vue'
-import TaskList from './apps/task previews/Page.vue'
-import Page404 from './apps/Page404.vue'
+import Store from './apps/Store.js'
+import createVueRouter from './apps/Router.js'
 
 import './styles/main.styl'
 
-const routes = [
-    { path: '/', component: TaskList },
-    { path: '/task/:id', component: Task },
-    { path: '/signin', component: SignIn },
-    { path: '/signup', component: SignUp },
-    { path: '/profile', component: Profile },
-    { path: '/:pathMatch(.*)*', component: Page404 }
-]
-const router = createRouter({
-    history: createWebHistory(),
-    routes: routes,
-});
 
 const app = createApp(App);
 
-app.use(router);
+app.use(createVueRouter(Store));
 app.use(Store);
 
 app.mount('#app');
