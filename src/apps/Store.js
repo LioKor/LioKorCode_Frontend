@@ -1,6 +1,6 @@
 import Vuex from 'vuex'
 import Api from "./api.js";
-import {User} from "../models/user";
+import User from "../models/user";
 
 const Store = new Vuex.Store({
 state: {

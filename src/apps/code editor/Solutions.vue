@@ -34,7 +34,7 @@
         <td v-else-if="solution.status === 'notFull'" class="notFull">{{ solution.id }}</td>
         <td v-else-if="solution.status === 'error'" class="error">{{ solution.id }}</td>
 
-        <td>{{ solution.receivedDatetime }}</td>
+        <td>{{ solution.datetime }}</td>
         <td>{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>
       </tr>
     </table>
@@ -42,6 +42,8 @@
 </template>
 
 <script>
+  import Solution from "../../models/solution";
+
   export default {
     props: {
       id: {
@@ -63,21 +65,19 @@
       }
 
       let solutionsInfo = await this.getSolutions(this.$props.id);
-      solutionsInfo = solutionsInfo.slice(solutionsInfo.length - 5, solutionsInfo.length).reverse();
+      solutionsInfo = solutionsInfo.slice(solutionsInfo.length - 10, solutionsInfo.length).reverse();
 
-      solutionsInfo.forEach(solution => {
-        solution.status = this.getSolutionStatusClass(solution.checkResult, solution.testsPassed);
+      this.solutions = [];
+      solutionsInfo.forEach(solutionInfo => {
+        const sol = new Solution();
+        sol.set(solutionInfo);
+        this.solutions.push(sol);
       });
-
-      this.solutions = solutionsInfo;
     },
 
     methods: {
       addEmptySolution() {
-        const solution = {};
-        solution.status = 'checking';
-        solution.id = '?';
-        solution.receivedDatetime = "?.?.? ?:?";
+        const solution = new Solution();
 
         solution.uid_ = this.addedSolutions++;
 
@@ -91,21 +91,9 @@
         if (idx === -1) {
           return;
         }
+        this.solutions[idx].set(solution);
+      },
 
-        solution.status = this.getSolutionStatusClass(solution.checkResult, solution.testsPassed);
-        this.solutions[idx] = solution;
-      },
-      getSolutionStatusClass(status, testsPassed) {
-        let cls = 'error';
-        if (status === 0) {
-          cls = 'passed';
-        } else if (status === 1) {
-          cls = 'checking';
-        } else if (testsPassed > 0) {
-          cls = 'notFull';
-        }
-        return cls;
-      },
       async getSolutions(id) {
         const solutions = await this.$store.state.api.getSolutions(id);
 

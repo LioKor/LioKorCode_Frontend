@@ -1,4 +1,4 @@
-export class User {
+export default class User {
   isLogined = Boolean
   username = String
   login = String
@@ -8,12 +8,8 @@ export class User {
   chosenRoomId = Number
 
   setDefault() {
+    this.set({});
     this.isLogined = false;
-    this.username = "";
-    this.login = "";
-    this.email = "";
-    this.fullname = "";
-    this.avatarUrl = "https://i.yapx.ru/GuFDE.gif";
     this.chosenRoomId = -1;
   }
 
@@ -21,13 +17,13 @@ export class User {
     this.setDefault();
   }
 
-  set({username, login, email, fullname, avatarUrl}) {
+  set({username = "", login = "", email = "", fullname = "", avatarUrl = "https://i.yapx.ru/GuFDE.gif"}) {
     this.isLogined = true;
-    this.username = username || "";
-    this.login = login || "";
-    this.email = email || "";
-    this.fullname = fullname || "";
-    this.avatarUrl = avatarUrl || "https://i.yapx.ru/GuFDE.gif";
+    this.username = username;
+    this.login = login;
+    this.email = email;
+    this.fullname = fullname;
+    this.avatarUrl = avatarUrl;
   }
 
   setChosenRoomId(id) {
