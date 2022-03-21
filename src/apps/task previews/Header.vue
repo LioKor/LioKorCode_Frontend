@@ -116,9 +116,9 @@
 <template>
   <div class="header">
     <div class="topLine">
-      <router-link to="/tasks/edit">Мои задания</router-link>
+      <router-link to="/tasks/my">Мои задания</router-link>
+      <router-link to="#">Туда</router-link>
       <router-link to="#">Сюда</router-link>
-      <router-link to="#">Обратно</router-link>
 
       <router-link to="/profile" class="right">Профиль</router-link>
     </div>
