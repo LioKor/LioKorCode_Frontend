@@ -37,6 +37,16 @@ function toArgs(data) {
     return str;
 }
 
+async function _ResponseToJson(response) {
+    let data = {};
+    try {
+        data = JSON.parse(await response.text()) || {};
+    } catch {
+    }
+    data.ok_ = response.ok;
+    return data;
+}
+
 export default class ApiRequests {
     apiUrl = undefined;
 
@@ -48,26 +58,16 @@ export default class ApiRequests {
         return request(method, this.apiUrl + path, data);
     }
 
-    async _ResponseToJson(response) {
-        let data = {};
-        try {
-            data = JSON.parse(await response.text());
-        } catch {
-        }
-        data.ok_ = response.ok;
-        return data;
-    }
-
     async get(path, data = {}) {
-        return await this._ResponseToJson(await this.request('GET', path + toArgs(data), {}));
+        return await _ResponseToJson(await this.request('GET', path + toArgs(data), {}));
     }
     async post(path, data = {}) {
-        return await this._ResponseToJson(await this.request('POST', path, data));
+        return await _ResponseToJson(await this.request('POST', path, data));
     }
     async put(path, data = {}) {
-        return await this._ResponseToJson(await this.request('PUT', path, data));
+        return await _ResponseToJson(await this.request('PUT', path, data));
     }
     async delete(path, data = {}) {
-        return await this._ResponseToJson(await this.request('DELETE', path, data));
+        return await _ResponseToJson(await this.request('DELETE', path, data));
     }
 }

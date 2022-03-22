@@ -78,7 +78,6 @@
     methods: {
       addEmptySolution() {
         const solution = new Solution();
-
         solution.uid_ = this.addedSolutions++;
 
         this.solutions = this.solutions.slice(0, this.solutions.length - 1);

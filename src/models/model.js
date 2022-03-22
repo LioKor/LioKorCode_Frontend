@@ -4,9 +4,9 @@ export default class Model {
   toNetworkNames = {
   }
 
-  setDefault() {
-    for (const key in this.default) {
-      this[key] = this.default[key];
+  setDefault(cls = this) {
+    for (const key in cls.default) {
+      this[key] = cls.default[key];
     }
   }
 
@@ -14,8 +14,8 @@ export default class Model {
     this.setDefault();
   }
 
-  set(data) {
-    for (let key in this.default) {
+  set(data, cls = this) {
+    for (let key in cls.default) {
       if (this.default.hasOwnProperty(key)) {
         this[key] = data[key];
       }

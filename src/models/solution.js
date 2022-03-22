@@ -3,7 +3,8 @@ import Model from "./model";
 export default class Solution extends Model {
   default = {
     id: '?',
-    datetime: Date.now(),
+    receivedDatetime: Date.now(),
+    datetime: "",
     checkResult: -1,
     status: 'checking',
     testsPassed: '?',
@@ -11,9 +12,14 @@ export default class Solution extends Model {
   }
 
   set(data) {
-    super.set(data);
+    super.set(data, this);
     this._setFormatTime();
     this._setStatus();
+  }
+  constructor() {
+    super();
+    this.setDefault();
+    this._setFormatTime();
   }
 
   _setStatus() {
@@ -29,7 +35,7 @@ export default class Solution extends Model {
   }
 
   _setFormatTime() {
-    const dt = new Date(this.datetime);
+    const dt = new Date(this.receivedDatetime);
     const curDate = dt.getDate();
     const now = new Date();
     const nowDate = now.getDate();

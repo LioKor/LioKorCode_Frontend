@@ -1,5 +1,13 @@
+<style lang="stylus">
+
+</style>
+
 <template>
-  <div class="standalone-form profile">
+  <div class="standalone-form fullwidth">
+    <router-link to="/tasks/my" class="back-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/></svg>
+    </router-link>
+
     <div class="title">
       <div class="primary">Изменить задание</div>
     </div>
@@ -7,26 +15,26 @@
       <form novalidate>
         <div class="form-group">
           <label>НАЗВАНИЕ<span class="error-text"></span></label>
-          <input type="text" class="form-control" :value="task.title">
+          <input type="text" class="form-control" v-model="task.name">
         </div>
         <div class="form-group">
           <label>ОПИСАНИЕ<span class="error-text"></span></label>
-          <textarea class="form-control" :value="task.description"></textarea>
+          <textarea class="form-control" v-model="task.description"></textarea>
         </div>
         <div class="form-group">
           <label>ОПИСАНИЕ ВХОДНЫХ ДАННЫХ<span class="error-text"></span></label>
-          <textarea class="form-control" :value="task.stdinDescription"></textarea>
+          <textarea class="form-control" v-model="task.stdinDescription"></textarea>
         </div>
         <div class="form-group">
           <label>ОПИСАНИЕ ВЫХОДНЫХ ДАННЫХ<span class="error-text"></span></label>
-            <textarea class="form-control" :value="task.stdoutDescription"></textarea>
+            <textarea class="form-control" v-model="task.stdoutDescription"></textarea>
         </div>
         <div class="form-group">
           <label>ТЕСТЫ<span class="error-text"></span></label>
-          <textarea class="form-control" :value="task.tests"></textarea>
+          <textarea class="form-control" v-model="task.tests"></textarea>
         </div>
         <div class="form-group">
-          <div class="btn" @click="updateTaskInfo($route.params.taskId, task)">Сохранить</div>
+          <div class="btn" @click="updateTaskInfo($route.params.taskId, task.toNetwork())">Сохранить</div>
         </div>
       </form>
     </div>

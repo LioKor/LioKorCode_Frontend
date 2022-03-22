@@ -12,10 +12,10 @@
   <Header></Header>
 
   <div class="two-previews previews-container">
-    <TaskPreview v-for="task in tasks.slice(0, 2)" :task="task"></TaskPreview>
+    <TaskPreview v-for="task in tasks.slice(0, 2)" :task="task" path-modifier=""></TaskPreview>
   </div>
   <div class="previews-container">
-    <TaskPreview v-for="task in tasks.slice(2)" :task="task"></TaskPreview>
+    <TaskPreview v-for="task in tasks.slice(2)" :task="task" path-modifier=""></TaskPreview>
   </div>
 </template>
 

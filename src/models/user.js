@@ -9,20 +9,21 @@ export default class User extends Model {
     password: "",
     email: "",
     fullname: "",
-    avatarUrl: "https://i.yapx.ru/GuFDE.gif",
+    //avatarUrl: "https://i.yapx.ru/GuFDE.gif",
     chosenRoomId: -1,
   }
 
   toNetworkNames = {
-    username,
-    email,
-    password,
-    fullname,
+    username: "username",
+    email: "email",
+    password: "password",
+    fullname: "fullname",
   }
 
   set(data) {
     super.set(data);
     this.isLogined = true;
+    this.avatarUrl = "https://i.yapx.ru/GuFDE.gif";
   }
 
   setChosenRoomId(id) {

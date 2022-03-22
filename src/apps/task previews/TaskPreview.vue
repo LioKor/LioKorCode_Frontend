@@ -57,7 +57,7 @@
   export default {
     props: {
       task: {},
-      pathModifier: ""
+      pathModifier: "",
     },
     mounted() {
     },

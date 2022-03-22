@@ -14,20 +14,11 @@ export default class Task extends Model {
   }
 
   toNetworkNames = {
-    name,
-    description,
-    stdinDescription,
-    stdoutDescription,
-    hints,
-    tests,
-  }
-
-  set(data) {
-    super.set(data);
-    this.isLogined = true;
-  }
-
-  setChosenRoomId(id) {
-    this.chosenRoomId = id;
+    name: "name",
+    description: "description",
+    stdinDescription: "stdinDescription",
+    stdoutDescription: "stdoutDescription",
+    hints: "hints",
+    tests: "tests",
   }
 }
