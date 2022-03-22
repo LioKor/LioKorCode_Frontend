@@ -1,29 +1,22 @@
-export default class Solution {
-  id = Number
-  datetime = String
-  checkResult = Number
-  status = String
-  testsPassed = Number
-  testsTotal = Number
+import Model from "./model";
 
-  setDefault() {
-    this.set({});
+export default class Solution extends Model {
+  default = {
+    id: '?',
+    datetime: Date.now(),
+    checkResult: -1,
+    status: 'checking',
+    testsPassed: '?',
+    testsTotal: '?',
   }
 
-  constructor() {
-    this.setDefault();
+  set(data) {
+    super.set(data);
+    this._setFormatTime();
+    this._setStatus();
   }
 
-  set({id = '?', receivedDatetime = Date.now(), checkResult = -1, testsPassed = '?', testsTotal = '?'}) {
-    this.id = id;
-    this.datetime = this.formatTime(receivedDatetime);
-    this.checkResult = checkResult;
-    this.testsPassed = testsPassed;
-    this.testsTotal = testsPassed;
-    this.status = this._getStatus();
-  }
-
-  _getStatus() {
+  _setStatus() {
     let cls = 'error';
     if (this.checkResult === 0) {
       cls = 'passed';
@@ -32,11 +25,11 @@ export default class Solution {
     } else if (this.testsPassed > 0) {
       cls = 'notFull';
     }
-    return cls;
+    this.status = cls;
   }
 
-  formatTime(date) {
-    const dt = new Date(date);
+  _setFormatTime() {
+    const dt = new Date(this.datetime);
     const curDate = dt.getDate();
     const now = new Date();
     const nowDate = now.getDate();
@@ -48,13 +41,13 @@ export default class Solution {
     dt.year = dt.getFullYear();
 
     if (curDate === nowDate) { // today
-      return `Сегодня в ${dt.hour}:${dt.minute}`;
+      this.datetime = `Сегодня в ${dt.hour}:${dt.minute}`;
     } else if (curDate === nowDate - 1) { // yesterday
-      return `Вчера в ${dt.hour}:${dt.minute}`;
+      this.datetime = `Вчера в ${dt.hour}:${dt.minute}`;
     }
     // long time ago
     if (dt.getFullYear() === now.getFullYear()) // this year
-      return `${dt.day}.${dt.month} ${dt.hour}:${dt.minute}`;
-    return `${dt.day}.${dt.month}.${dt.year} ${dt.hour}:${dt.minute}`;
+      this.datetime = `${dt.day}.${dt.month} ${dt.hour}:${dt.minute}`;
+    this.datetime = `${dt.day}.${dt.month}.${dt.year} ${dt.hour}:${dt.minute}`;
   }
 }

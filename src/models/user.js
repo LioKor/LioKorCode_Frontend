@@ -1,29 +1,28 @@
-export default class User {
-  isLogined = Boolean
-  username = String
-  login = String
-  email = String
-  fullname = String
-  avatarUrl = String
-  chosenRoomId = Number
+import Model from "./model";
 
-  setDefault() {
-    this.set({});
-    this.isLogined = false;
-    this.chosenRoomId = -1;
+export default class User extends Model {
+  default = {
+    id: '?',
+    isLogined: false,
+    username: "",
+    login: "",
+    password: "",
+    email: "",
+    fullname: "",
+    avatarUrl: "https://i.yapx.ru/GuFDE.gif",
+    chosenRoomId: -1,
   }
 
-  constructor() {
-    this.setDefault();
+  toNetworkNames = {
+    username,
+    email,
+    password,
+    fullname,
   }
 
-  set({username = "", login = "", email = "", fullname = "", avatarUrl = "https://i.yapx.ru/GuFDE.gif"}) {
+  set(data) {
+    super.set(data);
     this.isLogined = true;
-    this.username = username;
-    this.login = login;
-    this.email = email;
-    this.fullname = fullname;
-    this.avatarUrl = avatarUrl;
   }
 
   setChosenRoomId(id) {
