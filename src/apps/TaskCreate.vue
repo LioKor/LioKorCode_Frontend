@@ -8,7 +8,7 @@
     </router-link>
 
     <div class="title">
-      <div class="primary">Изменить задание</div>
+      <div class="primary">Создать задание</div>
     </div>
     <div class="form">
       <form novalidate>
@@ -37,10 +37,7 @@
           <textarea class="form-control" v-model="tests"></textarea>
         </div>
         <div class="form-group">
-          <div class="btn" @click="updateTaskInfo($route.params.taskId, task.toNetwork())">Сохранить</div>
-        </div>
-        <div class="form-group">
-          <div class="btn btn-danger" @click="deleteTask($route.params.taskId)">Удалить задание</div>
+          <div class="btn" @click="createTask(task.toNetwork())">Создать</div>
         </div>
       </form>
     </div>
@@ -58,41 +55,13 @@
       }
     },
 
-    async mounted() {
-      this.task.set(await this.getTask(this.$route.params.taskId));
-      this.tests = JSON.stringify(this.task.tests);
-    },
-
     methods: {
-      async getTask(id) {
-        const taskInfo = await this.$store.state.api.getTask(id);
-
-        if (!taskInfo.ok_) {
-          alert("Не получилось получить задание")
-          return {};
-        }
-        return taskInfo;
-      },
-
-      async updateTaskInfo(id, taskInfo) {
-        const result = await this.$store.state.api.updateTask(id, taskInfo);
+      async createTask(taskInfo) {
+        const result = await this.$store.state.api.createTask(taskInfo);
 
         if (!result.ok_) {
-          alert("Не получилось обновить задание");
+          alert("Не получилось создать задание");
           return {};
-        }
-        alert("Обновлено");
-        return result;
-      },
-
-      async deleteTask(id) {
-        if (!confirm("Точно удаляем задание?"))
-          return;
-
-        const result = await this.$store.state.api.deleteTask(id);
-        if (!result.ok_) {
-          alert("Не получилось удалить задание");
-          return;
         }
         this.$router.push('/tasks/my');
       },

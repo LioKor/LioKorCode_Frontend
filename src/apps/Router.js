@@ -8,10 +8,12 @@ import Profile from './Profile.vue'
 import SignUp from './SignUp.vue'
 import TaskList from './task previews/Page.vue'
 import Page404 from './Page404.vue'
+import TaskCreate from './TaskCreate.vue';
 
 export default function createVueRouter(Store) {
     const routes = [
         {path: '/', component: TaskList},
+        {path: '/task/create', component: TaskCreate},
         {path: '/task/:taskId', component: Task},
         {path: '/tasks/my', component: MyTasks},
         {path: '/task/edit/:taskId', component: TaskEdit},

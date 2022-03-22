@@ -21,4 +21,10 @@ export default class Task extends Model {
     hints: "hints",
     tests: "tests",
   }
+
+  toNetwork() {
+    const data = super.toNetwork();
+    data.tests = JSON.stringify(this.tests);
+    return data;
+  }
 }

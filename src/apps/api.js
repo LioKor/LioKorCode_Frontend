@@ -15,7 +15,7 @@ export default class Api extends ApiRequest {
     getMyTasks = () => this.get(`/tasks/user`);
     getUserTasks = (userId) => this.get(`/tasks/user/${userId}`);
     updateTask = (id, taskData) => this.put(`/tasks/${id}`, taskData);
-    deleteTask = (id) => this.post(`/tasks/${id}`);
+    deleteTask = (id) => this.delete(`/tasks/${id}`);
 
     sendSolution = (id, solution) => this.post(`/tasks/${id}/solutions`, solution);
     getSolutions = (id) => this.get(`/tasks/${id}/solutions`);
