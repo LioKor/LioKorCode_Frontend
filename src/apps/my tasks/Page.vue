@@ -57,7 +57,7 @@
     <TaskPreview v-for="task in tasks" :task="task" path-modifier="/edit"></TaskPreview>
   </div>
 
-  <router-link to="/task/create" class="float-button" href="/quest-create">
+  <router-link to="/task/create" class="float-button">
     <div class="hover-text">Добавить задание</div>
     <svg pointer-events="none" xmlns="http://www.w3.org/2000/svg"><path transform="scale(2.2) translate(-1,-1)" d="M10 3.25c.41 0 .75.34.75.75v5.25H16a.75.75 0 010 1.5h-5.25V16a.75.75 0 01-1.5 0v-5.25H4a.75.75 0 010-1.5h5.25V4c0-.41.34-.75.75-.75z"></path></svg>
   </router-link>
