@@ -80,7 +80,8 @@
         const solution = new Solution();
         solution.uid_ = this.addedSolutions++;
 
-        this.solutions = this.solutions.slice(0, this.solutions.length - 1);
+        if (this.solutions.length >= 10)
+          this.solutions = this.solutions.slice(0, this.solutions.length - 1);
         this.solutions.unshift(solution);
 
         return solution.uid_;
