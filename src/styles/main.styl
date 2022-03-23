@@ -6,8 +6,9 @@
 body
     font-family Arial
     margin 0
-    overflow hidden
-    max-height 100vh
+    overflow-x hidden
+    overflow-y scroll
+    min-height 100vh
 
     background global-background;
     transition background-color ease 0.3s
@@ -41,7 +42,7 @@ button:hover
 #app
     display flex
     flex-direction column
-    height 100vh
+    //height 100vh
 
 a
     text-decoration none

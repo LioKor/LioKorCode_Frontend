@@ -22,9 +22,8 @@ export default class Task extends Model {
     tests: "tests",
   }
 
-  toNetwork() {
-    const data = super.toNetwork();
-    data.tests = JSON.stringify(this.tests);
-    return data;
+  set(data) {
+    super.set(data, this);
+    this.tests = data.tests || [];
   }
 }
