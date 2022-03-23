@@ -27,7 +27,7 @@
 </style>
 
 <template>
-  <header class="lite desktop-only">
+  <header class="lite mobile-hide">
     <div class="logo">
       <div class="image">
         <img src="../images/liokor_logo.png" alt="logo">

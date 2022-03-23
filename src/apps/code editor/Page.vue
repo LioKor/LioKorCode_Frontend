@@ -5,7 +5,8 @@
     background-color white
 
   .code-editor-page
-    height 100%
+    height 100vh
+    overflow hidden
     color textColor1
 
   .task-and-editor
