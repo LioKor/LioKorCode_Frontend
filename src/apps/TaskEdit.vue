@@ -106,7 +106,6 @@
 
       addTestToList() {
         this.$refs.list.addItem();
-        console.log(this.task.tests);
       },
     }
   }

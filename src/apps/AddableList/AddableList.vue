@@ -118,7 +118,6 @@
       },
 
       updateVModel() {
-        console.log(this.modelValue);
         this.$emit('update:modelValue', this.modelValue);
       }
     }

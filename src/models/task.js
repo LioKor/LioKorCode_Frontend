@@ -26,4 +26,9 @@ export default class Task extends Model {
     super.set(data, this);
     this.tests = data.tests || [];
   }
+
+  constructor() {
+    super();
+    super.setDefault(this);
+  }
 }

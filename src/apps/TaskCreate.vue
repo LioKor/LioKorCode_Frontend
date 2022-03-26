@@ -68,6 +68,10 @@
         }
         this.$router.push('/tasks/my');
       },
+
+      addTestToList() {
+        this.$refs.list.addItem();
+      },
     }
   }
 </script>

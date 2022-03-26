@@ -36,9 +36,17 @@
     <Header ref="header" @startCheck="checkSolution"/>
 
     <div id="taskBlock" class="task-and-editor">
-      <TaskInfo ref="taskInfo" :id="taskId"/>
+      <TaskInfo ref="taskInfo" :id="taskId"></TaskInfo>
 
-      <SlideLine el1="taskInfo" el2="editorBlock" class="vertical"/>
+      <Tree name="Project" :items="[
+          {name: 'File1', value: 'txt1'},
+          {name: 'Folder1', value: [
+              {name: 'file3', value: 'text3'}
+          ]},
+          {name: 'file4', value: 'textt4'}
+          ]"></Tree>
+
+      <SlideLine el1="tree" el2="editorBlock" class="vertical"/>
 
       <Editor ref="editor"/>
     </div>
@@ -56,10 +64,11 @@
   import Header from './Header.vue';
 
   import SlideLine from '../SlideLine.vue';
+  import Tree from "./FilesTree/Tree.vue";
 
 
   export default {
-    components: { Header, TaskInfo, Editor, Solutions, SlideLine },
+    components: {Tree, Header, TaskInfo, Editor, Solutions, SlideLine},
 
     data() {
       return {
