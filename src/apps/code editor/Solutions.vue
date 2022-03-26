@@ -5,7 +5,6 @@
 
   #solutions
     background background
-    position relative
     overflow-y scroll
     table
       width 50%
@@ -14,7 +13,7 @@
         td
           text-align center
           padding 10px
-          border 1px solid monokai-bg-light
+          border 1px solid color3
         td.passed
           background #365e36
         td.checking
@@ -28,7 +27,7 @@
 <template>
   <div id="solutions" class="scrollable">
     <table>
-      <tr v-for="solution in solutions">
+      <tr v-for="solution in solutions" class="withHint" :data-hint="solution.message">
         <td v-if="solution.status === 'passed'" class="passed">{{ solution.id }}</td>
         <td v-else-if="solution.status === 'checking'" class="checking">{{ solution.id }}</td>
         <td v-else-if="solution.status === 'notFull'" class="notFull">{{ solution.id }}</td>

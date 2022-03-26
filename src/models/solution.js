@@ -9,6 +9,7 @@ export default class Solution extends Model {
     status: 'checking',
     testsPassed: '?',
     testsTotal: '?',
+    message: '?',
   }
 
   set(data) {
@@ -24,13 +25,29 @@ export default class Solution extends Model {
 
   _setStatus() {
     let cls = 'error';
-    if (this.checkResult === 0) {
+    switch (this.checkResult) {
+    case 0:
       cls = 'passed';
-    } else if (this.checkResult === 1) {
-      cls = 'checking';
-    } else if (this.testsPassed > 0) {
-      cls = 'notFull';
+      this.message = 'passed';
+      break;
+    case 1:
+      this.message = 'compile error';
+      break;
+    case 2:
+      this.message = 'runtime error';
+      break;
+    case 3:
+      this.message = 'check error';
+      break;
+    case 4:
+      this.message = 'timeout';
+      break;
+    case 5:
+      this.message = 'outdated (task changed)';
+      break;
     }
+    if (cls === 'error' && this.testsPassed > 0)
+      cls = 'notFull';
     this.status = cls;
   }
 

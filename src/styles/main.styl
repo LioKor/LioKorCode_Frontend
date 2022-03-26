@@ -40,8 +40,8 @@ button
     transition 0.3s ease all;
 
 button:hover
-    border-color orange
-    box-shadow 0 0 2px orange
+    border-color color4
+    box-shadow 0 0 2px color4
 
 a
     text-decoration none
@@ -50,3 +50,15 @@ a
     cursor pointer
 a:hover
     color textColor1
+
+.withHint
+    position relative
+    cursor pointer
+    pointer-events all
+.withHint:hover:after
+    content attr(data-hint)
+    position absolute
+    right 0
+    height 100%
+    background colorShadow
+    box-shadow 5px 0 5px colorShadow
