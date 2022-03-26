@@ -34,7 +34,8 @@
         </div>
         <div class="form-group">
           <label>ТЕСТЫ<span class="error-text"></span></label>
-          <textarea class="form-control" v-model="tests"></textarea>
+          <AddableList v-model="task.tests" ref="list"></AddableList>
+          <div class="btn thin" @click="addTestToList">Добавить тест</div>
         </div>
         <div class="form-group">
           <div class="btn" @click="createTask(task.toNetwork())">Создать</div>
@@ -46,12 +47,14 @@
 
 <script>
   import Task from "../models/task.js";
+  import AddableList from "./AddableList/AddableList.vue";
 
   export default {
+    components: {AddableList},
+
     data() {
       return {
         task: new Task(),
-        tests: "",
       }
     },
 

@@ -2,8 +2,8 @@
   @require '../styles/constants.styl'
 
   .btn.thin
-    padding-top 2px
-    padding-bottom 2px
+    padding-top 4px
+    padding-bottom 4px
 </style>
 
 <template>
