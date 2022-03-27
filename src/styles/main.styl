@@ -51,14 +51,25 @@ a
 a:hover
     color textColor1
 
+
 .withHint
     position relative
     cursor pointer
     pointer-events all
-.withHint:hover:after
+.withHint:after
     content attr(data-hint)
+    opacity 0
+    transition all 0.2s ease
+    padding 8px
+    margin 0
     position absolute
-    right 0
     height 100%
+    box-sizing border-box
     background colorShadow
     box-shadow 5px 0 5px colorShadow
+    display flex
+    align-items center
+    justify-content center
+    white-space nowrap
+.withHint:hover:after
+    opacity 1
