@@ -41,6 +41,9 @@
 </template>
 
 <script>
+  const lineWidth = 15;
+  const lineBigWidth = 30;
+
   export default {
     data() {
       return {
@@ -48,6 +51,8 @@
         rightBlock: HTMLElement, // TODO: make non-reactive
         el: HTMLElement, // TODO: make non-reactive
         isInSlide: false, // TODO: make non-reactive
+        isLeftCollapsed: false,
+        isRightCollapsed: false,
       }
     },
     props: {
@@ -83,31 +88,34 @@
       applySlide(leftPercentage) {
         if (leftPercentage <= 2) { // due to padding can't hide if only width is 0
           this.leftBlock.style.display = 'none';
-          this.rightBlock.style[this.mode] = '100%';
-          this.el.style[this.mode] = '50px';
+          this.rightBlock.style[this.mode] = `calc(100% - ${lineBigWidth}px)`;
+          this.el.style[this.mode] = lineBigWidth + 'px';
+          this.isLeftCollapsed = true;
+
         } else if (leftPercentage >= 98) {
-          this.leftBlock.style[this.mode] = '100%';
+          this.leftBlock.style[this.mode] = `calc(100% - ${lineBigWidth}px)`;
           this.rightBlock.style.display = 'none';
-          this.el.style[this.mode] = '50px';
+          this.el.style[this.mode] = lineBigWidth + 'px';
+          this.isRightCollapsed = true;
+
         } else {
           this.leftBlock.style.removeProperty('display');
           this.leftBlock.style[this.mode] = leftPercentage + '%';
-          this.el.style[this.mode] = null;
-
+          this.el.style.removeProperty(this.mode);
           this.rightBlock.style.removeProperty('display');
           this.rightBlock.style[this.mode] = (100 - leftPercentage) + '%';
+          this.isLeftCollapsed = false;
+          this.isRightCollapsed = false;
         }
       },
       startSlide() {
         this.isInSlide = true;
         document.body.style.setProperty('user-select', 'none');
-        document.body.style.setProperty('cursor', 'pointer');
       },
       endSlide() {
         if (this.isInSlide) {
           this.isInSlide = false;
           document.body.style.removeProperty('user-select');
-          document.body.style.removeProperty('cursor');
 
           let leftPercentage = 0;
           if (this.rightBlock.style.display === 'none') {
@@ -121,17 +129,20 @@
       },
       slideEvent(e) {
         if (this.isInSlide) {
-          let percPos;
+          let percPos, offset, cursorPos;
           switch (this.mode) {
             case 'width':
-              //const maxWidth = this.leftBlock.scrollWidth + this.el.scrollWidth + this.rightBlock.scrollWidth;
-              const maxWidth = window.innerWidth;
-              percPos = Math.round(e.pageX / maxWidth * 100);
+              const maxWidth = this.leftBlock.clientWidth + this.el.clientWidth + this.rightBlock.clientWidth;
+              offset = this.isLeftCollapsed ? this.$el.offsetLeft : this.leftBlock.offsetLeft;
+              cursorPos = (e.pageX - offset);
+              percPos = cursorPos / maxWidth * 100;
               break;
             case 'height':
-              //const maxHeight = this.leftBlock.scrollHeight + this.el.scrollHeight + this.rightBlock.scrollHeight;
-              const maxHeight = window.innerHeight;
-              percPos = Math.round(e.pageY / maxHeight * 100);
+              const maxHeight = this.leftBlock.clientHeight + this.el.clientHeight + this.rightBlock.clientHeight;
+              offset = this.isLeftCollapsed ? this.$el.offsetTop : this.leftBlock.offsetTop;
+              cursorPos = (e.pageY - offset);
+              percPos = cursorPos / maxHeight * 100;
+              console.log(maxHeight, cursorPos, percPos);
               break;
           }
           this.applySlide(percPos);

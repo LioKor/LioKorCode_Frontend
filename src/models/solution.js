@@ -25,28 +25,19 @@ export default class Solution extends Model {
 
   _setStatus() {
     let cls = 'error';
-    switch (this.checkResult) {
-    case 0:
-      cls = 'passed';
-      this.message = 'passed';
-      break;
-    case 1:
-      this.message = 'compile error';
-      break;
-    case 2:
-      this.message = 'runtime error';
-      break;
-    case 3:
-      this.message = 'check error';
-      break;
-    case 4:
-      this.message = 'timeout';
-      break;
-    case 5:
-      this.message = 'outdated (task changed)';
-      break;
+    const checkResults = {
+      0: 'passed',
+      1: 'checking',
+      2: 'compile error',
+      3: 'runtime error',
+      4: 'check error',
+      5: 'timeout',
+      6: 'outdated (task changed)',
     }
-    if (cls === 'error' && this.testsPassed > 0)
+    this.message = checkResults[this.checkResult];
+    if (this.checkResult === 0) {
+      cls = 'passed';
+    } else if (this.testsPassed > 0)
       cls = 'notFull';
     this.status = cls;
   }

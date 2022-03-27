@@ -6,6 +6,9 @@
     position relative
     > *
       position absolute
+
+  #aceEditor
+    width 100%
 </style>
 
 <template>

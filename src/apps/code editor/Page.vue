@@ -25,35 +25,42 @@
         td, th
           border 1px solid #BABABA
           padding 5px
-    div#editorBlock
-      width 70%
-      #aceEditor
-        width 100%
+
+  #taskInfo-and-tree
+    display flex
+    #taskInfo
+      flex 1
+
+  #code-editor-all
+    height 'calc(100% - %s)' % headerHeight
 </style>
 
 <template>
   <div class="code-editor-page">
     <Header ref="header" @startCheck="checkSolution"/>
 
-    <div id="taskBlock" class="task-and-editor">
-      <TaskInfo ref="taskInfo" :id="taskId"></TaskInfo>
+    <div id="code-editor-all">
+      <div id="taskBlock" class="task-and-editor">
+        <div id="taskInfo-and-tree">
+          <TaskInfo ref="taskInfo" :id="taskId"></TaskInfo>
 
-      <Tree name="Project" :items="[
-          {name: 'File1', value: 'txt1'},
-          {name: 'Folder1', value: [
-              {name: 'file3', value: 'text3'}
-          ]},
-          {name: 'file4', value: 'textt4'}
-          ]"></Tree>
+          <Tree name="Project" :items="[
+              {name: 'File1', value: 'txt1'},
+              {name: 'Folder1', value: [
+                  {name: 'file3', value: 'text3'}
+              ]},
+              {name: 'file4', value: 'textt4'}
+              ]"></Tree>
+        </div>
+        <SlideLine el1="taskInfo-and-tree" el2="editorBlock" class="vertical"/>
 
-      <SlideLine el1="tree" el2="editorBlock" class="vertical"/>
+        <Editor ref="editor"/>
+      </div>
 
-      <Editor ref="editor"/>
+      <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
+
+      <Solutions ref="solutions" :id="taskId"/>
     </div>
-
-    <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
-
-    <Solutions ref="solutions" :id="taskId"/>
   </div>
 </template>
 
