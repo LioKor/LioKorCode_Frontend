@@ -4,10 +4,10 @@
 </style>
 
 <template>
-  <li tabindex="1" class="tree-folder">{{name}}</li>
-  <ul>
-    <Item v-for="folder in folders" ref="folders" :name="folder.name" :items="folder.value"></Item>
-    <li tabindex="1" v-for="file in files" class="tree-file">{{file.name}}</li>
+  <li v-if="typeof item.value === 'string'" class="context-tree-file" :data-idx-path="idxPath">{{item.name}}</li>
+  <ul v-else>
+    <li tabindex="1" class="name folder context-tree-folder" :data-idx-path="idxPath" v-if="item.name">{{item.name}}</li>
+    <Item ref="innerItems" v-for="(innerItem, idx) in item.value" :item="innerItem" :idx-path="idxPath.concat(idx)"></Item>
   </ul>
 </template>
 
@@ -16,45 +16,22 @@
     name: "Item",
 
     props: {
-      name: {
-        type: String,
-        default: "",
+      item: {
+        type: Object,
+        required: true,
       },
-      items: {
-        type: [],
-        default: [],
+      idxPath: {
+        type: Array,
         required: true,
       }
-    },
-
-    data() {
-      return {
-        folders: [],
-        files: [],
-      }
-    },
-
-    async mounted() {
-      this.items.forEach((item) => {
-        if (typeof item.value === "string")
-          this.files.push(item);
-        else
-          this.folders.push(item);
-      });
     },
 
     methods: {
       getTree() {
         const tree = [];
-        this.$refs.folders.forEach(folder => tree.push(folder.getTree()));
+        this.$refs.innerItems.forEach(folder => tree.push(folder.getTree()));
         this.files.forEach(file => tree.push(file));
         return tree;
-      },
-      addFolder(name = "") {
-        this.folders.push({name: name, value: []});
-      },
-      addFile(name = "") {
-        this.files.push({name: name, value: ""});
       },
     }
   }

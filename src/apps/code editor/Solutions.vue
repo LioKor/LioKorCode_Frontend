@@ -64,7 +64,7 @@
       }
 
       let solutionsInfo = await this.getSolutions(this.$props.id);
-      solutionsInfo = solutionsInfo.slice(solutionsInfo.length - 10, solutionsInfo.length).reverse();
+      solutionsInfo = solutionsInfo.slice(-10).reverse();
 
       this.solutions = [];
       solutionsInfo.forEach(solutionInfo => {

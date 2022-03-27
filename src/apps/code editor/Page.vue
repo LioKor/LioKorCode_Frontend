@@ -47,7 +47,11 @@
           <Tree name="Project" :items="[
               {name: 'File1', value: 'txt1'},
               {name: 'Folder1', value: [
-                  {name: 'file3', value: 'text3'}
+                  {name: 'File6', value: 'txxxx6'},
+              ]},
+              {name: 'Folder2', value: [
+                  {name: 'File2', value: 'tx2'},
+                  {name: 'file3', value: 'text3'},
               ]},
               {name: 'file4', value: 'textt4'}
               ]"></Tree>

@@ -5,13 +5,14 @@
     display: none;
     position: absolute;
     z-index: 10;
-    padding: 12px 20px;
+    padding: 12px 15px;
     width: 240px;
     background-color: mix(color2, transparent);
     border: solid 1px color4;
     box-shadow: 0 0 5px colorShadow;
     list-style: none;
     > li
+      cursor: pointer;
       display: block;
       padding: 2px 6px;
       margin-bottom: 4px;
@@ -28,7 +29,7 @@
 <template>
   <ul v-for="(menu, menuIdx) in menus" class="context-menu in-context-menu" ref="menus" :data-menu-idx="menuIdx">
     {{menu.name}}
-    <li v-for="item in menu.items" ref="items" @click="item.action(); hideAllMenus();" class="context-menu-item in-context-menu">{{item.name}}</li>
+    <li v-for="item in menu.items" ref="items" @click="item.action(contextElement); hideAllMenus();" class="context-menu-item in-context-menu">{{item.name}}</li>
   </ul>
 </template>
 
