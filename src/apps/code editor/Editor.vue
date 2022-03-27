@@ -45,7 +45,6 @@
       this.aceEditor.on('change', () => {
         const text = this.aceEditor.getValue();
         //localStorage.setItem('code', text);
-        console.log(text);
         this.$emit('editorChange', text);
       });
 
@@ -65,7 +64,7 @@
 
     methods: {
       setText(text) {
-        this.aceEditor.setValue(text, 1);
+        this.aceEditor.setValue(text, 1); // ', 1' to disable selection
       }
     }
   }

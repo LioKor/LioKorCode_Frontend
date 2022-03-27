@@ -11,8 +11,9 @@
     {{item.name}}
   </li>
   <ul v-else>
-    <li tabindex="1" class="name folder context-tree-folder" :data-idx-path="idxPath" v-if="item.name">{{item.name}}
-      @click="$emit('selectFile', $el)
+    <li tabindex="1" class="name folder context-tree-folder" :data-idx-path="idxPath" v-if="item.name"
+      @click="$emit('selectFile', $el)">
+      {{item.name}}
     </li>
     <Item ref="innerItems" v-for="(innerItem, idx) in item.value" :item="innerItem" :idx-path="idxPath.concat(idx)"
           @select-file="(el) => {$emit('selectFile', el)}"

@@ -101,6 +101,7 @@
     },
 
     mounted() {
+      this.loadFromLocalStorage();
       this.sortFiles();
     },
 
@@ -117,6 +118,8 @@
             return -1;
           }
         });
+
+        this.saveToLocalStorage();
       },
 
       getItemPath(el) {
@@ -143,7 +146,6 @@
           return;
 
         const path = this.getItemPath(el);
-        console.log(path);
         if (!path.length) { // add to root
           this.reactiveItems.push({name: name, value: itemValue})
           this.sortFiles();
@@ -184,7 +186,6 @@
       copyItem(el) {
         this.selectedItem.path = this.getItemPath(el);
         this.selectedItem.mode = 'copy';
-        console.log(this.selectedItem.path);
       },
       cutItem(el) {
         this.selectedItem.path = this.getItemPath(el);
@@ -224,15 +225,36 @@
         this.$emit("openFileText", list[idx].value);
       },
 
-      getTree() {
-        return this.reactiveItems;
+      getSource(prefix = "", list = this.reactiveItems) {
+        const source = {};
+        if (prefix !== '')
+          prefix += '/';
+        list.forEach((item) => {
+          if (typeof item.value === 'string')
+            source[prefix + item.name] = item.value;
+          else
+            Object.assign(source, this.getSource(prefix + item.name, item.value));
+        });
+        return source;
       },
 
       setOpenedFileText(text) {
         if (!this.openedItem.path.length)
           return;
         this.openedItem.item.value = text;
-      }
+
+        this.saveToLocalStorage();
+      },
+
+      saveToLocalStorage() {
+        localStorage.setItem('filesTree', JSON.stringify(this.reactiveItems));
+      },
+      loadFromLocalStorage() {
+        const list = JSON.parse(localStorage.getItem('filesTree'));
+        if (list && list.length) {
+          this.reactiveItems = list;
+        }
+      },
     }
   }
 </script>

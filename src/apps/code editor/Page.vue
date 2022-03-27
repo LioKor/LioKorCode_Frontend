@@ -97,9 +97,9 @@ int main() {
 
         this.$refs.header.checkBegin();
         const solutionUid = this.$refs.solutions.addEmptySolution();
-        const code = this.$refs.editor.aceEditor.getValue();
+        const source = this.$refs.tree.getSource();
         const preCheckInfo = await this.$store.state.api.sendSolution(this.taskId, {
-          sourceCode: code
+          sourceCode: source
         });
         if (!preCheckInfo.ok_) {
           alert("Не удалось отправить решение");
