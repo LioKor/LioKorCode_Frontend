@@ -142,7 +142,6 @@
               offset = this.isLeftCollapsed ? this.$el.offsetTop : this.leftBlock.offsetTop;
               cursorPos = (e.pageY - offset);
               percPos = cursorPos / maxHeight * 100;
-              console.log(maxHeight, cursorPos, percPos);
               break;
           }
           this.applySlide(percPos);

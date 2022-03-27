@@ -12,6 +12,9 @@
     li:hover
       background color4
       color textColor1
+    li:focus
+      background color5
+      color textColor1
     li.name
       margin-left 0
     li.name.folder
@@ -29,9 +32,9 @@
 </style>
 
 <template>
-  <ul id="tree" class="context-tree-root" @addFile="addFile" @addFolder="addFolder">
+  <ul id="tree" class="context-tree-root">
     <li tabindex="1" class="name root context-tree-root" data-idx-path="">{{name}}</li>
-    <Item v-for="(item, idx) in reactiveItems" :item="item" :idx-path="[idx]"></Item>
+    <Item v-for="(item, idx) in reactiveItems" :item="item" :idx-path="[idx]" @open-file="openFile" @select-file="selectFile"></Item>
   </ul>
 
   <ContextMenu :menus="[
@@ -93,6 +96,7 @@
       return {
         reactiveItems: this.$props.items, // to make items reactive
         selectedItem: {path: [], mode: ""}, // todo: make non-reactive
+        openedItem: {path: [], el: HTMLElement, item: {}},
       }
     },
 
@@ -204,6 +208,30 @@
         const {list, idx} = this.findItem(this.getItemPath(el));
         list.push(deepClone(list[idx]));
         this.sortFiles(list);
+      },
+
+      selectFile(el) {
+      },
+      openFile(el) {
+        if (this.openedItem.path.length)
+          this.openedItem.el.classList.remove('opened');
+        el.classList.add('opened');
+        const path = this.getItemPath(el);
+        const {list, idx} = this.findItem(path);
+        this.openedItem.path = path;
+        this.openedItem.el = el;
+        this.openedItem.item = list[idx];
+        this.$emit("openFileText", list[idx].value);
+      },
+
+      getTree() {
+        return this.reactiveItems;
+      },
+
+      setOpenedFileText(text) {
+        if (!this.openedItem.path.length)
+          return;
+        this.openedItem.item.value = text;
       }
     }
   }

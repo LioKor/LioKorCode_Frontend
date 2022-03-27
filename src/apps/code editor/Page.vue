@@ -37,28 +37,29 @@
 
 <template>
   <div class="code-editor-page">
-    <Header ref="header" @startCheck="checkSolution"/>
+    <Header ref="header" @start-check="checkSolution"/>
 
     <div id="code-editor-all">
       <div id="taskBlock" class="task-and-editor">
         <div id="taskInfo-and-tree">
           <TaskInfo ref="taskInfo" :id="taskId"></TaskInfo>
 
-          <Tree name="Project" :items="[
-              {name: 'File1', value: 'txt1'},
-              {name: 'Folder1', value: [
-                  {name: 'File6', value: 'txxxx6'},
-              ]},
-              {name: 'Folder2', value: [
-                  {name: 'File2', value: 'tx2'},
-                  {name: 'file3', value: 'text3'},
-              ]},
-              {name: 'file4', value: 'textt4'}
-              ]"></Tree>
+          <Tree ref="tree" name="Project" :items="[
+              {name: 'prog.c', value: `#include <stdio.h>
+int main() {
+\treturn 0;
+}
+`},
+              {name: 'Makefile', value: `all:
+  gcc prog.c -o prog.o
+  ./prog.o
+`}
+              ]"
+          @open-file-text="setEditorText"></Tree>
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editorBlock" class="vertical"/>
 
-        <Editor ref="editor"/>
+        <Editor ref="editor" @editor-change="setOpenedFileText"/>
       </div>
 
       <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
@@ -109,6 +110,13 @@
         const checkInfo = await this.$store.state.api.getSolution(this.taskId, preCheckInfo.id);
         this.$refs.header.checkDone();
         this.$refs.solutions.replaceSolution(solutionUid, checkInfo);
+      },
+
+      setEditorText(text) {
+        this.$refs.editor.setText(text);
+      },
+      setOpenedFileText(text) {
+        this.$refs.tree.setOpenedFileText(text);
       }
     }
   }

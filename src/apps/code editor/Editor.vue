@@ -41,14 +41,16 @@
         fontSize: '12pt',
       });
 
+      // this.aceEditor.setValue(localStorage.getItem('code') || "");
       this.aceEditor.on('change', () => {
-        localStorage.setItem('code', this.aceEditor.getValue());
-      })
+        const text = this.aceEditor.getValue();
+        //localStorage.setItem('code', text);
+        console.log(text);
+        this.$emit('editorChange', text);
+      });
 
       this.aceEditor.setTheme('ace/theme/ambiance');
       this.aceEditor.session.setMode('ace/mode/c_cpp');
-
-      this.aceEditor.setValue(localStorage.getItem('code') || "");
 
       // const scrollbar = document.querySelector('.ace_scrollbar');
       // console.log(scrollbar)
@@ -58,6 +60,12 @@
       if (!this.$store.state.user.isLogined) {
         this.aceEditor.setReadOnly(true);
         this.showNeedToLogin = true;
+      }
+    },
+
+    methods: {
+      setText(text) {
+        this.aceEditor.setValue(text, 1);
       }
     }
   }
