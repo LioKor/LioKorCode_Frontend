@@ -1,6 +1,10 @@
 <style lang="stylus">
   @import "../styles/constants.styl"
 
+  font-size = 16px
+  font-size-hints = 12px
+  text-color = textColor2
+  text-color-hints = textColor5
   .context-menu
     display: none;
     position: absolute;
@@ -17,19 +21,27 @@
       padding: 2px 6px;
       margin-bottom: 4px;
       background color3
-      color textColor3
+      font-size font-size
+      color text-color
+      .context-item-hint
+        float right
+        font-size font-size-hints
+        color text-color-hints
+        line-height font-size
     > li:hover,
     > li:focus
       background color4
   .context-menu.active
     display: block;
-
 </style>
 
 <template>
   <ul v-for="(menu, menuIdx) in menus" class="context-menu in-context-menu" ref="menus" :data-menu-idx="menuIdx">
     {{menu.name}}
-    <li v-for="item in menu.items" ref="items" @click="item.action(contextElement); hideAllMenus();" class="context-menu-item in-context-menu">{{item.name}}</li>
+    <li v-for="item in menu.items" ref="items" @click.capture="item.action(contextElement); hideAllMenus();" class="context-menu-item in-context-menu">
+      <span class="context-item-name">{{item.name}}</span>
+      <span class="context-item-hint">{{item.hint}}</span>
+    </li>
   </ul>
 </template>
 
@@ -94,30 +106,30 @@
       },
 
       setKeyControlsListener() {
-        document.addEventListener('keydown', (e) => {
-          switch (e.code) {
-          case 'Escape':
-            this.hideAllMenus();
-            break;
-          case 'Enter':
-            this.hideAllMenus();
-            break;
-          case 'ArrowDown':
-            // const focusEl = this.$refs.items.find(el => el.hasFocus());
-            // if (!focusEl) {
-            //   this.$refs[0].focus();
-            //   return;
-            // }
-            // const nextEl = focusEl.nextElementSibling;
-            // if (!nextEl)
-            //   return;
-            // focusEl.blur();
-            // nextEl.focus();
-            break;
-          case 'ArrowUp':
-            break;
-          }
-        });
+        // document.addEventListener('keydown', (e) => {
+        //   switch (e.code) {
+        //   case 'Escape':
+        //     this.hideAllMenus();
+        //     break;
+        //   case 'Enter':
+        //     this.hideAllMenus();
+        //     break;
+        //   case 'ArrowDown':
+        //     // const focusEl = this.$refs.items.find(el => el.hasFocus());
+        //     // if (!focusEl) {
+        //     //   this.$refs[0].focus();
+        //     //   return;
+        //     // }
+        //     // const nextEl = focusEl.nextElementSibling;
+        //     // if (!nextEl)
+        //     //   return;
+        //     // focusEl.blur();
+        //     // nextEl.focus();
+        //     break;
+        //   case 'ArrowUp':
+        //     break;
+        //   }
+        // }, Modernizr.passiveeventlisteners ? {passive: true} : false);
       },
 
       showMenu(menuIdx) {

@@ -1,26 +1,49 @@
 <style lang="stylus">
   @import "../../../styles/constants.styl"
 
-  #tree
+  font-size = 16px
+
+  .tree-container
     background color2
+  .tree
     padding 5px
     margin 0
+    overflow-x hidden
+    tab-index 1
     li
       margin-left 20px
       pointer-events visible
       color textColor3
+      font-size font-size
+      position relative
+      outline none
+      z-index 0
+      cursor default
+    li:before
+      position absolute
+      left -500px
+      width 1000px
+      height (font-size + 2)
+      z-index -1
     li:hover
-      background color4
       color textColor1
-    li:focus
-      background color5
-      color textColor1
+    li:hover:before
+      content ""
+      background color1mostLighter
     li.name
       margin-left 0
     li.name.folder
       list-style georgian
     li.name.root
       list-style none
+    li:selected
+      color textColor1
+    li.selected:before
+      content ""
+      background color3
+    li.selected:focus:before
+      background color4
+
     ul
       margin 0
       padding 0
@@ -29,47 +52,65 @@
       background linear-gradient(color4, transparent) no-repeat
       background-size 2px calc(100% - 20px)
       background-position 0 20px
+      z-index 0
 </style>
 
 <template>
-  <ul id="tree" class="context-tree-root">
-    <li tabindex="1" class="name root context-tree-root" data-idx-path="">{{name}}</li>
-    <Item v-for="(item, idx) in reactiveItems" :item="item" :idx-path="[idx]" @open-file="openFile" @select-file="selectFile"></Item>
-  </ul>
+  <div id="tree" class="tree-container">
+    <ul class="tree context-tree-root root"
+      @keyp.delete="proxyFileFoo(deleteItem, true)"
+      @keyup.ctrl.c="proxyFileFoo(copyItem)"
+      @keyup.ctrl.x="proxyFileFoo(cutItem)"
+      @keyup.ctrl.v="proxyFileFoo(pasteItem)"
+      @keyup.alt.shift.d="proxyFileFoo(duplicateItem)"
+      @keyup.f2.prevent="proxyFileFoo(renameItem)"
+      @keyup.ctrl.insert.prevent="proxyFileFooNotNull(addFile)"
+      @keyup.alt.insert.prevent="proxyFileFooNotNull(addFolder)"
+      @keydown.up.prevent="selectPrevious"
+      @keydown.down.prevent="selectNext"
+      @keydown.right.prevent="expandSelected"
+      @keydown.left.prevent="collapseSelected"
+      @keydown.enter="proxyFileFoo(openFile)"
+      >
+      <li tabindex="1" class="name root context-tree-root" data-idx-path="">{{name}}</li>
+      <Item v-for="(item, idx) in reactiveItems" :item="item" :idx-path="[idx]" @open-file="openFile" @select-file="selectFile"></Item>
+    </ul>
 
-  <ContextMenu :menus="[
-        {
-          targets: 'context-tree-file',
-          items: [
-            {name: 'Copy', action: copyItem},
-            {name: 'Cut', action: cutItem},
-            {name: 'Duplicate', action: duplicateItem},
-            {name: 'Rename', action: renameItem},
-            {name: 'Delete', action: deleteItem},
-            ]
-        },
-        {
-          targets: 'context-tree-folder',
-          items: [
-            {name: 'Copy', action: copyItem},
-            {name: 'Cut', action: cutItem},
-            {name: 'Paste', action: pasteItem},
-            {name: 'Duplicate', action: duplicateItem},
-            {name: 'Add file', action: addFile},
-            {name: 'Add folder', action: addFolder},
-            {name: 'Rename', action: renameItem},
-            {name: 'Delete', action: deleteItem},
-            ]
-        },
-        {
-          targets: 'context-tree-root',
-          items: [
-            {name: 'Paste', action: pasteItem},
-            {name: 'Add file', action: addFile},
-            {name: 'Add folder', action: addFolder},
-            ]
-        },
-        ]"></ContextMenu>
+    <ContextMenu :menus="[
+          {
+            targets: 'context-tree-file',
+            items: [
+              {name: 'Copy', hint: 'Ctrl+C', action: copyItem},
+              {name: 'Cut', hint: 'Ctrl+X', action: cutItem},
+              {name: 'Paste', hint: 'Ctrl+V', action: pasteItem},
+              {name: 'Duplicate', hint: 'Alt+Shift+D', action: duplicateItem},
+              {name: 'Rename', hint: 'F2', action: renameItem},
+              {name: 'Delete', hint: 'Delete', action: deleteItem},
+              ]
+          },
+          {
+            targets: 'context-tree-folder',
+            items: [
+              {name: 'Copy', hint: 'Ctrl+C', action: copyItem},
+              {name: 'Cut', hint: 'Ctrl+X', action: cutItem},
+              {name: 'Paste', hint: 'Ctrl+V', action: pasteItem},
+              {name: 'Duplicate', hint: 'Alt+Shift+D', action: duplicateItem},
+              {name: 'Add file', hint: 'Ctrl+Insert', action: addFile},
+              {name: 'Add folder', hint: 'Alt+Insert', action: addFolder},
+              {name: 'Rename', hint: 'F2', action: renameItem},
+              {name: 'Delete', hint: 'Delete', action: deleteItem},
+              ]
+          },
+          {
+            targets: 'context-tree-root',
+            items: [
+              {name: 'Paste', hint: 'Ctrl+V', action: pasteItem},
+              {name: 'Add file', hint: 'Ctrl+Insert', action: addFile},
+              {name: 'Add folder', hint: 'Alt+Insert', action: addFolder},
+              ]
+          },
+          ]"></ContextMenu>
+  </div>
 </template>
 
 <script>
@@ -95,18 +136,19 @@
     data() {
       return {
         reactiveItems: this.$props.items, // to make items reactive
-        selectedItem: {path: [], mode: ""}, // todo: make non-reactive
-        openedItem: {path: [], el: HTMLElement, item: {}},
+        copyedItem: {el: null, mode: ""}, // todo: make non-reactive
+        selectedItem: {el: null, item: {}}, // todo: make non-reactive
+        openedItem: {el: null, item: {}}, // todo: make non-reactive
       }
     },
 
     mounted() {
       this.loadFromLocalStorage();
-      this.sortFiles();
+      this.sortFilesAndSave();
     },
 
     methods: {
-      sortFiles(list = this.reactiveItems) {
+      sortFilesAndSave(list = this.reactiveItems) {
         list.sort((a, b) => {
           const isAFile = typeof a.value === 'string';
           const isBFile = typeof b.value === 'string';
@@ -122,14 +164,17 @@
         this.saveToLocalStorage();
       },
 
+      // --- Controls by clicks on context menu
       getItemPath(el) {
+        if (!el)
+          return [];
         let attr = el.getAttribute('data-idx-path');
 
         if (!attr)
           return [];
         return attr = attr.split(',');
       },
-      findItem(path) {
+      getItem(path) {
         let list = this.reactiveItems;
         if (!path.length) {
           return {list: [{name: "ROOT", value: this.reactiveItems}], idx: 0};
@@ -148,22 +193,27 @@
         const path = this.getItemPath(el);
         if (!path.length) { // add to root
           this.reactiveItems.push({name: name, value: itemValue})
-          this.sortFiles();
+          this.sortFilesAndSave();
           return;
         }
         // add into some folder
-        const {list, idx} = this.findItem(this.getItemPath(el));
-        list[idx].value.push({name: name, value: itemValue});
-        this.sortFiles(list[idx].value);
+        const {list, idx} = this.getItem(this.getItemPath(el));
+        let toPush = list[idx].value;
+        if (typeof toPush === 'string') // selected item is a file
+          toPush = list; // let's push to item's folder
+        toPush.push({name: name, value: itemValue});
+        this.sortFilesAndSave(toPush);
       },
 
       deleteItem(el) {
         const conf = confirm('Точно удаляем?');
         if (!conf)
-          return;
+          return false;
 
-        const {list, idx} = this.findItem(this.getItemPath(el));
+        const {list, idx} = this.getItem(this.getItemPath(el));
         list.splice(idx, 1);
+        this.sortFilesAndSave(list);
+        return true;
       },
 
       addFile(el) {
@@ -178,51 +228,58 @@
         if (name === null)
           return;
 
-        const {list, idx} = this.findItem(this.getItemPath(el));
+        const {list, idx} = this.getItem(this.getItemPath(el));
         list[idx].name = name;
-        this.sortFiles(list);
+        this.sortFilesAndSave(list);
       },
 
       copyItem(el) {
-        this.selectedItem.path = this.getItemPath(el);
-        this.selectedItem.mode = 'copy';
+        this.copyedItem.el = el;
+        this.copyedItem.mode = 'copy';
       },
       cutItem(el) {
-        this.selectedItem.path = this.getItemPath(el);
-        this.selectedItem.mode = 'cut';
+        this.copyedItem.el = el;
+        this.copyedItem.mode = 'cut';
       },
       pasteItem(el) {
-        if (!this.selectedItem.path.length)
+        if (this.copyedItem.el === null)
           return;
-        const {list: listPaste, idx: idxPaste} = this.findItem(this.getItemPath(el));
-        const {list: listCopy, idx: idxCopy} = this.findItem(this.selectedItem.path);
+        const {list: listPaste, idx: idxPaste} = this.getItem(this.getItemPath(el));
+        const {list: listCopy, idx: idxCopy} = this.getItem(this.getItemPath(this.copyedItem.el));
 
-        listPaste[idxPaste].value.push(deepClone(listCopy[idxCopy])); // insert copy
-        this.sortFiles(listPaste[idxPaste].value);
+        let toPush = listPaste[idxPaste].value;
+        if (typeof toPush === 'string') // selected item is a file
+          toPush = listPaste; // let's push to item's folder
+        toPush.push(deepClone(listCopy[idxCopy]));
+        this.sortFilesAndSave(toPush);
 
-        if (this.selectedItem.mode === 'cut') {
+        if (this.copyedItem.mode === 'cut') {
           listCopy.splice(idxCopy, 1); // delete selected element
-          this.selectedItem.path = []; // drop selection
+          this.copyedItem.el = null; // drop selection
         }
       },
       duplicateItem(el) {
-        const {list, idx} = this.findItem(this.getItemPath(el));
+        const {list, idx} = this.getItem(this.getItemPath(el));
         list.push(deepClone(list[idx]));
-        this.sortFiles(list);
+        this.sortFilesAndSave(list);
       },
 
+      // --- Select and open files
+      toggleAndSaveFileClass(el, toSave, className) {
+        if (toSave.el !== null) {
+          toSave.el.classList.remove(className);
+        }
+        el.classList.add(className);
+        const {list, idx} = this.getItem(this.getItemPath(el));
+        toSave.el = el;
+        toSave.item = list[idx];
+      },
       selectFile(el) {
+        this.toggleAndSaveFileClass(el, this.selectedItem, 'selected');
       },
       openFile(el) {
-        if (this.openedItem.path.length)
-          this.openedItem.el.classList.remove('opened');
-        el.classList.add('opened');
-        const path = this.getItemPath(el);
-        const {list, idx} = this.findItem(path);
-        this.openedItem.path = path;
-        this.openedItem.el = el;
-        this.openedItem.item = list[idx];
-        this.$emit("openFileText", list[idx].value);
+        this.toggleAndSaveFileClass(el, this.openedItem, 'opened');
+        this.$emit("openFileText", this.openedItem.item.value);
       },
 
       getSource(prefix = "", list = this.reactiveItems) {
@@ -237,15 +294,15 @@
         });
         return source;
       },
-
       setOpenedFileText(text) {
-        if (!this.openedItem.path.length)
+        if (this.openedItem.el === null)
           return;
         this.openedItem.item.value = text;
 
         this.saveToLocalStorage();
       },
 
+      // --- Local storage work
       saveToLocalStorage() {
         localStorage.setItem('filesTree', JSON.stringify(this.reactiveItems));
       },
@@ -254,6 +311,75 @@
         if (list && list.length) {
           this.reactiveItems = list;
         }
+      },
+
+      // --- Controls by keys
+      proxyFileFoo(foo, dropSelection = false) {
+        if (this.selectedItem.el === null)
+          return;
+        const result = foo(this.selectedItem.el);
+        if (result && dropSelection) {
+          this.selectedItem.el.classList.remove('selected');
+          this.selectedItem.el = null;
+          this.selectedItem.item = null;
+        }
+      },
+      proxyFileFooNotNull(foo) {
+        if (this.selectedItem.el === null) {
+          foo(this.$el.querySelector('#tree'));
+          return;
+        }
+        foo(this.selectedItem.el);
+      },
+
+      // --- Arrow keys
+      // findItem(item, list = this.reactiveItems) {
+      //   for (let i = list.length-1; i >= 0; i--) {
+      //     if (list[i] === item)
+      //       return {list: list, idx: i};
+      //     if (typeof list[i].value !== 'string') { // item is a folder
+      //       const result = this.findItem(list[i].value);
+      //       if (result !== null)
+      //         return result;
+      //     }
+      //   }
+      //   return null;
+      // },
+      selectPrevious() {
+        let el = this.selectedItem.el;
+        const prevEl = el.previousElementSibling;
+        if (!prevEl) { // Stuck on top
+          const previousInParent = el.parentElement.previousElementSibling;
+          if (previousInParent.classList.contains('root'))
+            return;
+          el = previousInParent;
+        } else if (prevEl.tagName === 'UL') { // Prev el is a folder
+          el = prevEl.lastElementChild;
+        } else { // Prev el is a file - ok
+          el = prevEl;
+        }
+
+        el.focus();
+        this.selectFile(el);
+      },
+      selectNext() {
+        let el = this.selectedItem.el;
+        const nextEl = el.nextElementSibling;
+        if (!nextEl) { // Stuck on bottom
+          if (el.parentElement.classList.contains('root'))
+            return;
+          const nextInParent = el.parentElement.nextElementSibling;
+          if (!nextInParent)
+            return;
+          el = nextInParent;
+        } else if (nextEl.tagName === 'UL') { // Next el is a folder
+          el = nextEl.firstElementChild;
+        } else { // Next el is a file - ok
+          el = nextEl;
+        }
+
+        el.focus();
+        this.selectFile(el);
       },
     }
   }

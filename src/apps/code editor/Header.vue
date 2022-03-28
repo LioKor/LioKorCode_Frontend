@@ -20,9 +20,8 @@
 <template>
   <div class="header">
     <div class="topLine">
-      <div class="mobile-hide"><div class="logo"><strong>LioKor Code</strong> <span id="versionSpan" @click="showVersion">{{ version }}</span></div></div>
-      <div class="mobile-show"><div class="logo"><strong>LK Code</strong></div></div>
-      <router-link to="/">Задания</router-link>
+      <router-link to="/" class="mobile-hide"><div class="logo"><strong>LioKor Code</strong> <span id="versionSpan" @click="showVersion">{{ version }}</span></div></router-link>
+      <router-link to="/" class="mobile-show"><div class="logo"><strong>LK Code</strong></div></router-link>
       <div class="control-button" v-show="!isCheckInProgress && !isCheckError" @click=checkStartEmit>Check<span class="mobile-hide"> (F9)</span></div>
       <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Checking...</div>
       <div class="control-button danger" v-show="isCheckError" :disabled="isCheckError">Need auth</div>

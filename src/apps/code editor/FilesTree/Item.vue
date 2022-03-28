@@ -7,12 +7,14 @@
   <li tabindex="1" v-if="typeof item.value === 'string'" class="context-tree-file" :data-idx-path="idxPath"
       @dblclick="$emit('openFile', $el)"
       @mousedown="(e) => {if (e.detail > 1) e.preventDefault(); /*disable user select on 2 or more clicks*/ }"
-      @click="$emit('selectFile', $el)">
+      @click="$emit('selectFile', $el)"
+      @contextmenu="$emit('selectFile', $el)">
     {{item.name}}
   </li>
   <ul v-else>
     <li tabindex="1" class="name folder context-tree-folder" :data-idx-path="idxPath" v-if="item.name"
-      @click="$emit('selectFile', $el)">
+      @click="$emit('selectFile', $el.firstChild)"
+      @contextmenu="$emit('selectFile', $el.firstChild)">
       {{item.name}}
     </li>
     <Item ref="innerItems" v-for="(innerItem, idx) in item.value" :item="innerItem" :idx-path="idxPath.concat(idx)"
