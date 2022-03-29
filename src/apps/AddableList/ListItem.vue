@@ -54,7 +54,8 @@
   <span class="orderid">{{ idx }}</span>
   <div class="btn delete" @click="$emit('deleteListItem', idx)"><span class="cross"></span></div>
   <input type="text" placeholder="Входные данные" class="form-control" ref="input1" :value="modelValue[0]" @input="updateVModel">
-  <input type="text" placeholder="Выходные данные" class="form-control" ref="input2" :value="modelValue[1]" @input="updateVModel">
+  <input type="text" placeholder="Выходные данные" class="form-control" ref="input2" :value="modelValue[1]" @input="updateVModel"
+    @keydown.tab="addItemIfLast">
 </template>
 
 <script>
@@ -67,7 +68,12 @@
     methods: {
       updateVModel() {
         this.$emit('update:modelValue', [this.$refs.input1.value,this.$refs.input2.value]);
-      }
+      },
+      addItemIfLast(e) {
+        console.log(e);
+        if (!e.target.parentElement.nextElementSibling)
+          this.$parent.addItem();
+      },
     }
   }
 </script>

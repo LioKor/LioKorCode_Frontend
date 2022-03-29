@@ -9,6 +9,7 @@
     padding 5px
     margin 0
     overflow-x hidden
+    height 100%
     li
       margin-left 20px
       pointer-events visible
