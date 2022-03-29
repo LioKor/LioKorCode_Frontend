@@ -10,9 +10,10 @@
 
   text-color = textColor3
   text-color-hover = textColor1
-  text-font-size = 18px
+  text-font-size = 16px
   padding-top = 7px
   padding-sides = 10px
+  padding-bottom = 4px
 
   .tabs
     position relative
@@ -31,6 +32,7 @@
       width 100%
       writing-mode vertical-lr
       transform rotate(180deg)
+      padding padding-sides padding-top padding-sides 0
     .tab:before
       transform skewY(30deg)
       background linear-gradient(90deg, transparent 0, border-color 50%, transparent 70%) 50% 100% / 200% 1px no-repeat, linear-gradient(90deg, transparent 0%, border-color 50%, transparent 80%) 50% 0% / 200% 1px no-repeat, tab-color
@@ -42,6 +44,7 @@
     width 100%
     .tab
       height 100%
+      padding padding-top padding-sides padding-bottom padding-sides
     .tab:before
       transform skewX(30deg)
       background linear-gradient(transparent 0, border-color 50%, transparent 70%) 100% 50% / 1px 200% no-repeat, linear-gradient(transparent 0%, border-color 50%, transparent 80%) 0% 50% / 1px 200% no-repeat, tab-color
@@ -50,10 +53,11 @@
 
   .tabs
     .tab
+      transition all 0.2s ease
       color text-color
-      padding padding-sides padding-top padding-sides 0
       box-sizing border-box
       cursor default
+      position relative
       z-index 0
     .tab:before
       content ""
@@ -74,7 +78,8 @@
 
   .close-tab-svg
     width 14px
-    stroke textColor3
+    margin-bottom -2px
+    stroke textColor5
     border-radius 50%
     padding 2px
   .close-tab-svg:hover
@@ -86,7 +91,7 @@
   <ul id="tabs" class="tabs">
     <li v-for="item in items" @click="item.action($event); selectTab($event)" class="tab">
       {{item.name}}
-      <svg v-if="item.closable !== false" @click.capture.stop="deleteTab" xmlns="http://www.w3.org/2000/svg" class="close-tab-svg" viewBox="0 0 10 10"><path d="M 10,0 L 0,10 M 0,0 L 10,10"></path></svg>
+      <svg v-if="item.closable !== false" @click.stop="deleteTab" xmlns="http://www.w3.org/2000/svg" class="close-tab-svg" viewBox="0 0 10 10"><path d="M 10,0 L 0,10 M 0,0 L 10,10"></path></svg>
     </li>
   </ul>
 </template>
@@ -119,7 +124,10 @@
         this.selectedEl = newEl;
       },
       deleteTab(e) {
-        e.target.parentElement.remove();
+        let el = e.target;
+        while(el.tagName !== 'LI')
+          el = el.parentElement;
+        el.remove();
       }
     }
   }

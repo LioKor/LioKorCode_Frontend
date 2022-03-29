@@ -31,6 +31,10 @@
     #taskInfo
       flex 1
 
+  #editor-block
+    display flex
+    flex-direction column
+
   #code-editor-all
     height 'calc(100% - %s)' % headerHeight
 </style>
@@ -63,9 +67,15 @@ run: build
               ]"
           @open-file-text="setEditorText"></Tree>
         </div>
-        <SlideLine el1="taskInfo-and-tree" el2="editorBlock" class="vertical"/>
-
-        <Editor ref="editor" @editor-change="setOpenedFileText"/>
+        <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
+        <div id="editor-block">
+          <Tabs class="horizontal" :items="[
+                {name: 'file1', action: () => {}},
+                {name: 'file2', action: () => {}},
+                {name: 'file3', action: () => {}},
+            ]"></Tabs>
+          <Editor ref="editor" @editor-change="setOpenedFileText"/>
+        </div>
       </div>
 
       <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>

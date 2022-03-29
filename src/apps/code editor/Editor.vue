@@ -1,18 +1,18 @@
 <style lang="stylus">
-  .editor
-    height 100%
-
-  .absolute-wrapper
+  .editor-container
+    flex 1
     position relative
     > *
       position absolute
+  .editor
+    height 100%
 
   #aceEditor
     width 100%
 </style>
 
 <template>
-  <div id="editorBlock" class="absolute-wrapper">
+  <div class="editor-container">
     <div id="aceEditor" class="editor"></div>
 
     <div v-show="showNeedToLogin" class="standalone-form">
