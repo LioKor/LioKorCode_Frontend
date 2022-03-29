@@ -44,6 +44,7 @@ async function _ResponseToJson(response) {
     } catch {
     }
     data.ok_ = response.ok;
+    data.status_ = response.status;
     return data;
 }
 
