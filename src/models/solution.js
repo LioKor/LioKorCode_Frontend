@@ -31,8 +31,11 @@ export default class Solution extends Model {
       2: 'compile error',
       3: 'runtime error',
       4: 'check error',
-      5: 'timeout',
-      6: 'outdated (task changed)',
+      5: 'outdated (task changed)',
+      6: 'runtime timeout',
+      7: 'compile timeout',
+      8: 'lint error',
+      9: 'draft'
     }
     this.message = checkResults[this.checkResult];
     if (this.checkResult === 0) {
