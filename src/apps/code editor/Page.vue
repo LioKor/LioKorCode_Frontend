@@ -42,19 +42,23 @@
     <div id="code-editor-all">
       <div id="taskBlock" class="task-and-editor">
         <div id="taskInfo-and-tree">
-          <TaskInfo ref="taskInfo" :id="taskId"></TaskInfo>
+          <Tabs :items="[
+              {name: 'Задание', action: () => {this.openedTab = 0}},
+              {name: 'Файлы', action: () => {this.openedTab = 1}}
+          ]"></Tabs>
+          <TaskInfo v-show="openedTab === 0" ref="taskInfo" :id="taskId"></TaskInfo>
 
-          <Tree ref="tree" name="Project" :items="[
-              {name: 'prog.c', value: `#include <stdio.h>
+          <Tree v-show="openedTab === 1" ref="tree" name="Project" :items="[
+              {name: 'main.c', value: `#include <stdio.h>
 
 int main() {
 \treturn 0;
 }
 `},
               {name: 'Makefile', value: `build:
-\tgcc prog.c -o prog.o
+\tgcc main.c -o solution.o
 run: build
-\t./prog.o
+\t./solution.o
 `}
               ]"
           @open-file-text="setEditorText"></Tree>
@@ -79,14 +83,16 @@ run: build
 
   import SlideLine from '../SlideLine.vue';
   import Tree from "./FilesTree/Tree.vue";
+  import Tabs from "../Tabs.vue";
 
 
   export default {
-    components: {Tree, Header, TaskInfo, Editor, Solutions, SlideLine},
+    components: {Tabs, Tree, Header, TaskInfo, Editor, Solutions, SlideLine},
 
     data() {
       return {
         taskId: parseInt(this.$route.params.taskId),
+        openedTab: 0,
       }
     },
 
