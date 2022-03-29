@@ -39,6 +39,13 @@ export function openRoll(element) {
     element.setAttribute('data-open-roll', '');
     element.style.height = element.scrollHeight + "px";
 }
+export function toggleRoll(element) {
+    if (isClosedRoll(element)) {
+        closeRoll(element);
+    } else {
+        openRoll(element);
+    }
+}
 export function fastRoll(element) {
     element.setAttribute('data-open-roll', '');
     const buffer = element.style.transition;

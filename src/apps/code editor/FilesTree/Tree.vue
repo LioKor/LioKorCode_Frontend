@@ -9,7 +9,6 @@
     padding 5px
     margin 0
     overflow-x hidden
-    tab-index 1
     li
       margin-left 20px
       pointer-events visible
@@ -32,8 +31,6 @@
       background color1mostLighter
     li.name
       margin-left 0
-    li.name.folder
-      list-style georgian
     li.name.root
       list-style none
     li:selected
@@ -43,6 +40,21 @@
       background color3
     li.selected:focus:before
       background color4
+
+    li.name.folder
+      list-style georgian
+      ~ li
+      ~ ul
+        height 0
+        opacity 0
+        transition none
+    li.name.folder.expanded
+      list-style hangul-consonant
+      ~ li
+      ~ ul
+        opacity 1
+        height auto
+        transition all 0.2s ease
 
     ul
       margin 0
@@ -224,12 +236,12 @@
       },
 
       renameItem(el) {
-        const name = prompt('Во что переименуем?');
+        const {list, idx} = this.getItem(this.getItemPath(el));
+        const name = prompt('Во что переименуем?', list[idx].name);
         if (name === null)
           return;
 
-        const {list, idx} = this.getItem(this.getItemPath(el));
-        list[idx].name = name;
+        list[idx].name = name; //
         this.sortFilesAndSave(list);
       },
 
@@ -381,6 +393,16 @@
         el.focus();
         this.selectFile(el);
       },
+      expandSelected() {
+        if (!this.selectedItem.el)
+          return;
+        this.selectedItem.el.classList.add('expanded');
+      },
+      collapseSelected() {
+        if (!this.selectedItem.el)
+          return;
+        this.selectedItem.el.classList.remove('expanded');
+      }
     }
   }
 </script>

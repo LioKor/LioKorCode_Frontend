@@ -13,8 +13,10 @@
   </li>
   <ul v-else>
     <li tabindex="1" class="name folder context-tree-folder" :data-idx-path="idxPath" v-if="item.name"
-      @click="$emit('selectFile', $el.firstChild)"
-      @contextmenu="$emit('selectFile', $el.firstChild)">
+        @dblclick="$event.target.classList.toggle('expanded')"
+        @mousedown="(e) => {if (e.detail > 1) e.preventDefault(); /*disable user select on 2 or more clicks*/ }"
+        @click="$emit('selectFile', $el.firstChild)"
+        @contextmenu="$emit('selectFile', $el.firstChild)">
       {{item.name}}
     </li>
     <Item ref="innerItems" v-for="(innerItem, idx) in item.value" :item="innerItem" :idx-path="idxPath.concat(idx)"
