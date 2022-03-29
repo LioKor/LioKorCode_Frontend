@@ -50,7 +50,12 @@
       });
 
       this.aceEditor.setTheme('ace/theme/ambiance');
-      this.aceEditor.session.setMode('ace/mode/c_cpp');
+      // this.aceEditor.session.setMode('ace/mode/c_cpp');
+      this.aceEditor.session.setOptions({
+        mode: 'ace/mode/c_cpp',
+        tabSize: 4,
+        useSoftTabs: false
+      })
 
       // const scrollbar = document.querySelector('.ace_scrollbar');
       // console.log(scrollbar)
