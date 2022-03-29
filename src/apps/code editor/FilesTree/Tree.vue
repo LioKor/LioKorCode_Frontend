@@ -6,14 +6,14 @@
 
   .tree-container
     background background
-    width 100%
     height 100%
+    flex 1
+    overflow-x hidden
   .tree
     padding 10px
     margin 0
     overflow-x hidden
     height 100%
-    width 100%
     li
       margin-left 20px
       pointer-events visible

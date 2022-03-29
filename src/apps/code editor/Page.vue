@@ -43,8 +43,8 @@
       <div id="taskBlock" class="task-and-editor">
         <div id="taskInfo-and-tree">
           <Tabs class="vertical" :items="[
-              {name: 'Задание', action: () => {this.openedTab = 0}},
-              {name: 'Файлы', action: () => {this.openedTab = 1}}
+              {name: 'Задание', action: () => {this.openedTab = 0}, closable: false},
+              {name: 'Файлы', action: () => {this.openedTab = 1}, closable: false}
           ]"></Tabs>
           <TaskInfo v-show="openedTab === 0" ref="taskInfo" :id="taskId"></TaskInfo>
 
