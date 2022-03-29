@@ -2,11 +2,12 @@
 
 betweenItems = 30px
 headerHeight = 50px
-headerBG = color2
+headerBG = color2lighter
 highLightColor = color4
 empColor = color5
+border-color = color4
 
-sidePartHeight = 300px
+sidePartHeight = 280px
 borderRadiusTop = 40px
 borderRadiusBottom = 20px
 degree = 26.5deg
@@ -14,7 +15,7 @@ shadow = -5px 5px 5px black
 
 .header
   height headerHeight
-  margin-bottom 30px
+  margin-bottom 10px
   width 100%
   left 0
   top 0
@@ -56,7 +57,7 @@ shadow = -5px 5px 5px black
       transform skew(-30deg)
       z-index -1
     > *:after
-      background linear-gradient(transparent 0, highLightColor 50%, transparent 70%) 100% 50% / 2px 200% no-repeat, linear-gradient(transparent 0%, color4 50%, transparent 80%) 0% 50% / 2px 200% no-repeat
+      background linear-gradient(transparent 0, border-color 50%, transparent 70%) 100% 50% / 2px 200% no-repeat, linear-gradient(transparent 0%, border-color 50%, transparent 80%) 0% 50% / 2px 200% no-repeat
     > *:before
       background linear-gradient(highLightColor, transparent) 0 100% / 100% 200% no-repeat
       transition all 0.2s ease

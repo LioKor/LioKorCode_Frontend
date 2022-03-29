@@ -36,9 +36,10 @@
     },
     mounted() {
       this.aceEditor = ace.edit('aceEditor');
-
       this.aceEditor.setOptions({
         fontSize: '12pt',
+        tabSize: 4,
+        useSoftTabs: true,
       });
 
       // this.aceEditor.setValue(localStorage.getItem('code') || "");

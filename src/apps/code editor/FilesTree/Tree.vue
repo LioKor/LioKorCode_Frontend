@@ -71,7 +71,7 @@
 <template>
   <div id="tree" class="tree-container">
     <ul class="tree context-tree-root root"
-      @keyp.delete="proxyFileFoo(deleteItem, true)"
+      @keyup.delete="proxyFileFoo(deleteItem, true)"
       @keyup.ctrl.c="proxyFileFoo(copyItem)"
       @keyup.ctrl.x="proxyFileFoo(cutItem)"
       @keyup.ctrl.v="proxyFileFoo(pasteItem)"
@@ -93,33 +93,33 @@
           {
             targets: 'context-tree-file',
             items: [
-              {name: 'Copy', hint: 'Ctrl+C', action: copyItem},
-              {name: 'Cut', hint: 'Ctrl+X', action: cutItem},
-              {name: 'Paste', hint: 'Ctrl+V', action: pasteItem},
-              {name: 'Duplicate', hint: 'Alt+Shift+D', action: duplicateItem},
-              {name: 'Rename', hint: 'F2', action: renameItem},
-              {name: 'Delete', hint: 'Delete', action: deleteItem},
+              {name: 'Копировать', hint: 'Ctrl+C', action: copyItem},
+              {name: 'Вырезать', hint: 'Ctrl+X', action: cutItem},
+              {name: 'Вставить', hint: 'Ctrl+V', action: pasteItem},
+              {name: 'Дублировать', hint: 'Alt+Shift+D', action: duplicateItem},
+              {name: 'Переименовать', hint: 'F2', action: renameItem},
+              {name: 'Удалить', hint: 'Delete', action: deleteItem},
               ]
           },
           {
             targets: 'context-tree-folder',
             items: [
-              {name: 'Copy', hint: 'Ctrl+C', action: copyItem},
-              {name: 'Cut', hint: 'Ctrl+X', action: cutItem},
-              {name: 'Paste', hint: 'Ctrl+V', action: pasteItem},
-              {name: 'Duplicate', hint: 'Alt+Shift+D', action: duplicateItem},
-              {name: 'Add file', hint: 'Ctrl+Insert', action: addFile},
-              {name: 'Add folder', hint: 'Alt+Insert', action: addFolder},
-              {name: 'Rename', hint: 'F2', action: renameItem},
-              {name: 'Delete', hint: 'Delete', action: deleteItem},
+              {name: 'Копировать', hint: 'Ctrl+C', action: copyItem},
+              {name: 'Вырезать', hint: 'Ctrl+X', action: cutItem},
+              {name: 'Вставить', hint: 'Ctrl+V', action: pasteItem},
+              {name: 'Дублировать', hint: 'Alt+Shift+D', action: duplicateItem},
+              {name: 'Создать файл', hint: 'Ctrl+Insert', action: addFile},
+              {name: 'Создать папку', hint: 'Alt+Insert', action: addFolder},
+              {name: 'Переименовать', hint: 'F2', action: renameItem},
+              {name: 'Удалить', hint: 'Delete', action: deleteItem},
               ]
           },
           {
             targets: 'context-tree-root',
             items: [
-              {name: 'Paste', hint: 'Ctrl+V', action: pasteItem},
-              {name: 'Add file', hint: 'Ctrl+Insert', action: addFile},
-              {name: 'Add folder', hint: 'Alt+Insert', action: addFolder},
+              {name: 'Вставить', hint: 'Ctrl+V', action: pasteItem},
+              {name: 'Создать файл', hint: 'Ctrl+Insert', action: addFile},
+              {name: 'Создать папку', hint: 'Alt+Insert', action: addFolder},
               ]
           },
           ]"></ContextMenu>
@@ -278,12 +278,15 @@
       },
 
       // --- Select and open files
-      toggleAndSaveFileClass(el, toSave, className) {
+      toggleAndSaveFileClass(el, toSave, className, list, idx) {
         if (toSave.el !== null) {
           toSave.el.classList.remove(className);
         }
         el.classList.add(className);
-        const {list, idx} = this.getItem(this.getItemPath(el));
+        if (list === undefined || idx === undefined) {
+          const res = this.getItem(this.getItemPath(el));
+          list = res.list; idx = res.idx;
+        }
         toSave.el = el;
         toSave.item = list[idx];
       },
@@ -291,7 +294,12 @@
         this.toggleAndSaveFileClass(el, this.selectedItem, 'selected');
       },
       openFile(el) {
-        this.toggleAndSaveFileClass(el, this.openedItem, 'opened');
+        const {list, idx} = this.getItem(this.getItemPath(el));
+        if (typeof list[idx].value !== 'string') { // el is a folder
+          this.toggleExpandEl(el);
+          return;
+        }
+        this.toggleAndSaveFileClass(el, this.openedItem, 'opened', list, idx);
         this.$emit("openFileText", this.openedItem.item.value);
       },
 
@@ -360,16 +368,28 @@
       // },
       selectPrevious() {
         let el = this.selectedItem.el;
+        if (!el)
+          return;
+
         const prevEl = el.previousElementSibling;
         if (!prevEl) { // Stuck on top
           const previousInParent = el.parentElement.previousElementSibling;
           if (previousInParent.classList.contains('root'))
             return;
           el = previousInParent;
-        } else if (prevEl.tagName === 'UL') { // Prev el is a folder
-          el = prevEl.lastElementChild;
         } else { // Prev el is a file - ok
           el = prevEl;
+        }
+
+        if (el.tagName === 'UL') { // Prev el is a folder
+          const recursiveStepDown = (el) => {
+            const lastEl = el.lastElementChild;
+            if (lastEl.tagName === 'UL') {
+              return recursiveStepDown(lastEl);
+            }
+            return lastEl;
+          }
+          el = recursiveStepDown(el);
         }
 
         el.focus();
@@ -377,32 +397,50 @@
       },
       selectNext() {
         let el = this.selectedItem.el;
+        if (!el)
+          return;
+
         const nextEl = el.nextElementSibling;
         if (!nextEl) { // Stuck on bottom
-          if (el.parentElement.classList.contains('root'))
+          const recursiveStepUp = (el) => {
+            if (el.parentElement.classList.contains('root'))
+              return;
+            const nextInParent = el.parentElement.nextElementSibling;
+            if (!nextInParent)
+              return recursiveStepUp(el.parentElement.parentElement.firstElementChild);
+            return nextInParent;
+          }
+          el = recursiveStepUp(el);
+          if (el === undefined)
             return;
-          const nextInParent = el.parentElement.nextElementSibling;
-          if (!nextInParent)
-            return;
-          el = nextInParent;
-        } else if (nextEl.tagName === 'UL') { // Next el is a folder
-          el = nextEl.firstElementChild;
         } else { // Next el is a file - ok
           el = nextEl;
         }
 
+        if (el.tagName === 'UL') // Prev el is a folder
+          el = el.firstElementChild;
+
         el.focus();
         this.selectFile(el);
+      },
+      toggleExpandEl(el) {
+        el.classList.toggle('expanded');
+      },
+      expandEl(el) {
+        el.classList.add('expanded');
       },
       expandSelected() {
         if (!this.selectedItem.el)
           return;
-        this.selectedItem.el.classList.add('expanded');
+        this.expandEl(this.selectedItem.el);
+      },
+      collapseEl(el) {
+        el.classList.remove('expanded');
       },
       collapseSelected() {
         if (!this.selectedItem.el)
           return;
-        this.selectedItem.el.classList.remove('expanded');
+        this.collapseEl(this.selectedItem.el);
       }
     }
   }

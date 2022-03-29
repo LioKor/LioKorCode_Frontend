@@ -46,13 +46,15 @@
 
           <Tree ref="tree" name="Project" :items="[
               {name: 'prog.c', value: `#include <stdio.h>
+
 int main() {
 \treturn 0;
 }
 `},
-              {name: 'Makefile', value: `all:
-  gcc prog.c -o prog.o
-  ./prog.o
+              {name: 'Makefile', value: `build:
+\tgcc prog.c -o prog.o
+run: build
+\t./prog.o
 `}
               ]"
           @open-file-text="setEditorText"></Tree>

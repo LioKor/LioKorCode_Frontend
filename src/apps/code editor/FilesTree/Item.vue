@@ -12,7 +12,7 @@
     {{item.name}}
   </li>
   <ul v-else>
-    <li tabindex="1" class="name folder context-tree-folder" :data-idx-path="idxPath" v-if="item.name"
+    <li tabindex="1" class="name folder context-tree-folder expanded" :data-idx-path="idxPath" v-if="item.name"
         @dblclick="$event.target.classList.toggle('expanded')"
         @mousedown="(e) => {if (e.detail > 1) e.preventDefault(); /*disable user select on 2 or more clicks*/ }"
         @click="$emit('selectFile', $el.firstChild)"
