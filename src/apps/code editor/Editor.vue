@@ -39,7 +39,7 @@
       this.aceEditor.setOptions({
         fontSize: '12pt',
         tabSize: 4,
-        useSoftTabs: true,
+        useSoftTabs: false,
       });
 
       // this.aceEditor.setValue(localStorage.getItem('code') || "");
