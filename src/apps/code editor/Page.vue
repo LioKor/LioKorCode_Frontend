@@ -42,7 +42,7 @@
     <div id="code-editor-all">
       <div id="taskBlock" class="task-and-editor">
         <div id="taskInfo-and-tree">
-          <Tabs :items="[
+          <Tabs class="vertical" :items="[
               {name: 'Задание', action: () => {this.openedTab = 0}},
               {name: 'Файлы', action: () => {this.openedTab = 1}}
           ]"></Tabs>

@@ -2,14 +2,18 @@
   @import "../../../styles/constants.styl"
 
   font-size = 16px
+  background = linear-gradient(30deg, #0e2028 0%, #2e3f44 40%, #0c2129 100%) repeat scroll 0% 0%;
 
   .tree-container
-    background color2
+    background background
+    width 100%
+    height 100%
   .tree
-    padding 5px
+    padding 10px
     margin 0
     overflow-x hidden
     height 100%
+    width 100%
     li
       margin-left 20px
       pointer-events visible
