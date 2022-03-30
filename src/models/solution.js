@@ -6,6 +6,8 @@ export default class Solution extends Model {
     receivedDatetime: Date.now(),
     datetime: "",
     checkResult: -1,
+    checkError: '',
+    checkTime: 0,
     status: 'checking',
     testsPassed: '?',
     testsTotal: '?',

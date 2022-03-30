@@ -7,7 +7,7 @@
     background background
     overflow-y scroll
     table
-      width 50%
+      width 85%
       border-collapse collapse
       tr
         td
@@ -22,6 +22,9 @@
           background #5b3e31
         td.error
           background #4b302e
+        td.message
+          max-width 200px
+          text-align left
 </style>
 
 <template>
@@ -35,6 +38,8 @@
 
         <td>{{ solution.datetime }}</td>
         <td>{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>
+        <td>{{ solution.checkTime }} <span v-show="solution.checkTime">s</span></td>
+        <td class="message" v-html="solution.checkError"></td>
       </tr>
     </table>
   </div>
@@ -90,6 +95,7 @@
         if (idx === -1) {
           return;
         }
+        solution.checkError = solution.checkError.replaceAll('\n', '<br>')
         this.solutions[idx].set(solution);
       },
 
