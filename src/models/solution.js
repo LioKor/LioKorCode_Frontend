@@ -42,8 +42,9 @@ export default class Solution extends Model {
     this.message = checkResults[this.checkResult];
     if (this.checkResult === 0) {
       cls = 'passed';
-    } else if (this.testsPassed > 0)
+    } else if (this.testsPassed > 0) {
       cls = 'notFull';
+    }
     this.status = cls;
   }
 

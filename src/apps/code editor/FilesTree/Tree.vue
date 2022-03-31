@@ -334,8 +334,11 @@
       loadFromLocalStorage() {
         const list = JSON.parse(localStorage.getItem('filesTree'));
         if (list && list.length) {
-          this.reactiveItems = list;
+          this.loadTree(list);
         }
+      },
+      loadTree(list) {
+        this.reactiveItems = list;
       },
 
       // --- Controls by keys

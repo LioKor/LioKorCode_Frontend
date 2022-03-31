@@ -80,7 +80,7 @@ run: build
 
       <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
 
-      <Solutions ref="solutions" :id="taskId"/>
+      <Solutions ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
     </div>
   </div>
 </template>
@@ -135,6 +135,26 @@ run: build
       },
       setOpenedFileText(text) {
         this.$refs.tree.setOpenedFileText(text);
+      },
+
+      parseSourceCode(sourceCode) {
+        const filesList = []
+        for (const [name, content] of Object.entries(sourceCode)) {
+          filesList.push({
+            name: name,
+            value: content,
+          });
+        }
+        return filesList;
+      },
+
+      async openSolution(solutionId) {
+        const checkInfo = await this.$store.state.api.getSolution(this.taskId, solutionId)
+
+        const fileList = this.parseSourceCode(checkInfo.sourceCode);
+        this.$refs.tree.loadTree(fileList);
+
+        this.setEditorText('')
       }
     }
   }

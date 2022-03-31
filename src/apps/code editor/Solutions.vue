@@ -6,15 +6,34 @@
   #solutions
     background background
     overflow-y scroll
+    .min-width
+      width 1px
+      white-space nowrap
+    .action
+      cursor pointer
+    .action:hover
+      color clHighlight
     table
-      width 85%
+      width calc(100% - 128px)
       border-collapse collapse
+      thead
+        th
+          white-space nowrap
+          padding 5px
+          border 1px solid color3
       tr
         td
           text-align center
           padding 10px
           border 1px solid color3
-        td.passed
+        td.id
+        th.id
+          width 1%
+        th.date
+        td.date
+          width 1%
+          white-space nowrap
+        td.ok
           background #365e36
         td.checking
           background #72633d
@@ -30,16 +49,28 @@
 <template>
   <div id="solutions" class="scrollable">
     <table>
+      <thead>
+        <tr>
+          <th class="id">id</th>
+          <th>Дата проверки</th>
+          <th>Тесты</th>
+          <th>Время выполнения</th>
+          <th>Время компиляции</th>
+          <th>Сообщение</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
       <tr v-for="solution in solutions" class="withHint" :data-hint="solution.message">
-        <td v-if="solution.status === 'passed'" class="passed">{{ solution.id }}</td>
-        <td v-else-if="solution.status === 'checking'" class="checking">{{ solution.id }}</td>
-        <td v-else-if="solution.status === 'notFull'" class="notFull">{{ solution.id }}</td>
-        <td v-else-if="solution.status === 'error'" class="error">{{ solution.id }}</td>
+        <td :class="getStatusClass(solution.checkResult)" class="id">{{ solution.id }}</td>
 
-        <td>{{ solution.datetime }}</td>
-        <td>{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>
-        <td>{{ solution.checkTime }} <span v-show="solution.checkTime">s</span></td>
+        <td class="min-width">{{ solution.datetime }}</td>
+        <td class="min-width">{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>
+        <td class="min-width">{{ solution.checkTime }} <span v-show="solution.checkTime">s</span></td>
+        <td class="min-width">{{ solution.checkTime }} <span v-show="solution.checkTime">s</span></td>
+
         <td class="message" v-html="solution.checkError"></td>
+
+        <td class="min-width"><span class="action" @click="openSolution(solution.id)">Открыть</span></td>
       </tr>
     </table>
   </div>
@@ -80,6 +111,21 @@
     },
 
     methods: {
+      getStatusClass(status) {
+        if (status === 0) {
+          return 'ok';
+        } else if (status === 1) {
+          return 'checking';
+        } else {
+          return 'error';
+        }
+      },
+
+      openSolution(id) {
+        if (confirm('Текущее решение будет уничтожено. Продолжить?')) {
+          this.$emit('openSolution', id);
+        }
+      },
       addEmptySolution() {
         const solution = new Solution();
         solution.uid_ = this.addedSolutions++;
