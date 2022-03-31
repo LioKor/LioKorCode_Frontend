@@ -107,6 +107,7 @@
           this.isLeftCollapsed = false;
           this.isRightCollapsed = false;
         }
+        this.$emit('sliderMoved')
       },
       startSlide() {
         this.isInSlide = true;

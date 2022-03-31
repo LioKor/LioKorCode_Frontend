@@ -46,38 +46,28 @@
     <div id="code-editor-all">
       <div id="taskBlock" class="task-and-editor">
         <div id="taskInfo-and-tree">
-          <Tabs class="vertical" :items="[
+          <Tabs class="vertical" ref="tabsVertical" :items="[
               {name: 'Задание', action: () => {this.openedTab = 0}, closable: false},
               {name: 'Файлы', action: () => {this.openedTab = 1}, closable: false}
           ]"></Tabs>
           <TaskInfo v-show="openedTab === 0" ref="taskInfo" :id="taskId"></TaskInfo>
 
           <Tree v-show="openedTab === 1" ref="tree" name="Project" :items="[
-              {name: 'main.c', value: `#include <stdio.h>
-
-int main() {
-\treturn 0;
-}
-`},
-              {name: 'Makefile', value: `build:
-\tgcc main.c -o solution.o
-run: build
-\t./solution.o
-`}
-              ]"
-          @open-file-text="openTreeFile" @rename-file="updateFileNameInTabs"></Tree>
+              {name: 'main.c', value: 'int main() {\n\treturn 0;\n}\n'},
+              {name: 'Makefile', value: `build:\n\tgcc main.c -o solution\nrun: build\n\t./solution`}
+            ]"
+            @open-file-text="openTreeFile" @rename-file="updateFileNameInTabs"></Tree>
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
         <div id="editor-block">
-          <Tabs class="horizontal" ref="tabs" :items="[
-            ]"></Tabs>
+          <Tabs class="horizontal" ref="tabs" :items="[]" @lastTabClosed="this.$refs.editor.clear()"></Tabs>
           <Editor ref="editor" @editor-change="updateOpenedFileText"/>
         </div>
       </div>
 
-      <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
+      <SlideLine el1="taskBlock" el2="solutions" class="horizontal" @sliderMoved="this.$refs.editor.resize()" />
 
-      <Solutions ref="solutions" :id="taskId"/>
+      <Solutions ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
     </div>
   </div>
 </template>
@@ -133,6 +123,7 @@ run: build
           action: () => {this.$refs.tree.openFileByItem(treeItem)},
           uniqueValue: treeItem,
         });
+        this.$refs.editor.setReadOnly(false)
         this.$refs.editor.setText(treeItem.value, treeItem.name);
       },
       updateOpenedFileText(text) {
@@ -143,6 +134,30 @@ run: build
       updateFileNameInTabs(treeItem) {
         this.$refs.tabs.updateTab(treeItem, treeItem.name);
         this.$refs.editor.setSyntaxHighlighting(treeItem.name);
+      },
+
+      parseSourceCode(sourceCode) {
+        const filesList = []
+        for (const [name, content] of Object.entries(sourceCode)) {
+          filesList.push({
+            name: name,
+            value: content,
+          });
+        }
+        return filesList;
+      },
+
+      async openSolution(solutionId) {
+        const checkInfo = await this.$store.state.api.getSolution(this.taskId, solutionId)
+
+        const fileList = this.parseSourceCode(checkInfo.sourceCode);
+        this.$refs.tree.loadTree(fileList);
+
+        this.$refs.editor.clear()
+        this.$refs.editor.setReadOnly(true);
+
+        this.$refs.tabsVertical.selectTabIndex(1);
+        this.$refs.tabs.closeAllTabs();
       }
     }
   }

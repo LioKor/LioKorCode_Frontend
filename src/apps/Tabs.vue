@@ -140,6 +140,9 @@
         item.action();
         //this.$emit('selectTab', item, idx);
       },
+      selectTabIndex(ind) {
+        this.selectTabEl(this.$refs.items[ind], true);
+      },
       selectTab(e) {
         const el = e.target;
         this.selectTabEl(el, true);
@@ -154,6 +157,9 @@
         if (this.selectedEl === el)
             this.selectTabEl(el.previousElementSibling || el.nextElementSibling, true);
         this.reactiveItems.splice(idx, 1);
+        if (this.reactiveItems.length === 0) {
+          this.$emit('lastTabClosed');  // to clear editor after this event
+        }
         //this.$emit('deleteTab', item, idx);
       },
       async addTab(item = {name: "", action: () => {}, closable: true, uniqueValue: undefined}, setSelected = true) {
@@ -179,6 +185,11 @@
         if (!item)
           return;
         item.name = name;
+      },
+
+      closeAllTabs() {
+        this.reactiveItems = [];
+        this.selectedEl = null;
       }
     }
   }
