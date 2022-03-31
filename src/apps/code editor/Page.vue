@@ -133,7 +133,7 @@ run: build
           action: () => {this.$refs.tree.openFileByItem(treeItem)},
           uniqueValue: treeItem,
         });
-        this.$refs.editor.setText(treeItem.value);
+        this.$refs.editor.setText(treeItem.value, treeItem.name);
       },
       updateOpenedFileText(text) {
         const item = this.$refs.tabs.getSelected().uniqueValue;
