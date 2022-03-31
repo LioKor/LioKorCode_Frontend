@@ -125,21 +125,24 @@
       }
     },
     methods: {
-      selectTabEl(el) {
+      selectTabEl(el, withAction = false) {
         if (!el)
           return;
         if (this.selectedEl)
           this.selectedEl.classList.remove('selected');
         el.classList.add('selected');
         this.selectedEl = el;
-      },
-      selectTab(e) {
-        const el = e.target;
+
+        if (!withAction)
+          return
         const idx = el.getAttribute('data-idx');
         const item = this.reactiveItems[idx];
         item.action();
-        this.selectTabEl(el);
-        this.$emit('selectTab', item, idx);
+        //this.$emit('selectTab', item, idx);
+      },
+      selectTab(e) {
+        const el = e.target;
+        this.selectTabEl(el, true);
       },
       deleteTab(e) {
         let el = e.target;
@@ -148,11 +151,10 @@
 
         const idx = el.getAttribute('data-idx');
         const item = this.reactiveItems[idx];
-        if (this.selectedEl === el) {
-          this.selectTabEl(el.previousElementSibling || el.nextElementSibling);
-        }
+        if (this.selectedEl === el)
+            this.selectTabEl(el.previousElementSibling || el.nextElementSibling, true);
         this.reactiveItems.splice(idx, 1);
-        this.$emit('deleteTab', item, idx);
+        //this.$emit('deleteTab', item, idx);
       },
       async addTab(item = {name: "", action: () => {}, closable: true, uniqueValue: undefined}, setSelected = true) {
         const existingItemIdx = this.reactiveItems.findIndex(it => it.uniqueValue === item.uniqueValue);
