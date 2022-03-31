@@ -37,38 +37,48 @@
 
           <div class="title">
               <div class="avatar">
-                  <img id="avatarImage" :src="avatarUrl" alt="">
-                  <div id="avatarChange" class="cover">
+                  <img :src="avatarUrl" alt="">
+                  <div class="cover">
                       Изменить
                   </div>
               </div>
-              <div class="primary" id="username">{{ username }}</div>
+              <div class="primary">{{ username }}</div>
           </div>
           <div class="form">
-              <form id="editProfileForm" novalidate>
-                  <input name="avatarDataURL" type="hidden" id="avatarDataURL">
+              <form novalidate>
+                  <input name="avatarDataURL" type="hidden">
 
-                  <div class="form-group" id="usernameGroup">
-                    <label>ЛОГИН<span class="error-text" id="usernameErrorText"></span></label>
-                    <input name="username" type="text" class="form-control" :value="username">
+                  <div class="form-group">
+                    <label>ЛОГИН<span class="error-text"></span></label>
+                    <input name="username" type="text" class="form-control" :value="username" autocomplete="off">
                   </div>
-                  <div class="form-group" id="fullnameGroup">
-                      <label>ПОЛНОЕ ИМЯ<span class="error-text" id="fullnameErrorText"></span></label>
-                      <input name="fullname" type="text" class="form-control" :value="fullname">
+                  <div class="form-group">
+                      <label>ПОЛНОЕ ИМЯ<span class="error-text"></span></label>
+                      <input name="fullname" type="text" class="form-control" :value="fullname" autocomplete="off">
                   </div>
-                  <div class="form-group" id="reserveEmailGroup">
-                      <label>ЗАПАСНОЙ E-MAIL<span class="error-text" id="reserveEmailErrorText"></span></label>
-                      <input name="reserveEmail" type="email" class="form-control" :value="email">
+                  <div class="form-group">
+                      <label>ЗАПАСНОЙ E-MAIL<span class="error-text"></span></label>
+                      <input name="reserveEmail" type="email" class="form-control" :value="email" autocomplete="off">
                       <!-- <div class="muted">Необходимо будет подтвердить на старом и новом ящиках</div> -->
                   </div>
                   <div class="form-group">
                     <div class="btn" @click="updateUserInfo">Сохранить</div>
                   </div>
-                  <div class="form-group">
-                      <router-link :to="'/user/'+username+'/password'" class="btn" id="changePasswordButton">Сменить пароль</router-link>
+                  <div class="roll-closed" ref="changePasswordFields">
+                    <div class="form-group">
+                      <label>СТАРЫЙ ПАРОЛЬ<span class="error-text"></span></label>
+                      <input name="oldPassword" type="password" class="form-control" :value="oldPassword" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                      <label>НОВЫЙ ПАРОЛЬ<span class="error-text"></span></label>
+                      <input name="newPassword" type="password" class="form-control" :value="newPassword" autocomplete="off">
+                    </div>
                   </div>
                   <div class="form-group">
-                      <div @click="signOut" class="btn btn-danger" id="logoutButton">Выйти</div>
+                      <div class="btn" @click="changePassword">Сменить пароль</div>
+                  </div>
+                  <div class="form-group">
+                      <div @click="signOut" class="btn btn-danger">Выйти</div>
                   </div>
               </form>
           </div>
@@ -79,6 +89,7 @@
 
 <script>
   import Logo from './Logo.vue'
+  import {closeRoll, isClosedRoll, openRoll} from "../utils/show-hide";
 
   export default {
     components: { Logo },
@@ -89,6 +100,8 @@
         email: this.$store.state.user.email,
         avatarUrl: this.$store.state.user.avatarUrl,
         fullname: this.$store.state.user.fullname,
+        oldPassword: "",
+        newPassword: "",
       }
     },
 
@@ -115,6 +128,19 @@
         }
         await this.$store.dispatch('DELETE_USER');
         this.$router.push('/signin');
+      },
+      async changePassword() {
+        if (isClosedRoll(this.$refs.changePasswordFields)) {
+          openRoll(this.$refs.changePasswordFields);
+          return;
+        }
+        const response = await this.$store.state.api.changePassword(this.oldPassword, this.newPassword);
+        if (!response.ok_) {
+          alert("Не удалось сменить пароль");
+          return;
+        }
+        alert("Пароль изменен");
+        closeRoll(this.$refs.changePasswordFields);
       }
     },
   }
