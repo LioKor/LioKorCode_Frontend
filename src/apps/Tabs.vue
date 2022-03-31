@@ -173,6 +173,12 @@
           return null;
         const idx = this.selectedEl.getAttribute('data-idx');
         return this.reactiveItems[idx];
+      },
+      updateTab(uniqueValue, name) {
+        const item = this.reactiveItems.find(tab => tab.uniqueValue === uniqueValue);
+        if (!item)
+          return;
+        item.name = name;
       }
     }
   }

@@ -65,7 +65,7 @@ run: build
 \t./solution.o
 `}
               ]"
-          @open-file-text="openTreeFile"></Tree>
+          @open-file-text="openTreeFile" @rename-file="updateFileNameInTabs"></Tree>
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
         <div id="editor-block">
@@ -139,6 +139,10 @@ run: build
         const item = this.$refs.tabs.getSelected().uniqueValue;
         item.value = text;
         this.$refs.tree.saveToLocalStorage();
+      },
+      updateFileNameInTabs(treeItem) {
+        this.$refs.tabs.updateTab(treeItem, treeItem.name);
+        this.$refs.editor.setSyntaxHighlighting(treeItem.name);
       }
     }
   }

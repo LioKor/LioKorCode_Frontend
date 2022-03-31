@@ -84,7 +84,7 @@
       },
 
       setSyntaxHighlighting(name) {
-        let mode;
+        let mode = 'plain_text';
         if (['GNUmakefile', 'makefile', 'Makefile'].find(el => el === name)) {
           mode = 'makefile';
         }
@@ -104,7 +104,7 @@
           {ends: ['.pl', 'pm'], mode: 'perl'},
           {ends: ['.java', '.class', '.jar', '.jad', '.jmod'], mode: 'java'},
         ];
-        const rule = rules.find(rule => rule.ends.find(end => name.endsWith(end)));
+        const rule = rules.find(rule => rule.ends.find(end => name.endsWith(end)) !== undefined);
         if (rule)
           mode = rule.mode;
         this.aceEditor.session.setMode('ace/mode/' + mode);
