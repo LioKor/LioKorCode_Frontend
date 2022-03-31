@@ -60,7 +60,7 @@
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
         <div id="editor-block">
-          <Tabs class="horizontal" ref="tabs" :items="[]" @lastTabClosed="this.$refs.editor.clear()"></Tabs>
+          <Tabs class="horizontal" ref="tabs" :items="[]" @lastTabClosed="allFilesClosed"></Tabs>
           <Editor ref="editor" @editor-change="updateOpenedFileText"/>
         </div>
       </div>
@@ -153,11 +153,15 @@
         const fileList = this.parseSourceCode(checkInfo.sourceCode);
         this.$refs.tree.loadTree(fileList);
 
-        this.$refs.editor.clear()
-        this.$refs.editor.setReadOnly(true);
+        this.allFilesClosed()
 
         this.$refs.tabsVertical.selectTabIndex(1);
         this.$refs.tabs.closeAllTabs();
+      },
+
+      allFilesClosed() {
+        this.$refs.editor.setReadOnly(true);
+        this.$refs.editor.clear();
       }
     }
   }
