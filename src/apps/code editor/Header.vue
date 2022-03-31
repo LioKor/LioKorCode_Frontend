@@ -27,7 +27,8 @@
       <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Checking...</div>
       <div class="control-button danger" v-show="isCheckError" :disabled="isCheckError">Need auth</div>
 
-      <router-link to="/profile" class="right">Профиль</router-link>
+      <router-link v-if="$store.state.user.isLogined" to="/profile" class="right">{{$store.state.user.username}}</router-link>
+      <router-link v-else to="/signin" class="right">Войти</router-link>
 
 <!--      <router-link to="#">Туда</router-link>-->
 <!--      <router-link to="#">Сюда</router-link>-->
