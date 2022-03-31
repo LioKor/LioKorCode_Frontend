@@ -14,7 +14,7 @@
     .action:hover
       color clHighlight
     table
-      width calc(100% - 128px)
+      width 100%
       border-collapse collapse
       thead
         th
@@ -26,13 +26,6 @@
           text-align center
           padding 10px
           border 1px solid color3
-        td.id
-        th.id
-          width 1%
-        th.date
-        td.date
-          width 1%
-          white-space nowrap
         td.ok
           background #365e36
         td.checking
@@ -51,17 +44,17 @@
     <table>
       <thead>
         <tr>
-          <th class="id">id</th>
-          <th>Дата проверки</th>
-          <th>Тесты</th>
-          <th>Время выполнения</th>
-          <th>Время компиляции</th>
+          <th class="min-width">id</th>
+          <th class="min-width">Дата проверки</th>
+          <th class="min-width">Тесты</th>
+          <th class="min-width">Время выполнения</th>
+          <th class="min-width">Время компиляции</th>
           <th>Сообщение</th>
-          <th>Действия</th>
+          <th class="min-width">Действия</th>
         </tr>
       </thead>
-      <tr v-for="solution in solutions" class="withHint" :data-hint="solution.message">
-        <td :class="getStatusClass(solution.checkResult)" class="id">{{ solution.id }}</td>
+      <tr v-for="solution in solutions">
+        <td class="min-width withHint" :class="getStatusClass(solution.checkResult)" :data-hint="solution.message">{{ solution.id }}</td>
 
         <td class="min-width">{{ solution.datetime }}</td>
         <td class="min-width">{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>

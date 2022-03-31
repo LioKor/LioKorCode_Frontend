@@ -69,8 +69,7 @@ run: build
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
         <div id="editor-block">
-          <Tabs class="horizontal" ref="tabs" :items="[
-            ]"></Tabs>
+          <Tabs class="horizontal" ref="tabs" :items="[]" @lastTabClosed="clearEditor"></Tabs>
           <Editor ref="editor" @editor-change="updateOpenedFileText"/>
         </div>
       </div>
@@ -164,6 +163,10 @@ run: build
 
         this.setEditorText('')
         this.$refs.tabs.closeAllTabs()
+      },
+
+      clearEditor() {
+        this.$refs.editor.setText('')
       },
 
       resizeEditor() {
