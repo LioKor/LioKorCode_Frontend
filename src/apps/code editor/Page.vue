@@ -69,12 +69,12 @@ run: build
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
         <div id="editor-block">
-          <Tabs class="horizontal" ref="tabs" :items="[]" @lastTabClosed="clearEditor"></Tabs>
+          <Tabs class="horizontal" ref="tabs" :items="[]" @lastTabClosed="this.$refs.editor.clear()"></Tabs>
           <Editor ref="editor" @editor-change="updateOpenedFileText"/>
         </div>
       </div>
 
-      <SlideLine el1="taskBlock" el2="solutions" class="horizontal" @sliderMoved="resizeEditor" />
+      <SlideLine el1="taskBlock" el2="solutions" class="horizontal" @sliderMoved="this.$refs.editor.resize()" />
 
       <Solutions ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
     </div>
@@ -132,16 +132,13 @@ run: build
           action: () => {this.$refs.tree.openFileByItem(treeItem)},
           uniqueValue: treeItem,
         });
+        this.$refs.editor.setReadOnly(false)
         this.$refs.editor.setText(treeItem.value);
       },
       updateOpenedFileText(text) {
         const item = this.$refs.tabs.getSelected().uniqueValue;
         item.value = text;
         this.$refs.tree.saveToLocalStorage();
-      },
-
-      setEditorText(text) {
-        this.$refs.editor.setText(text);
       },
 
       parseSourceCode(sourceCode) {
@@ -161,16 +158,9 @@ run: build
         const fileList = this.parseSourceCode(checkInfo.sourceCode);
         this.$refs.tree.loadTree(fileList);
 
-        this.setEditorText('')
+        this.$refs.editor.clear()
+        this.$refs.editor.setReadOnly(true);
         this.$refs.tabs.closeAllTabs()
-      },
-
-      clearEditor() {
-        this.$refs.editor.setText('')
-      },
-
-      resizeEditor() {
-        this.$refs.editor.resize()
       }
     }
   }

@@ -86,6 +86,12 @@
 
         if (disableChangeEmit)
           this.aceEditor.on('change', this.onChangeAction);
+      },
+      clear() {
+        this.setText('')
+      },
+      setReadOnly(state) {
+        this.aceEditor.setReadOnly(state);
       }
     }
   }
