@@ -173,6 +173,11 @@
           return null;
         const idx = this.selectedEl.getAttribute('data-idx');
         return this.reactiveItems[idx];
+      },
+
+      closeAllTabs() {
+        this.reactiveItems = [];
+        this.selectedEl = null;
       }
     }
   }

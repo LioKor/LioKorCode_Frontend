@@ -75,7 +75,7 @@ run: build
         </div>
       </div>
 
-      <SlideLine el1="taskBlock" el2="solutions" class="horizontal"/>
+      <SlideLine el1="taskBlock" el2="solutions" class="horizontal" @sliderMoved="resizeEditor" />
 
       <Solutions ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
     </div>
@@ -163,6 +163,11 @@ run: build
         this.$refs.tree.loadTree(fileList);
 
         this.setEditorText('')
+        this.$refs.tabs.closeAllTabs()
+      },
+
+      resizeEditor() {
+        this.$refs.editor.resize()
       }
     }
   }

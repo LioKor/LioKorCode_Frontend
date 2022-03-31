@@ -17,7 +17,7 @@
 
     <div v-show="showNeedToLogin" class="standalone-form">
       <div class="title">
-        <div class="primary">Для отправки решений необходимо авторизоваться</div>
+        <div class="primary">Для отправки решений необходимо <router-link to="/signin">авторизоваться</router-link></div>
       </div>
     </div>
   </div>
@@ -70,6 +70,9 @@
     },
 
     methods: {
+      resize() {
+        this.aceEditor.resize();
+      },
       setText(text, disableChangeEmit = true) {
         if (!this.isMounted) {
           this.textWhenMounted = text;
