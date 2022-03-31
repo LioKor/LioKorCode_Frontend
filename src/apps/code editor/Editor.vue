@@ -47,8 +47,7 @@
 
       this.aceEditor.setOptions({
         fontSize: '12pt',
-        tabSize: 4,
-        useSoftTabs: false,
+        tabSize: 4
       });
 
       this.aceEditor.on('change', this.onChangeAction);
@@ -70,7 +69,7 @@
       resize() {
         this.aceEditor.resize();
       },
-      setText(text, name, disableChangeEmit = true) {
+      setText(text, name = null, disableChangeEmit = true) {
         if (!this.isMounted) {
           this.textWhenMounted = text;
         } else {
@@ -83,7 +82,9 @@
             this.aceEditor.on('change', this.onChangeAction);
         }
 
-        this.setSyntaxHighlighting(name);
+        if (name) {
+          this.setSyntaxHighlighting(name);
+        }
       },
 
       setSyntaxHighlighting(name) {
@@ -110,7 +111,9 @@
         const rule = rules.find(rule => rule.ends.find(end => name.endsWith(end)) !== undefined);
         if (rule)
           mode = rule.mode;
+
         this.aceEditor.session.setMode('ace/mode/' + mode);
+        this.aceEditor.session.setUseSoftTabs(mode !== 'makefile');
       },
       clear() {
         this.setText('')

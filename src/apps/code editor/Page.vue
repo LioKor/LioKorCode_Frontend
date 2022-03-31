@@ -46,26 +46,17 @@
     <div id="code-editor-all">
       <div id="taskBlock" class="task-and-editor">
         <div id="taskInfo-and-tree">
-          <Tabs class="vertical" :items="[
+          <Tabs class="vertical" ref="tabsVertical" :items="[
               {name: 'Задание', action: () => {this.openedTab = 0}, closable: false},
               {name: 'Файлы', action: () => {this.openedTab = 1}, closable: false}
           ]"></Tabs>
           <TaskInfo v-show="openedTab === 0" ref="taskInfo" :id="taskId"></TaskInfo>
 
           <Tree v-show="openedTab === 1" ref="tree" name="Project" :items="[
-              {name: 'main.c', value: `#include <stdio.h>
-
-int main() {
-\treturn 0;
-}
-`},
-              {name: 'Makefile', value: `build:
-\tgcc main.c -o solution.o
-run: build
-\t./solution.o
-`}
-              ]"
-          @open-file-text="openTreeFile" @rename-file="updateFileNameInTabs"></Tree>
+              {name: 'main.c', value: 'int main() {\n\treturn 0;\n}\n'},
+              {name: 'Makefile', value: `build:\n\tgcc main.c -o solution\nrun: build\n\t./solution`}
+            ]"
+            @open-file-text="openTreeFile" @rename-file="updateFileNameInTabs"></Tree>
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
         <div id="editor-block">
@@ -164,7 +155,9 @@ run: build
 
         this.$refs.editor.clear()
         this.$refs.editor.setReadOnly(true);
-        this.$refs.tabs.closeAllTabs()
+
+        this.$refs.tabsVertical.selectTabIndex(1);
+        this.$refs.tabs.closeAllTabs();
       }
     }
   }

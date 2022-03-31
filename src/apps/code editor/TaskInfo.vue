@@ -13,7 +13,7 @@
 <template>
   <div id="taskInfo" class="task scrollable">
     <h2>{{ name }}</h2>
-    <!--h3>Описание:</h3-->
+
     <p>{{ description }}</p>
 
     <div v-if="stdinDescription">
@@ -21,11 +21,11 @@
       <p>{{ stdinDescription }}</p>
     </div>
     <div v-if="stdoutDescription">
-      <h4>Выходные даные:</h4>
+      <h4>Выходные данные:</h4>
       <p>{{ stdoutDescription }}</p>
     </div>
     <div v-if="notes">
-      <h4>Подсказки:</h4>
+      <h4>Особые указания:</h4>
       <p>{{ notes }}</p>
     </div>
 

@@ -26,6 +26,9 @@
           text-align center
           padding 10px
           border 1px solid color3
+          overflow hidden
+        td.with-hint
+          overflow visible
         td.ok
           background #365e36
         td.checking
@@ -54,7 +57,7 @@
         </tr>
       </thead>
       <tr v-for="solution in solutions">
-        <td class="min-width withHint" :class="getStatusClass(solution.checkResult)" :data-hint="solution.message">{{ solution.id }}</td>
+        <td class="min-width with-hint" :class="getStatusClass(solution.checkResult)" :data-hint="solution.message">{{ solution.id }}</td>
 
         <td class="min-width">{{ solution.datetime }}</td>
         <td class="min-width">{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>

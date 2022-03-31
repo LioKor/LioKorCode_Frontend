@@ -140,6 +140,9 @@
         item.action();
         //this.$emit('selectTab', item, idx);
       },
+      selectTabIndex(ind) {
+        this.selectTabEl(this.$refs.items[ind], true);
+      },
       selectTab(e) {
         const el = e.target;
         this.selectTabEl(el, true);

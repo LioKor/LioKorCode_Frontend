@@ -29,12 +29,6 @@
 
       <router-link v-if="$store.state.user.isLogined" to="/profile" class="right">{{$store.state.user.username}}</router-link>
       <router-link v-else to="/signin" class="right">Войти</router-link>
-
-<!--      <router-link to="#">Туда</router-link>-->
-<!--      <router-link to="#">Сюда</router-link>-->
-<!--      <router-link to="#">Обратно</router-link>-->
-
-<!--      <router-link to="#" class="right">Твоё имя</router-link>-->
     </div>
   </div>
 </template>
