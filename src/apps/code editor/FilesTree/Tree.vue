@@ -74,7 +74,7 @@
 
 <template>
   <div id="tree" class="tree-container">
-    <ul class="tree context-tree-root root"
+    <ul class="tree context-tree-root root" ref="root"
       @keyup.delete="proxyFileFoo(deleteItem, true)"
       @keyup.ctrl.c="proxyFileFoo(copyItem)"
       @keyup.ctrl.x="proxyFileFoo(cutItem)"
@@ -134,6 +134,7 @@
   import ContextMenu from "../../ContextMenu.vue";
   import Item from "./Item.vue";
   import {deepClone} from "../../../utils/utils.js";
+  import {nextTick} from "vue";
 
   export default {
     components: {ContextMenu, Item},
@@ -159,9 +160,17 @@
       }
     },
 
-    mounted() {
+    async mounted() {
       this.loadFromLocalStorage();
       this.sortFilesAndSave();
+
+      await nextTick();
+      const path = localStorage.getItem('openedFilePath');
+      if (path !== null) {
+        this.openFile(this.getElByPath(path.split(',')));
+      } else {
+        this.openFile(this.$refs.root.children[1]);
+      }
     },
 
     methods: {
@@ -182,6 +191,27 @@
       },
 
       // --- Controls by clicks on context menu
+      getPathByItem(item, where = this.reactiveItems, pathPrefix = []) {
+        for (let i = this.reactiveItems.length-1; i >= 0; i--) {
+          const curItem = this.reactiveItems[i];
+          if (curItem === item) {
+            return pathPrefix.concat([i]);
+          }
+          if (typeof curItem.value !== 'string') {
+            const res = this.getPathByItem(item, curItem.value);
+            if (res)
+              return res;
+          }
+        }
+        return null;
+      },
+      getElByPath(path) {
+        let curRoot = this.$refs.root;
+        path.forEach(idx => {
+          curRoot = curRoot.children[Number(idx) + 1];
+        });
+        return curRoot;
+      },
       getItemPath(el) {
         if (!el)
           return [];
@@ -246,7 +276,7 @@
         if (name === null)
           return;
 
-        list[idx].name = name; //
+        list[idx].name = name;
         this.sortFilesAndSave(list);
       },
 
@@ -282,7 +312,7 @@
       },
 
       // --- Select and open files
-      toggleAndSaveFileClass(el, toSave, className, list, idx) {
+      toggleAndSaveFileClass(el, toSave, className, list = undefined, idx = undefined) {
         if (toSave.el !== null) {
           toSave.el.classList.remove(className);
         }
@@ -298,13 +328,18 @@
         this.toggleAndSaveFileClass(el, this.selectedItem, 'selected');
       },
       openFile(el) {
-        const {list, idx} = this.getItem(this.getItemPath(el));
+        const path = this.getItemPath(el);
+        const {list, idx} = this.getItem(path);
         if (typeof list[idx].value !== 'string') { // el is a folder
           this.toggleExpandEl(el);
           return;
         }
+        localStorage.setItem('openedFilePath', path.join(','));
         this.toggleAndSaveFileClass(el, this.openedItem, 'opened', list, idx);
-        this.$emit("openFileText", this.openedItem.item.value);
+        this.$emit("openFileText", this.openedItem.item);
+      },
+      openFileByItem(item) {
+        this.openFile(this.getElByPath(this.getPathByItem(item)));
       },
 
       getSource(prefix = "", list = this.reactiveItems) {
@@ -318,13 +353,6 @@
             Object.assign(source, this.getSource(prefix + item.name, item.value));
         });
         return source;
-      },
-      setOpenedFileText(text) {
-        if (this.openedItem.el === null)
-          return;
-        this.openedItem.item.value = text;
-
-        this.saveToLocalStorage();
       },
 
       // --- Local storage work
@@ -358,18 +386,6 @@
       },
 
       // --- Arrow keys
-      // findItem(item, list = this.reactiveItems) {
-      //   for (let i = list.length-1; i >= 0; i--) {
-      //     if (list[i] === item)
-      //       return {list: list, idx: i};
-      //     if (typeof list[i].value !== 'string') { // item is a folder
-      //       const result = this.findItem(list[i].value);
-      //       if (result !== null)
-      //         return result;
-      //     }
-      //   }
-      //   return null;
-      // },
       selectPrevious() {
         let el = this.selectedItem.el;
         if (!el)

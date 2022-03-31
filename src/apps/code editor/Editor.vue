@@ -32,10 +32,20 @@
       return {
         aceEditor: null,
         showNeedToLogin: false,
+        isMounted: false,
+        textWhenMounted: "",
+        onChangeAction: () => {
+          const text = this.aceEditor.getValue();
+          //localStorage.setItem('code', text);
+          this.$emit('editorChange', text);
+        }
       }
     },
     mounted() {
       this.aceEditor = ace.edit('aceEditor');
+      this.isMounted = true;
+      this.aceEditor.setValue(this.textWhenMounted, 1); // ', 1' to disable selection
+
       this.aceEditor.setOptions({
         fontSize: '12pt',
         tabSize: 4,
@@ -43,11 +53,7 @@
       });
 
       // this.aceEditor.setValue(localStorage.getItem('code') || "");
-      this.aceEditor.on('change', () => {
-        const text = this.aceEditor.getValue();
-        //localStorage.setItem('code', text);
-        this.$emit('editorChange', text);
-      });
+      this.aceEditor.on('change', this.onChangeAction);
 
       this.aceEditor.setTheme('ace/theme/ambiance');
       this.aceEditor.session.setMode('ace/mode/c_cpp');
@@ -64,8 +70,19 @@
     },
 
     methods: {
-      setText(text) {
+      setText(text, disableChangeEmit = true) {
+        if (!this.isMounted) {
+          this.textWhenMounted = text;
+          return;
+        }
+
+        if (disableChangeEmit)
+          this.aceEditor.removeAllListeners('change');
+
         this.aceEditor.setValue(text, 1); // ', 1' to disable selection
+
+        if (disableChangeEmit)
+          this.aceEditor.on('change', this.onChangeAction);
       }
     }
   }
