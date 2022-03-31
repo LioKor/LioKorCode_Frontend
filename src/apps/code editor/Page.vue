@@ -65,7 +65,7 @@ run: build
 \t./solution.o
 `}
               ]"
-          @open-file-text="openTreeFile"></Tree>
+          @open-file-text="openTreeFile" @rename-file="updateFileNameInTabs"></Tree>
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
         <div id="editor-block">
@@ -133,12 +133,16 @@ run: build
           uniqueValue: treeItem,
         });
         this.$refs.editor.setReadOnly(false)
-        this.$refs.editor.setText(treeItem.value);
+        this.$refs.editor.setText(treeItem.value, treeItem.name);
       },
       updateOpenedFileText(text) {
         const item = this.$refs.tabs.getSelected().uniqueValue;
         item.value = text;
         this.$refs.tree.saveToLocalStorage();
+      },
+      updateFileNameInTabs(treeItem) {
+        this.$refs.tabs.updateTab(treeItem, treeItem.name);
+        this.$refs.editor.setSyntaxHighlighting(treeItem.name);
       },
 
       parseSourceCode(sourceCode) {

@@ -278,6 +278,8 @@
 
         list[idx].name = name;
         this.sortFilesAndSave(list);
+
+        this.$emit('renameFile', list[idx]);
       },
 
       copyItem(el) {

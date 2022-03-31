@@ -36,7 +36,6 @@
         textWhenMounted: "",
         onChangeAction: () => {
           const text = this.aceEditor.getValue();
-          //localStorage.setItem('code', text);
           this.$emit('editorChange', text);
         }
       }
@@ -52,11 +51,9 @@
         useSoftTabs: false,
       });
 
-      // this.aceEditor.setValue(localStorage.getItem('code') || "");
       this.aceEditor.on('change', this.onChangeAction);
 
       this.aceEditor.setTheme('ace/theme/ambiance');
-      this.aceEditor.session.setMode('ace/mode/c_cpp');
 
       // const scrollbar = document.querySelector('.ace_scrollbar');
       // console.log(scrollbar)
@@ -73,19 +70,47 @@
       resize() {
         this.aceEditor.resize();
       },
-      setText(text, disableChangeEmit = true) {
+      setText(text, name, disableChangeEmit = true) {
         if (!this.isMounted) {
           this.textWhenMounted = text;
-          return;
+        } else {
+          if (disableChangeEmit)
+            this.aceEditor.removeAllListeners('change');
+
+          this.aceEditor.setValue(text, 1); // ', 1' to disable selection
+
+          if (disableChangeEmit)
+            this.aceEditor.on('change', this.onChangeAction);
         }
 
-        if (disableChangeEmit)
-          this.aceEditor.removeAllListeners('change');
+        this.setSyntaxHighlighting(name);
+      },
 
-        this.aceEditor.setValue(text, 1); // ', 1' to disable selection
-
-        if (disableChangeEmit)
-          this.aceEditor.on('change', this.onChangeAction);
+      setSyntaxHighlighting(name) {
+        let mode = 'plain_text';
+        if (['GNUmakefile', 'makefile', 'Makefile'].find(el => el === name)) {
+          mode = 'makefile';
+        }
+        const rules = [
+          {ends: ['.py'], mode: 'python'},
+          {ends: ['.c', '.cpp', '.h', '.cc', '.c++', '.hpp', '.cxx', '.hxx', '.h++'], mode: 'c_cpp'},
+          {ends: ['.pas', '.inc'], mode: 'pascal'},
+          {ends: ['.kt', '.kts'], mode: 'kotlin'},
+          {ends: ['.scala', '.sc'], mode: 'scala'},
+          {ends: ['.ts'], mode: 'typescript'},
+          {ends: ['.js'], mode: 'javascript'},
+          {ends: ['.xml'], mode: 'xml'},
+          {ends: ['.yaml'], mode: 'yaml'},
+          {ends: ['.json'], mode: 'json'},
+          {ends: ['.html'], mode: 'html'},
+          {ends: ['.php'], mode: 'php'},
+          {ends: ['.pl', 'pm'], mode: 'perl'},
+          {ends: ['.java', '.class', '.jar', '.jad', '.jmod'], mode: 'java'},
+        ];
+        const rule = rules.find(rule => rule.ends.find(end => name.endsWith(end)) !== undefined);
+        if (rule)
+          mode = rule.mode;
+        this.aceEditor.session.setMode('ace/mode/' + mode);
       },
       clear() {
         this.setText('')
