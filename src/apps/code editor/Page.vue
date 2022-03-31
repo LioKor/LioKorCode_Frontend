@@ -65,16 +65,13 @@ run: build
 \t./solution.o
 `}
               ]"
-          @open-file-text="setEditorText"></Tree>
+          @open-file-text="openTreeFile"></Tree>
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
         <div id="editor-block">
-          <Tabs class="horizontal" :items="[
-                {name: 'file1', action: () => {}},
-                {name: 'file2', action: () => {}},
-                {name: 'file3', action: () => {}},
+          <Tabs class="horizontal" ref="tabs" :items="[
             ]"></Tabs>
-          <Editor ref="editor" @editor-change="setOpenedFileText"/>
+          <Editor ref="editor" @editor-change="updateOpenedFileText"/>
         </div>
       </div>
 
@@ -130,11 +127,22 @@ run: build
         this.$refs.solutions.replaceSolution(solutionUid, checkInfo);
       },
 
+      openTreeFile(treeItem) {
+        this.$refs.tabs.addTab({
+          name: treeItem.name,
+          action: () => {this.$refs.tree.openFileByItem(treeItem)},
+          uniqueValue: treeItem,
+        });
+        this.$refs.editor.setText(treeItem.value);
+      },
+      updateOpenedFileText(text) {
+        const item = this.$refs.tabs.getSelected().uniqueValue;
+        item.value = text;
+        this.$refs.tree.saveToLocalStorage();
+      },
+
       setEditorText(text) {
         this.$refs.editor.setText(text);
-      },
-      setOpenedFileText(text) {
-        this.$refs.tree.setOpenedFileText(text);
       },
 
       parseSourceCode(sourceCode) {

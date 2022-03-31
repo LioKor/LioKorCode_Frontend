@@ -11,7 +11,8 @@
   text-color = textColor3
   text-color-hover = textColor1
   text-font-size = 16px
-  padding-top = 7px
+  tab-height = 23px
+  padding-top = (tab-height - text-font-size)
   padding-sides = 10px
   padding-bottom = 4px
 
@@ -28,6 +29,7 @@
   .tabs.vertical
     flex-direction column
     height 100%
+    width tab-height
     .tab
       width 100%
       writing-mode vertical-lr
@@ -42,6 +44,7 @@
   .tabs.horizontal
     flex-direction row
     width 100%
+    height tab-height + padding-bottom
     .tab
       height 100%
       padding padding-top padding-sides padding-bottom padding-sides
@@ -89,7 +92,7 @@
 
 <template>
   <ul id="tabs" class="tabs">
-    <li v-for="item in items" @click="item.action($event); selectTab($event)" class="tab">
+    <li v-for="(item, idx) in reactiveItems" :data-idx="idx" ref="items" @click="selectTab" class="tab">
       {{item.name}}
       <svg v-if="item.closable !== false" @click.stop="deleteTab" xmlns="http://www.w3.org/2000/svg" class="close-tab-svg" viewBox="0 0 10 10"><path d="M 10,0 L 0,10 M 0,0 L 10,10"></path></svg>
     </li>
@@ -97,6 +100,8 @@
 </template>
 
 <script>
+  import {nextTick} from "vue";
+
   export default {
     props: {
       items: {
@@ -108,26 +113,64 @@
 
     data() {
       return {
-        selectedEl: HTMLElement,
+        reactiveItems: this.items,
+        selectedEl: null,
       }
     },
 
     mounted() {
-      this.selectedEl = this.$el.firstElementChild;
-      this.selectedEl.classList.add('selected');
+      if (this.$refs.items) {
+        this.selectedEl = this.$refs.items[0];
+        this.selectedEl.classList.add('selected');
+      }
     },
     methods: {
+      selectTabEl(el) {
+        if (!el)
+          return;
+        if (this.selectedEl)
+          this.selectedEl.classList.remove('selected');
+        el.classList.add('selected');
+        this.selectedEl = el;
+      },
       selectTab(e) {
-        this.selectedEl.classList.remove('selected');
-        const newEl = e.target;
-        newEl.classList.add('selected');
-        this.selectedEl = newEl;
+        const el = e.target;
+        const idx = el.getAttribute('data-idx');
+        const item = this.reactiveItems[idx];
+        item.action();
+        this.selectTabEl(el);
+        this.$emit('selectTab', item, idx);
       },
       deleteTab(e) {
         let el = e.target;
         while(el.tagName !== 'LI')
           el = el.parentElement;
-        el.remove();
+
+        const idx = el.getAttribute('data-idx');
+        const item = this.reactiveItems[idx];
+        if (this.selectedEl === el) {
+          this.selectTabEl(el.previousElementSibling || el.nextElementSibling);
+        }
+        this.reactiveItems.splice(idx, 1);
+        this.$emit('deleteTab', item, idx);
+      },
+      async addTab(item = {name: "", action: () => {}, closable: true, uniqueValue: undefined}, setSelected = true) {
+        const existingItemIdx = this.reactiveItems.findIndex(it => it.uniqueValue === item.uniqueValue);
+        if (existingItemIdx !== -1) {
+          if (setSelected) {
+            this.selectTabEl(this.$refs.items[existingItemIdx]);
+          }
+          return;
+        }
+        this.reactiveItems.push(item);
+        await nextTick();
+        this.selectTabEl(this.$refs.items[this.$refs.items.length-1]);
+      },
+      getSelected() {
+        if (!this.selectedEl)
+          return null;
+        const idx = this.selectedEl.getAttribute('data-idx');
+        return this.reactiveItems[idx];
       }
     }
   }
