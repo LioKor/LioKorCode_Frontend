@@ -134,7 +134,7 @@
           openRoll(this.$refs.changePasswordFields);
           return;
         }
-        const response = await this.$store.state.api.changePassword(this.oldPassword, this.newPassword);
+        const response = await this.$store.state.api.updatePassword(this.oldPassword, this.newPassword);
         if (!response.ok_) {
           alert("Не удалось сменить пароль");
           return;

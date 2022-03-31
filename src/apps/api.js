@@ -8,7 +8,8 @@ export default class Api extends ApiRequest {
     getUser = () => this.get('/user');
     updateUser = (userInfo) => this.put('/user', userInfo);
     signOut = () => this.delete('/user/session');
-    changePassword = (oldPassword, newPassword) => this.put('/user/password', {oldPassword, newPassword});
+    updatePassword = (oldPassword, newPassword) => this.put('/user/password', {oldPassword, newPassword});
+    updateAvatar = (avatarUrl) => this.put('/user/avatar', {avatarUrl});
 
     createTask = (taskData) => this.post(`/tasks`, taskData);
     getTasks = () => this.get(`/tasks`);
