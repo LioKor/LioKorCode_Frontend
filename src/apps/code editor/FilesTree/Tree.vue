@@ -192,13 +192,13 @@
 
       // --- Controls by clicks on context menu
       getPathByItem(item, where = this.reactiveItems, pathPrefix = []) {
-        for (let i = this.reactiveItems.length-1; i >= 0; i--) {
-          const curItem = this.reactiveItems[i];
+        for (let i = where.length-1; i >= 0; i--) {
+          const curItem = where[i];
           if (curItem === item) {
             return pathPrefix.concat([i]);
           }
           if (typeof curItem.value !== 'string') {
-            const res = this.getPathByItem(item, curItem.value);
+            const res = this.getPathByItem(item, curItem.value, pathPrefix.concat([i]));
             if (res)
               return res;
           }
