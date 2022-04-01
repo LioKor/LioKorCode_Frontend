@@ -77,9 +77,15 @@
       this.setKeyControlsListener();
     },
 
+    unmounted() {
+      this.removeContextClickListener();
+      this.removeClickListener();
+      this.removeKeyControlsListener();
+    },
+
     methods: {
       setContextClickListener() {
-        window.addEventListener("contextmenu", (e) => {
+        this._contextClickListener = (e) => {
           const menuIdx = this.menus.findIndex(menu => e.target.classList.contains(menu.targets));
           this.hideAllMenus();
           if (menuIdx === -1) {
@@ -90,11 +96,16 @@
           e.preventDefault();
           this.positionMenu(e, menuIdx);
           this.showMenu(menuIdx);
-        });
+        };
+
+        window.addEventListener("contextmenu", this._contextClickListener);
+      },
+      removeContextClickListener() {
+        window.removeEventListener("contextmenu", this._contextClickListener);
       },
 
       setClickListener() {
-        window.addEventListener( "click", (e) => {
+        this.clickListener = (e) => {
           if (e.target.classList.contains('in-context-menu')) {
             e.preventDefault();
             return;
@@ -102,7 +113,12 @@
           if ((e.which || e.button) === 1) {
             this.hideAllMenus();
           }
-        });
+        };
+
+        window.addEventListener( "click", this.clickListener);
+      },
+      removeClickListener() {
+        window.removeEventListener( "click", this.clickListener);
       },
 
       setKeyControlsListener() {
@@ -130,6 +146,8 @@
         //     break;
         //   }
         // }, Modernizr.passiveeventlisteners ? {passive: true} : false);
+      },
+      removeKeyControlsListener() {
       },
 
       showMenu(menuIdx) {
