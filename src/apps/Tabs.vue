@@ -154,13 +154,18 @@
 
         const idx = el.getAttribute('data-idx');
         const item = this.reactiveItems[idx];
+        //console.log("DELETE ITEM:", item);
         if (this.selectedEl === el)
             this.selectTabEl(el.previousElementSibling || el.nextElementSibling, true);
+
+        //console.log("IDX:", idx);
         this.reactiveItems.splice(idx, 1);
+        //this.$emit('deleteTab', item, idx);
+
+        //console.log("LEN:", this.reactiveItems.length);
         if (this.reactiveItems.length === 0) {
           this.$emit('lastTabClosed');  // to clear editor after this event
         }
-        //this.$emit('deleteTab', item, idx);
       },
       async addTab(item = {name: "", action: () => {}, closable: true, uniqueValue: undefined}, setSelected = true) {
         const existingItemIdx = this.reactiveItems.findIndex(it => it.uniqueValue === item.uniqueValue);
