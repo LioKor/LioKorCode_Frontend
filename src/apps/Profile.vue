@@ -1,30 +1,30 @@
 <style lang="stylus">
   size = 96px
-
-  .avatar
-    position relative
-    width size
-    margin 0 auto
-    margin-bottom 5px
-    .cover
-      position absolute
-      top 0
+  .profile
+    .avatar
+      position relative
       width size
-      height size
-      line-height size
-      border-radius (size / 2 - 1) // to fix avatar outside of div
       margin 0 auto
-      color textColor1
-      background-color clBackground
-      opacity 0
-      cursor pointer
-      transition all 0.2s ease
-    .cover:hover
-      opacity 0.9
-    img
-      border-radius size
-      width size
-      height size
+      margin-bottom 5px
+      .cover
+        position absolute
+        top 0
+        width size
+        height size
+        line-height size
+        border-radius (size / 2 - 1) // to fix avatar outside of div
+        margin 0 auto
+        color textColor1
+        background-color clBackground
+        opacity 0
+        cursor pointer
+        transition all 0.2s ease
+      .cover:hover
+        opacity 0.9
+      img
+        border-radius size
+        width size
+        height size
 </style>
 
 <template>
