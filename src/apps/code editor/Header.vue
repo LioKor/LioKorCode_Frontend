@@ -26,6 +26,8 @@
       <div class="control-button" v-show="!isCheckInProgress && !isCheckError" @click=checkStartEmit>Check<span class="mobile-hide"> (F9)</span></div>
       <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Checking...</div>
       <div class="control-button danger" v-show="isCheckError" :disabled="isCheckError">Need auth</div>
+      <div @click="$emit('openSession')">Открыть сессию</div>
+      <div @click="$emit('connectSession')">Подключиться</div>
 
       <router-link v-if="$store.state.user.isLogined" to="/profile" class="right">{{$store.state.user.username}}</router-link>
       <router-link v-else to="/signin" class="right">Войти</router-link>

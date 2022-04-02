@@ -27,6 +27,8 @@
   import 'ace-builds'
   import 'ace-builds/webpack-resolver'
 
+  const watcherIntervalTime = 2000;
+
   export default {
     data() {
       return {
@@ -34,10 +36,8 @@
         showNeedToLogin: false,
         isMounted: false,
         textWhenMounted: "",
-        onChangeAction: () => {
-          const text = this.aceEditor.getValue();
-          this.$emit('editorChange', text);
-        }
+        deletions: [],
+        additions: [],
       }
     },
     mounted() {
@@ -63,11 +63,19 @@
         this.aceEditor.setReadOnly(true);
         this.showNeedToLogin = true;
       }
+
+      this.watcherInterval = setInterval(() => {
+        this.$emit('editDiff', this.deletions, this.additions);
+      }, watcherIntervalTime);
     },
 
     methods: {
       resize() {
         this.aceEditor.resize();
+      },
+      onChangeAction() {
+        const text = this.aceEditor.getValue();
+        this.$emit('editorChange', text);
       },
       setText(text, name = null, disableChangeEmit = true) {
         if (!this.isMounted) {

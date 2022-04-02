@@ -41,7 +41,7 @@
 
 <template>
   <div class="code-editor-page">
-    <Header ref="header" @start-check="checkSolution"/>
+    <Header ref="header" @start-check="checkSolution" @open-session="openSession" @connect-session="connectSession"/>
 
     <div id="code-editor-all">
       <div id="taskBlock" class="task-and-editor">
@@ -81,6 +81,7 @@
   import SlideLine from '../SlideLine.vue';
   import Tree from "./FilesTree/Tree.vue";
   import Tabs from "../Tabs.vue";
+  import wsRedactorApi from "./wsRedactorApi";
 
 
   export default {
@@ -162,6 +163,41 @@
       allFilesClosed() {
         this.$refs.editor.setReadOnly(true);
         this.$refs.editor.clear();
+      },
+
+      // --- WebSockets live editor
+      editorActions(json) {
+        switch (json.type) {
+          case 'set':
+          case 'select':
+          case 'add':
+          case 'delete':
+        }
+      },
+      openSession() {
+        this.ws = new wsRedactorApi(this.$store.state.api.apiUrl);
+        this.ws.onmessage = (json) => {
+          alert('Ваша сессия создана. ID:\n' + json.id);
+
+          this.ws.onmessage = (json) => {
+            alert('К вам подключился: ' + json.username);
+
+            this.ws.onmessage = this.editorActions;
+          };
+        };
+        this.ws.open();
+      },
+      connectSession() {
+        const id = prompt('Ведите ID сессии');
+        if (!id)
+          return;
+
+        this.ws = new wsRedactorApi(this.$store.state.api.apiUrl, id);
+        this.ws.onmessage = this.editorActions;
+        this.ws.onerror = () => {
+          alert('Соединение не удалоь');
+        }
+        this.ws.open();
       }
     }
   }

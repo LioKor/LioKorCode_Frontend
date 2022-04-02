@@ -16,13 +16,16 @@
 </template>
 
 <script>
+  import Modal from '../utils/Modal.vue'
+
   import SlideLine from './SlideLine.vue';
   import Rooms from './Rooms/Rooms.vue';
 
   export default {
-    components: { SlideLine, Rooms },
+    components: { Modal, SlideLine, Rooms },
 
-    async mounted() {
+    mounted() {
+      this.$store.state.modal = Modal;
     },
   }
 </script>
