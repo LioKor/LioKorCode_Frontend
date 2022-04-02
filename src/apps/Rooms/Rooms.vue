@@ -171,6 +171,8 @@ textColor2 = #AAA
 </template>
 
 <script>
+const WS_ROOMS_URL = `ws://${document.location.hostname}:9090`
+
 let ws = null;
 
 class Message {
@@ -203,10 +205,7 @@ export default {
       rooms: [],
 
       message: '',
-      messages: [
-          new Message('Wolf', 'RAWR'),
-          new Message('Lion', 'MEOW')
-      ]
+      messages: []
     }
   },
 
@@ -260,7 +259,7 @@ export default {
     // only after some time username is available
     await this.waitForUsername();
 
-    ws = new WebSocket('ws://code.liokor.com:9090');
+    ws = new WebSocket(WS_ROOMS_URL);
     ws.addEventListener('open', () => {
       console.log('WebSocket connected!')
 
