@@ -6,10 +6,13 @@
 </template>
 
 <script>
-  export default {
-    components: {  },
+  import Modal from "../utils/Modal.vue";
 
-    async mounted() {
-    },
+  export default {
+    components: { Modal },
+
+    mounted() {
+      this.$store.state.modal = Modal;
+    }
   }
 </script>
