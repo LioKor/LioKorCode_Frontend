@@ -118,7 +118,7 @@
       },
 
       openSolution(id) {
-        if (confirm('Текущее решение будет уничтожено. Продолжить?')) {
+        if (this.$store.state.modal.prompt('Текущее решение будет уничтожено. Продолжить?')) {
           this.$emit('openSolution', id);
         }
       },

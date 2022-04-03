@@ -233,7 +233,7 @@
       },
 
       addSomething(el, promptMsg, itemValue) {
-        const name = prompt(promptMsg);
+        const name = this.$store.state.modal.prompt(promptMsg);
         if (name === null)
           return;
 
@@ -253,7 +253,7 @@
       },
 
       deleteItem(el) {
-        const conf = confirm('Точно удаляем?');
+        const conf = this.$store.state.modal.prompt('Точно удаляем?');
         if (!conf)
           return false;
 
@@ -272,7 +272,7 @@
 
       renameItem(el) {
         const {list, idx} = this.getItem(this.getItemPath(el));
-        const name = prompt('Во что переименуем?', list[idx].name);
+        const name = this.$store.state.modal.prompt('Во что переименуем?', list[idx].name);
         if (name === null)
           return;
 

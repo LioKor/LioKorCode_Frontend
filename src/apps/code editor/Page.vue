@@ -188,7 +188,7 @@
         this.ws.open();
       },
       connectSession() {
-        const id = prompt('Ведите ID сессии');
+        const id = this.$store.state.modal.prompt('Ведите ID сессии');
         if (!id)
           return;
 
