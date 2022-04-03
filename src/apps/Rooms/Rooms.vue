@@ -94,7 +94,7 @@ textColor2 = #AAA
 </style>
 
 <template>
-  <div id="rooms" @contextmenu.prevent="state = !state">
+  <div @contextmenu.prevent="state = !state">
     <div v-if="!this.$store.state.user.isLogined">
       <h1>Комнаты</h1>
       <h2><router-link to="/signin">Авторизуйтесь</router-link>, чтобы создать или присоединиться к комнате</h2>
@@ -145,7 +145,7 @@ textColor2 = #AAA
         <div id="messagesDiv" class="messages" ref="messages">
           <div v-for="message in messages" class="message">
             <div class="avatar">
-              <img alt="">
+              <img alt="" src="">
             </div>
             <div class="body">
               <div class="title">

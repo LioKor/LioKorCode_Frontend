@@ -1,7 +1,7 @@
 <style lang="stylus">
   @import "../../styles/constants.styl"
 
-  #taskBlock
+  #task-block
     background-color white
 
   .code-editor-page
@@ -44,13 +44,13 @@
     <Header ref="header" @start-check="checkSolution" @open-session="openSession" @connect-session="connectSession"/>
 
     <div id="code-editor-all">
-      <div id="taskBlock" class="task-and-editor">
+      <div id="task-block" class="task-and-editor">
         <div id="taskInfo-and-tree">
           <Tabs class="vertical" ref="tabsVertical" :items="[
               {name: 'Задание', action: () => {this.openedTab = 0}, closable: false},
               {name: 'Файлы', action: () => {this.openedTab = 1}, closable: false}
           ]"></Tabs>
-          <TaskInfo v-show="openedTab === 0" ref="taskInfo" :id="taskId"></TaskInfo>
+          <TaskInfo v-show="openedTab === 0" ref="taskInfo" :task-id="taskId"></TaskInfo>
 
           <Tree v-show="openedTab === 1" ref="tree" name="Project" :items="[
               {name: 'main.c', value: 'int main() {\n\treturn 0;\n}\n'},
@@ -65,9 +65,9 @@
         </div>
       </div>
 
-      <SlideLine el1="taskBlock" el2="solutions" class="horizontal" @sliderMoved="this.$refs.editor.resize()" />
+      <SlideLine el1="task-block" el2="solutions-block" class="horizontal" @sliderMoved="this.$refs.editor.resize()" />
 
-      <Solutions ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
+      <Solutions id="solutions-block" ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
     </div>
   </div>
 </template>

@@ -91,7 +91,7 @@
 </style>
 
 <template>
-  <ul id="tabs" class="tabs">
+  <ul class="tabs">
     <li v-for="(item, idx) in reactiveItems" :data-idx="idx" ref="items" @click="selectTab" class="tab">
       {{item.name}}
       <svg v-if="item.closable !== false" @click.stop="deleteTab" xmlns="http://www.w3.org/2000/svg" class="close-tab-svg" viewBox="0 0 10 10"><path d="M 10,0 L 0,10 M 0,0 L 10,10"></path></svg>
@@ -153,7 +153,7 @@
           el = el.parentElement;
 
         const idx = el.getAttribute('data-idx');
-        const item = this.reactiveItems[idx];
+        //const item = this.reactiveItems[idx];
         //console.log("DELETE ITEM:", item);
         if (this.selectedEl === el)
             this.selectTabEl(el.previousElementSibling || el.nextElementSibling, true);

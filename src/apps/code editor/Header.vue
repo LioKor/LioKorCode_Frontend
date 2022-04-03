@@ -20,7 +20,7 @@
 <template>
   <div class="header header-editor">
     <div class="topLine">
-      <router-link to="/" class="mobile-hide"><div class="logo"><strong>LioKor Code</strong> <span id="versionSpan" @contextmenu="showVersion">{{ version }}</span></div></router-link>
+      <router-link to="/" class="mobile-hide"><div class="logo"><strong>LioKor Code</strong> <span @contextmenu="showVersion">{{ version }}</span></div></router-link>
       <router-link to="/" class="mobile-show"><div class="logo"><strong>LK Code</strong></div></router-link>
       <router-link to="/">Задания</router-link>
       <div class="control-button" v-show="!isCheckInProgress && !isCheckError" @click=checkStartEmit>Check<span class="mobile-hide"> (F9)</span></div>

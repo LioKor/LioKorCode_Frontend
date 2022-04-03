@@ -34,7 +34,7 @@
 </style>
 
 <template>
-  <div id="slideLine" class="slide-line"
+  <div class="slide-line"
        @mousedown="startSlide"
        @touchstart="startSlide"
   ></div>

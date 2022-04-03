@@ -11,7 +11,7 @@
 </style>
 
 <template>
-  <div id="taskInfo" class="task scrollable">
+  <div class="task scrollable">
     <h2>{{ name }}</h2>
 
     <p>{{ description }}</p>
@@ -30,7 +30,7 @@
     </div>
 
     <h3>Примеры тестов:</h3>
-    <table id="examplesTable">
+    <table>
       <thead>
       <tr>
         <th>stdin</th>
@@ -50,7 +50,7 @@
 <script>
   export default {
     props: {
-      id: {
+      taskId: {
         type: Number,
         required: true
       }
@@ -69,7 +69,7 @@
       }
     },
     async mounted() {
-      const taskInfo = await this.getTask(this.$props.id);
+      const taskInfo = await this.getTask(this.$props.taskId);
 
       this.name = taskInfo.name;
       this.description = taskInfo.description;

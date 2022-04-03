@@ -12,7 +12,7 @@
 
   <SlideLine class="vertical" el1="router" el2="rooms" />
 
-  <Rooms />
+  <Rooms id="rooms"/>
 
   <Modal ref="modal"></Modal>
   <Popups ref="popups"></Popups>
