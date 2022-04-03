@@ -11,6 +11,7 @@ module.exports = {
     output: {
         filename: 'main.js',
         path: path.resolve(__dirname, 'dist'),
+        publicPath: '/'
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -37,7 +38,11 @@ module.exports = {
             ]
         },
         proxy: {
-            '/api': 'http://code.liokor.com'
+            '/api': {
+                target: 'https://code.liokor.com',
+                secure: false,
+                changeOrigin: true
+            }
         }
     },
     resolve: {

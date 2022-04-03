@@ -171,7 +171,9 @@ textColor2 = #AAA
 </template>
 
 <script>
-const WS_ROOMS_URL = `ws://${document.location.hostname}:9090`
+
+const WS_ADDR = (window.location.hostname === 'localhost')? 'localhost:9090': `${window.location.hostname}/ws`
+const WS_ROOMS_URL = `${(window.location.protocol === 'http:')? 'ws': 'wss'}://${WS_ADDR}`
 
 let ws = null;
 
