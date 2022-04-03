@@ -3,7 +3,7 @@
 
   background = linear-gradient(30deg, #0e2028 0%, #2e3f44 40%, #0c2129 100%) repeat scroll 0% 0%;
 
-  #taskInfo
+  .task-info
     background background
     td
     th
@@ -11,7 +11,7 @@
 </style>
 
 <template>
-  <div class="task scrollable">
+  <div class="task-info task scrollable">
     <h2>{{ name }}</h2>
 
     <p>{{ description }}</p>

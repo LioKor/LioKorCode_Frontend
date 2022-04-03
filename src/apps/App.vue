@@ -10,7 +10,7 @@
     <router-view></router-view>
   </div>
 
-  <SlideLine class="vertical" el1="router" el2="rooms" />
+  <SlideLine class="vertical" el1="router" el2="rooms" uid="rooms"/>
 
   <Rooms id="rooms"/>
 

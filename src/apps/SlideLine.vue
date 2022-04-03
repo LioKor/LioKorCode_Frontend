@@ -63,6 +63,10 @@
       el2: {
         type: String,
         required: true,
+      },
+      uid: {
+        type: String,
+        required: true,
       }
     },
     mounted() {
@@ -82,7 +86,7 @@
       window.addEventListener('mousemove', this.slideEvent);
       window.addEventListener('touchmove', this.slideEvent);
 
-      this.applySlide(window.localStorage.getItem(this.mode) || 30)
+      this.applySlide(window.localStorage.getItem(this.uid + '-slide-value') || 30)
     },
     methods: {
       applySlide(leftPercentage) {
@@ -125,7 +129,7 @@
             leftPercentage = this.leftBlock.style[this.mode].slice(0, this.leftBlock.style[this.mode].length - 1);
           }
 
-          window.localStorage.setItem(this.mode, leftPercentage.toString());
+          window.localStorage.setItem(this.uid + '-slide-value', leftPercentage.toString());
         }
       },
       slideEvent(e) {

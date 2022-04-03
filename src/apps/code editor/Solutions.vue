@@ -43,7 +43,7 @@
 </style>
 
 <template>
-  <div class="scrollable">
+  <div id="solutions" class="scrollable">
     <table>
       <thead>
         <tr>

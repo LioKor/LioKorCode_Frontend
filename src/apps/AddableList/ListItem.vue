@@ -70,7 +70,6 @@
         this.$emit('update:modelValue', [this.$refs.input1.value,this.$refs.input2.value]);
       },
       addItemIfLast(e) {
-        console.log(e);
         if (!e.target.parentElement.nextElementSibling)
           this.$parent.addItem();
       },

@@ -253,11 +253,14 @@
       },
 
       deleteItem(el) {
-        const conf = this.$store.state.modal.prompt('Точно удаляем?');
+        const {list, idx} = this.getItem(this.getItemPath(el));
+
+        console.log(list[idx]);
+        const conf = this.$store.state.modal.confirm('Точно удаляем?', list[idx].name);
+        console.log("RES:", conf);
         if (!conf)
           return false;
 
-        const {list, idx} = this.getItem(this.getItemPath(el));
         list.splice(idx, 1);
         this.sortFilesAndSave(list);
         return true;

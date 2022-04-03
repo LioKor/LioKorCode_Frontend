@@ -28,7 +28,7 @@
 
   #taskInfo-and-tree
     display flex
-    #taskInfo
+    #task-info
       flex 1
 
   #editor-block
@@ -50,7 +50,7 @@
               {name: 'Задание', action: () => {this.openedTab = 0}, closable: false},
               {name: 'Файлы', action: () => {this.openedTab = 1}, closable: false}
           ]"></Tabs>
-          <TaskInfo v-show="openedTab === 0" ref="taskInfo" :task-id="taskId"></TaskInfo>
+          <TaskInfo id="task-info" v-show="openedTab === 0" ref="taskInfo" :task-id="taskId"></TaskInfo>
 
           <Tree v-show="openedTab === 1" ref="tree" name="Project" :items="[
               {name: 'main.c', value: 'int main() {\n\treturn 0;\n}\n'},
@@ -58,16 +58,16 @@
             ]"
             @open-file-text="openTreeFile" @rename-file="updateFileNameInTabs"></Tree>
         </div>
-        <SlideLine el1="taskInfo-and-tree" el2="editor-block" class="vertical"/>
+        <SlideLine el1="taskInfo-and-tree" el2="editor-block" uid="editor-vertical" class="vertical"/>
         <div id="editor-block">
           <Tabs class="horizontal" ref="tabs" :items="[]" @lastTabClosed="allFilesClosed"></Tabs>
           <Editor ref="editor" @editor-change="updateOpenedFileText"/>
         </div>
       </div>
 
-      <SlideLine el1="task-block" el2="solutions-block" class="horizontal" @sliderMoved="this.$refs.editor.resize()" />
+      <SlideLine el1="task-block" el2="solutions" uid="editor-horizontal" class="horizontal" @sliderMoved="this.$refs.editor.resize()" />
 
-      <Solutions id="solutions-block" ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
+      <Solutions ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
     </div>
   </div>
 </template>

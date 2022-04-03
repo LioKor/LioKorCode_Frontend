@@ -78,7 +78,6 @@
                         <div class="message">${message}</div>`
         this.$el.append(el);
         el.style.height = getChildrenHeight(el) + 'px';
-        console.log(el);
 
         setTimeout(() => {
           el.classList.add('_transitionOpacity');
