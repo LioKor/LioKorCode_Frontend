@@ -1,5 +1,5 @@
 <style lang="stylus">
-  @require 'constants.styl'
+  @require '../styles/constants.styl'
 
   close-btn-size = 25px
 
