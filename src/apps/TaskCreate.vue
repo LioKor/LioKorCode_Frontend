@@ -63,7 +63,7 @@
         const result = await this.$store.state.api.createTask(taskInfo);
 
         if (!result.ok_) {
-          alert("Не получилось создать задание");
+          this.$store.state.popups.error("Не получилось создать задание");
           return {};
         }
         this.$router.push('/tasks/my');

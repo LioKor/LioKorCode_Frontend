@@ -87,7 +87,7 @@
     },
 
     methods: {
-      __createModal(title, description = '', type='alert') {
+      __createModal(title, description = '', type='this.$store.state.popups.alert') {
         this.isShowed = true;
         this.type = type;
         this.title = title;
@@ -128,7 +128,7 @@
         return this.__createModal(title, description, 'confirm');
       },
       alert(title, description) {
-        return this.__createModal(title, description, 'alert');
+        return this.__createModal(title, description, 'this.$store.state.popups.alert');
       },
     }
   }

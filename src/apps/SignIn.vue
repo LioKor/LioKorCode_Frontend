@@ -50,7 +50,7 @@
       async signIn() {
         const response = await this.$store.state.api.signIn(this.username, this.password);
         if (!response.ok_) {
-          alert("Логин или пароль не подходят");
+          this.$store.state.popups.error("Логин или пароль не подходят");
           return;
         }
         await this.$store.dispatch('GET_USER');

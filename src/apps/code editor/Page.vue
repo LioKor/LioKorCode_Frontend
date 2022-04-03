@@ -108,7 +108,7 @@
           sourceCode: source
         });
         if (!preCheckInfo.ok_) {
-          alert("Не удалось отправить решение");
+          this.$store.state.popups.error("Не удалось отправить решение");
           this.$refs.header.checkDone();
           return;
         }
@@ -177,10 +177,10 @@
       openSession() {
         this.ws = new wsRedactorApi(this.$store.state.api.apiUrl);
         this.ws.onmessage = (json) => {
-          alert('Ваша сессия создана. ID:\n' + json.id);
+          this.$store.state.popups.success('Ваша сессия создана. ID:\n' + json.id);
 
           this.ws.onmessage = (json) => {
-            alert('К вам подключился: ' + json.username);
+            this.$store.state.popups.success('К вам подключился: ' + json.username);
 
             this.ws.onmessage = this.editorActions;
           };
@@ -195,7 +195,7 @@
         this.ws = new wsRedactorApi(this.$store.state.api.apiUrl, id);
         this.ws.onmessage = this.editorActions;
         this.ws.onerror = () => {
-          alert('Соединение не удалоь');
+          this.$store.state.popups.error('Соединение не удалоь');
         }
         this.ws.open();
       }

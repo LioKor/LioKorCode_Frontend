@@ -48,7 +48,7 @@
 
     methods: {
       showVersion() {
-        alert(`Build date: ${this.buildDate}`)
+        this.$store.state.popups.alert(`Build date: ${this.buildDate}`)
       },
       checkStartEmit() {
         if (this.isCheckInProgress === false) {

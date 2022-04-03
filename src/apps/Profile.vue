@@ -114,16 +114,16 @@
           fullname: this.fullname,
         });
         if (!response.ok_) {
-          alert("Не удалось изменить данные");
+          this.$store.state.popups.error("Не удалось изменить данные");
           return;
         }
-        alert("Данные изменены");
+        this.$store.state.popups.success("Данные изменены");
         this.$router.push('/signin');
       },
       async signOut() {
         const response = await this.$store.state.api.signOut();
         if (!response.ok_) {
-          alert("Не удалось выйти из аккаунта. Пiпався, розбiйник? А всё...");
+          this.$store.state.popups.error("Не удалось выйти из аккаунта. Пiпався, розбiйник? А всё...");
           return;
         }
         await this.$store.dispatch('DELETE_USER');
@@ -136,10 +136,10 @@
         }
         const response = await this.$store.state.api.updatePassword(this.oldPassword, this.newPassword);
         if (!response.ok_) {
-          alert("Не удалось сменить пароль");
+          this.$store.state.popups.error("Не удалось сменить пароль");
           return;
         }
-        alert("Пароль изменен");
+        this.$store.state.popups.success("Пароль изменен");
         closeRoll(this.$refs.changePasswordFields);
       }
     },

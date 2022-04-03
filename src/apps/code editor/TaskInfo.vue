@@ -83,7 +83,7 @@
         const taskInfo = await this.$store.state.api.getTask(id);
 
         if (!taskInfo.ok_) {
-          alert("Не получилось получить задание")
+          this.$store.state.popups.error("Не получилось получить задание")
           return {};
         }
         return taskInfo;

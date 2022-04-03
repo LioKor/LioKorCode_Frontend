@@ -75,7 +75,7 @@
         const taskInfo = await this.$store.state.api.getTask(id);
 
         if (!taskInfo.ok_) {
-          alert("Не получилось получить задание")
+          this.$store.state.popups.error("Не получилось получить задание")
           return {};
         }
         return taskInfo;
@@ -85,10 +85,10 @@
         const result = await this.$store.state.api.updateTask(id, taskInfo);
 
         if (!result.ok_) {
-          alert("Не получилось обновить задание");
+          this.$store.state.popups.error("Не получилось обновить задание");
           return {};
         }
-        alert("Обновлено");
+        this.$store.state.popups.success("Обновлено");
         return result;
       },
 
@@ -98,7 +98,7 @@
 
         const result = await this.$store.state.api.deleteTask(id);
         if (!result.ok_) {
-          alert("Не получилось удалить задание");
+          this.$store.state.popups.error("Не получилось удалить задание");
           return;
         }
         this.$router.push('/tasks/my');

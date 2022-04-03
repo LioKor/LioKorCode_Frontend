@@ -145,7 +145,7 @@
         const solutions = await this.$store.state.api.getSolutions(id);
 
         if (!solutions.ok_) {
-          alert("Не получилось получить решения");
+          this.$store.state.popups.error("Не получилось получить решения");
           return [];
         }
 

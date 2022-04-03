@@ -67,13 +67,13 @@
         //todo: username and email validations
 
         if (this.password !== this.passwordConfirm) {
-          alert("Пароли не совпадают");
+          this.$store.state.popups.error("Пароли не совпадают");
           return;
         }
 
         const response = await this.$store.state.api.signUp(this.username, this.email, this.password, this.fullname);
         if (!response.ok_) {
-          alert("Не удалось создать пользователя");
+          this.$store.state.popups.error("Не удалось создать пользователя");
           return;
         }
         await this.$store.dispatch('GET_USER');

@@ -38,7 +38,7 @@
       getTasks: async function() {
         const tasks = await this.$store.state.api.getTasks();
         if (!tasks.ok_) {
-          alert("Не удалось получить список заданий");
+          this.$store.state.popups.error("Не удалось получить список заданий");
           return;
         }
 
