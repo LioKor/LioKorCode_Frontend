@@ -14,20 +14,11 @@
 
     background-color colorShadow
 
-    .modal
-      margin-top 200px
-
-      .form
-        max-width 90%
-        background linear-gradient(20deg, bgColor1 0%, bgColor2 50%, bgColor1 100%)
-
-      .submit-container
-        width 100%
-        display flex
-        > *
-          flex 1
-          margin-left 10px
-          margin-right 10px
+    .confirm-button
+      width 45%
+      display inline-block
+      margin-left 2.5%
+      margin-right 2.5%
 
     .close-btn
       position absolute
@@ -67,9 +58,9 @@
 
         <div class="form-group">
           <span @click="__submit(text)" class="btn submit" v-if="type !== 'confirm'">Ок</span>
-          <div v-else>
-            <span @click="__submit(true)" class="btn submit">Да</span>
-            <span @click="__submit(false)" class="btn btn-danger">Нет</span>
+          <div v-else class="confirm-buttons">
+            <span @click="__submit(true)" class="confirm-button btn submit">Да</span>
+            <span @click="__submit(false)" class="confirm-button btn btn-danger">Нет</span>
           </div>
         </div>
       </div>
@@ -89,7 +80,7 @@
     },
 
     methods: {
-      __createModal(title, description = '', type='this.$store.state.popups.alert') {
+      async __createModal(title, description = '', type='this.$store.state.popups.alert') {
         this.isShowed = true;
         this.type = type;
         this.title = title;
@@ -126,15 +117,15 @@
         this.text = "";
       },
 
-      async prompt(title, description, defaultText) {
+      prompt(title, description, defaultText) {
         this.text = defaultText;
         return this.__createModal(title, description, 'prompt');
       },
-      async confirm(title, description) {
+      confirm(title, description) {
         return this.__createModal(title, description, 'confirm');
       },
-      async alert(title, description) {
-        return this.__createModal(title, description, 'this.$store.state.popups.alert');
+      alert(title, description) {
+        return this.__createModal(title, description, 'alert');
       },
     }
   }

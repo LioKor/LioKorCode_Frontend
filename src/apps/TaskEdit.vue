@@ -93,7 +93,7 @@
       },
 
       async deleteTask(id) {
-        if (!this.$store.state.modal.confirm("Точно удаляем задание?"))
+        if (! await this.$store.state.modal.confirm("Точно удаляем задание?"))
           return;
 
         const result = await this.$store.state.api.deleteTask(id);

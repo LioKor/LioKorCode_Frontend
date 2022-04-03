@@ -232,8 +232,8 @@
         return {list: list, idx: path[path.length - 1]};
       },
 
-      addSomething(el, promptMsg, itemValue) {
-        const name = this.$store.state.modal.prompt(promptMsg);
+      async addSomething(el, promptMsg, itemValue) {
+        const name = await this.$store.state.modal.prompt(promptMsg);
         if (name === null)
           return;
 
@@ -252,11 +252,11 @@
         this.sortFilesAndSave(toPush);
       },
 
-      deleteItem(el) {
+      async deleteItem(el) {
         const {list, idx} = this.getItem(this.getItemPath(el));
 
         console.log(list[idx]);
-        const conf = this.$store.state.modal.confirm('Точно удаляем?', list[idx].name);
+        const conf = await this.$store.state.modal.confirm('Точно удаляем?', list[idx].name);
         console.log("RES:", conf);
         if (!conf)
           return false;
@@ -273,9 +273,9 @@
         this.addSomething(el, 'Введите имя папки', []);
       },
 
-      renameItem(el) {
+      async renameItem(el) {
         const {list, idx} = this.getItem(this.getItemPath(el));
-        const name = this.$store.state.modal.prompt('Во что переименуем?', list[idx].name);
+        const name = await this.$store.state.modal.prompt('Во что переименуем?', list[idx].name);
         if (name === null)
           return;
 

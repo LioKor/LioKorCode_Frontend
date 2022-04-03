@@ -187,8 +187,8 @@
         };
         this.ws.open();
       },
-      connectSession() {
-        const id = this.$store.state.modal.prompt('Ведите ID сессии');
+      async connectSession() {
+        const id = await this.$store.state.modal.prompt('Ведите ID сессии');
         if (!id)
           return;
 
