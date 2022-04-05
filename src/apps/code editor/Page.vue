@@ -41,7 +41,7 @@
 
 <template>
   <div class="code-editor-page">
-    <Header ref="header" @start-check="checkSolution" @open-session="openSession" @connect-session="connectSession"/>
+    <Header ref="header" @start-check="checkSolution" @open-session="openSession" @connect-session="connectSession" @leave-session="leaveSession"/>
 
     <div id="code-editor-all">
       <div id="task-block" class="task-and-editor">
@@ -82,6 +82,7 @@
   import Tree from "./FilesTree/Tree.vue";
   import Tabs from "../Tabs.vue";
   import wsRedactorApi from "./wsRedactorApi";
+  import LiveEditor from "./LiveEditor/LiveEditor";
 
 
   export default {
@@ -166,39 +167,29 @@
       },
 
       // --- WebSockets live editor
-      editorActions(json) {
-        switch (json.type) {
-          case 'set':
-          case 'select':
-          case 'add':
-          case 'delete':
-        }
+      openSession(uid) {
+        this.connectSession(uid);
       },
-      openSession() {
-        this.ws = new wsRedactorApi(this.$store.state.api.apiUrl);
-        this.ws.onmessage = (json) => {
-          this.$store.state.popups.success('Ваша сессия создана. ID:\n' + json.id);
-
-          this.ws.onmessage = (json) => {
-            this.$store.state.popups.success('К вам подключился: ' + json.username);
-
-            this.ws.onmessage = this.editorActions;
-          };
-        };
-        this.ws.open();
-      },
-      async connectSession() {
-        const id = await this.$store.state.modal.prompt('Ведите ID сессии');
-        if (!id)
+      connectSession(uid) {
+        const response = this.$store.state.api.checkRedactorSession(uid);
+        if (!response.ok_) {
+          this.$store.state.popups.error('Не удалось подключиться к сессии', uid);
           return;
-
-        this.ws = new wsRedactorApi(this.$store.state.api.apiUrl, id);
-        this.ws.onmessage = this.editorActions;
-        this.ws.onerror = () => {
-          this.$store.state.popups.error('Соединение не удалоь');
         }
-        this.ws.open();
-      }
+
+        this.createLiveEditor(uid);
+      },
+      leaveSession() {
+        this.removeLiveEditor();
+      },
+
+      createLiveEditor(id) {
+        this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, id);
+        this.liveEditor.join(this.$store.state.user.username);
+      },
+      removeLiveEditor() {
+        this.liveEditor.leave();
+      },
     }
   }
 </script>

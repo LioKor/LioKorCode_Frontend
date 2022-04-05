@@ -66,7 +66,7 @@
 
         <td class="message" v-html="solution.checkError"></td>
 
-        <td class="min-width"><span class="action" @click="openSolution(solution.id)">Открыть</span></td>
+        <td class="min-width"><span class="action" @click="openSolution(solution.id)">Загрузить</span></td>
       </tr>
     </table>
   </div>
@@ -118,7 +118,7 @@
       },
 
       async openSolution(id) {
-        if (await this.$store.state.modal.prompt('Текущее решение будет уничтожено. Продолжить?')) {
+        if (await this.$store.state.modal.confirm('Текущее решение будет потеряно. Продолжить?')) {
           this.$emit('openSolution', id);
         }
       },

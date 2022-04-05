@@ -41,7 +41,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/></svg>
     </span>
 
-    <div class="standalone-form">
+    <form class="standalone-form" novalidate @submit.prevent="__submit()">
       <span class="close-btn" @click="__close(null)">
         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/></svg>
       </span>
@@ -57,14 +57,14 @@
         </div>
 
         <div class="form-group">
-          <span @click="__submit(text)" class="btn submit" v-if="type !== 'confirm'">Ок</span>
+          <input class="btn submit" v-if="type !== 'confirm'" type="submit" value="Ок">
           <div v-else class="confirm-buttons">
-            <span @click="__submit(true)" class="confirm-button btn submit">Да</span>
-            <span @click="__submit(false)" class="confirm-button btn btn-danger">Нет</span>
+            <button @click="__submit(true)" class="confirm-button btn submit" ref="buttonYes">Да</button>
+            <button @click="__submit(false)" class="confirm-button btn btn-danger">Нет</button>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 <script>
@@ -80,7 +80,7 @@
     },
 
     methods: {
-      async __createModal(title, description = '', type='this.$store.state.popups.alert') {
+      async __createModal(title, description = '', type='alert') {
         this.isShowed = true;
         this.type = type;
         this.title = title;

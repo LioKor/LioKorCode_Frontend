@@ -1,4 +1,13 @@
 <style lang="stylus">
+  .header-editor
+    .topLine
+      > a
+      > div
+        letter-spacing 1px
+        padding 0 10px
+      .logo
+        margin 0
+
   .header.header-editor
     margin-bottom 0
 
@@ -26,8 +35,10 @@
       <div class="control-button" v-show="!isCheckInProgress && !isCheckError" @click=checkStartEmit>Check<span class="mobile-hide"> (F9)</span></div>
       <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Checking...</div>
       <div class="control-button danger" v-show="isCheckError" :disabled="isCheckError">Need auth</div>
-      <div @click="$emit('openSession')">Открыть сессию</div>
-      <div @click="$emit('connectSession')">Подключиться</div>
+
+      <div v-show="!sessionStatus" @click="openSession">Открыть сессию</div>
+      <div v-show="!sessionStatus" @click="connectToSession">Подключиться</div>
+      <div v-show="sessionStatus" @click="leaveSession">Отключиться</div>
 
       <router-link v-if="$store.state.user.isLogined" to="/profile" class="right">{{$store.state.user.username}}</router-link>
       <router-link v-else to="/signin" class="right">Войти</router-link>
@@ -43,6 +54,7 @@
         buildDate: (new Date(BUILD_TIMESTAMP)).toLocaleDateString('en-GB'),
         isCheckInProgress: false,
         isCheckError: false,
+        sessionStatus: '',
       }
     },
 
@@ -64,6 +76,39 @@
       checkError() {
         this.isCheckError = true;
       },
+
+      async openSession() {
+        if (!await this.$store.state.modal.confirm('Вы уверены, что хотите открыть текущий файл для совместного редактирования?', 'Подключиться сможет любой, кому вы предоставите ID сессии')) {
+          return;
+        }
+
+        const uid = this.$store.state.api.openRedactorSession(this.$refs.editor.aceEditor.getValue());
+        if (!uid.ok_) {
+          this.$store.state.popups.error('Не удалось создать сессию');
+          return;
+        }
+        this.redatorSessionUid = uid.id;
+        this.$store.state.modal.alert('Ваша сессия создана. ID:', uid.id);
+
+        this.$emit('openSession', uid.id);
+        this.sessionStatus = 'opened';
+      },
+      async leaveSession() {
+        if (!await this.$store.state.modal.confirm('Вы уверены, что хотите закрыть сессию? ID:', this.redatorSessionUid)) {
+          return;
+        }
+
+        this.$emit('leaveSession');
+        this.sessionStatus = '';
+      },
+      async connectToSession() {
+        const uid = await this.$store.state.modal.prompt('Ведите ID сессии');
+        if (!uid)
+          return;
+
+        this.$emit('connectSession', uid);
+        this.sessionStatus = 'connected';
+      },
     },
 
     mounted() {
@@ -72,6 +117,6 @@
           this.checkStartEmit();
         }
       });
-    }
+    },
   }
 </script>
