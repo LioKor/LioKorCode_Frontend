@@ -82,7 +82,7 @@
           return;
         }
 
-        const uid = this.$store.state.api.openRedactorSession(this.$refs.editor.aceEditor.getValue());
+        const uid = this.$store.state.api.openRedactorSession(this.$parent.$refs.editor.aceEditor.getValue());
         if (!uid.ok_) {
           this.$store.state.popups.error('Не удалось создать сессию');
           return;
@@ -106,6 +106,7 @@
         if (!uid)
           return;
 
+        this.redatorSessionUid = uid;
         this.$emit('connectSession', uid);
         this.sessionStatus = 'connected';
       },

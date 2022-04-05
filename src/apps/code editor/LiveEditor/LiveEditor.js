@@ -1,5 +1,5 @@
-import WS from "../../../utils/ws";
-import WsServerAdapter from "./WsServerAdapter";
+import WS from "../../../utils/ws.js";
+import WsServerAdapter from "./WsServerAdapter.js";
 
 export default class LiveEditor {
   ws = null;
@@ -18,7 +18,8 @@ export default class LiveEditor {
     });
 
     // Create WebSocket connection
-    this.ws =  new WS([location.protocol.replace('http', 'ws'), '//', location.host/*, '/redactor/', roomId*/].join(''));
+    //this.ws = new WS([location.protocol.replace('http', 'ws'), '//', location.host, '/redactor/', roomId].join(''));
+    this.ws = new WS('ws://127.0.0.1:8080/ws');
 
     this.__setupHandlers();
 

@@ -3,9 +3,9 @@ export default class WS {
     url = "";
     protocols = undefined;
     handlers = {
-        open: () => {console.log(`WS connection to ${this.url} opened`)},
-        close: () => {console.log(`WS connection to ${this.url} closed`)},
-        error: () => {console.log(`WS error in ${this.url}`)},
+        open: (e) => {console.log(`WS connection to ${this.url} opened`, e)},
+        close: (e) => {console.log(`WS connection to ${this.url} closed`, e)},
+        error: (e) => {console.log(`WS error in ${this.url}`, e)},
         // ...
         // more events that will come from server
     }
@@ -17,14 +17,14 @@ export default class WS {
 
     open() {
         this.ws = new WebSocket(this.url, this.protocols);
-        this.ws.onopen = () => {
-            this.handlers.open();
+        this.ws.onopen = (e) => {
+            this.handlers.open(e);
         }
-        this.ws.onerror = () => {
-            this.handlers.error();
+        this.ws.onerror = (e) => {
+            this.handlers.error(e);
         }
-        this.ws.onclose = () => {
-            this.handlers.close();
+        this.ws.onclose = (e) => {
+            this.handlers.close(e);
         }
         this.ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
