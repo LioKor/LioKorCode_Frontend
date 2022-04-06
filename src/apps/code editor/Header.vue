@@ -107,7 +107,7 @@
         if (!uid)
           return;
 
-        this.$store.state.modal.success('Вы подключились к сессии');
+        this.$store.state.popups.success('Вы подключились к сессии');
         this.redatorSessionUid = uid;
         this.$emit('connectSession', uid);
         this.sessionStatus = 'connected';
