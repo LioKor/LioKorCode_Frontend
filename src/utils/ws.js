@@ -28,7 +28,7 @@ export default class WS {
         }
         this.ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
-            console.log("GET MESSAGE:", message);
+            //console.log("WS GET MESSAGE:", message);
 
             if (message?.e)
                 this.handlers[message.e](message.d, event);
@@ -36,7 +36,7 @@ export default class WS {
     }
 
     send(eventName, data) {
-        console.log("SEND MESSAGE:", eventName, data);
+        //console.log("WS SEND MESSAGE:", eventName, data);
         this.ws.send(JSON.stringify({e: eventName, d: data}));
     }
 

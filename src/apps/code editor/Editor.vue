@@ -102,6 +102,7 @@
         }
         const rules = [
           {ends: ['.py'], mode: 'python'},
+          {ends: ['.go'], mode: 'golang'},
           {ends: ['.c', '.cpp', '.h', '.cc', '.c++', '.hpp', '.cxx', '.hxx', '.h++'], mode: 'c_cpp'},
           {ends: ['.pas', '.inc'], mode: 'pascal'},
           {ends: ['.kt', '.kts'], mode: 'kotlin'},

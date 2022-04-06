@@ -175,18 +175,28 @@
           return;
         }
 
+        this.$refs.tree.lockOpeningFiles();
+        this.$refs.tabs.lockChangeTabs();
         this.createLiveEditor(uid);
       },
       leaveSession() {
+        this.$refs.tree.unlockOpeningFiles();
         this.removeLiveEditor();
       },
 
       createLiveEditor(id) {
         this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, id);
+        this.liveEditor.callbacks.join = ({client_id, username}) => {
+          this.$store.state.popups.alert('К сессии присоединился:', username);
+        };
+        this.liveEditor.callbacks.quit = ({clientId}) => {
+          this.$store.state.popups.alert('От сессии отключился:', clientId);
+        };
         this.liveEditor.join(this.$store.state.user.username);
       },
       removeLiveEditor() {
         this.liveEditor.leave();
+        this.$refs.tabs.unlockChangeTabs();
         delete this.liveEditor;
       },
     }

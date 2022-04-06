@@ -88,6 +88,10 @@
   .close-tab-svg:hover
     stroke color1
     background grey
+
+  .blocked
+    .tab
+      cursor not-allowed
 </style>
 
 <template>
@@ -115,6 +119,7 @@
       return {
         reactiveItems: this.items,
         selectedEl: null,
+        canChangeTabs: true,
       }
     },
 
@@ -128,13 +133,16 @@
       selectTabEl(el, withAction = false) {
         if (!el)
           return;
+        if (!this.canChangeTabs)
+          return;
+
         if (this.selectedEl)
           this.selectedEl.classList.remove('selected');
         el.classList.add('selected');
         this.selectedEl = el;
 
         if (!withAction)
-          return
+          return;
         const idx = el.getAttribute('data-idx');
         const item = this.reactiveItems[idx];
         item.action();
@@ -148,21 +156,20 @@
         this.selectTabEl(el, true);
       },
       deleteTab(e) {
+        if (!this.canChangeTabs)
+          return;
+
         let el = e.target;
         while(el.tagName !== 'LI')
           el = el.parentElement;
 
         const idx = el.getAttribute('data-idx');
-        //const item = this.reactiveItems[idx];
-        //console.log("DELETE ITEM:", item);
         if (this.selectedEl === el)
             this.selectTabEl(el.previousElementSibling || el.nextElementSibling, true);
 
-        //console.log("IDX:", idx);
         this.reactiveItems.splice(idx, 1);
         //this.$emit('deleteTab', item, idx);
 
-        //console.log("LEN:", this.reactiveItems.length);
         if (this.reactiveItems.length === 0) {
           this.$emit('lastTabClosed');  // to clear editor after this event
         }
@@ -195,6 +202,15 @@
       closeAllTabs() {
         this.reactiveItems = [];
         this.selectedEl = null;
+      },
+
+      lockChangeTabs() {
+        this.canChangeTabs = false;
+        this.$el.classList.add('blocked');
+      },
+      unlockChangeTabs() {
+        this.canChangeTabs = false;
+        this.$el.classList.remove('blocked');
       }
     }
   }

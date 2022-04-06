@@ -70,6 +70,10 @@
       background-size 2px calc(100% - 20px)
       background-position 0 20px
       z-index 0
+
+  .blocked
+    li
+      cursor not-allowed
 </style>
 
 <template>
@@ -157,6 +161,7 @@
         copyedItem: {el: null, mode: ""}, // todo: make non-reactive
         selectedItem: {el: null, item: {}}, // todo: make non-reactive
         openedItem: {el: null, item: {}}, // todo: make non-reactive
+        canOpenFiles: true, // todo: make non-reactive
       }
     },
 
@@ -255,9 +260,7 @@
       async deleteItem(el) {
         const {list, idx} = this.getItem(this.getItemPath(el));
 
-        console.log(list[idx]);
         const conf = await this.$store.state.modal.confirm('Точно удаляем?', list[idx].name);
-        console.log("RES:", conf);
         if (!conf)
           return false;
 
@@ -275,7 +278,7 @@
 
       async renameItem(el) {
         const {list, idx} = this.getItem(this.getItemPath(el));
-        const name = await this.$store.state.modal.prompt('Во что переименуем?', list[idx].name);
+        const name = await this.$store.state.modal.prompt('Во что переименуем?', 'Было: ' + list[idx].name, list[idx].name);
         if (name === null)
           return;
 
@@ -333,6 +336,9 @@
         this.toggleAndSaveFileClass(el, this.selectedItem, 'selected');
       },
       openFile(el) {
+        if (!this.canOpenFiles)
+          return;
+
         const path = this.getItemPath(el);
         const {list, idx} = this.getItem(path);
         if (typeof list[idx].value !== 'string') { // el is a folder
@@ -469,6 +475,15 @@
         if (!this.selectedItem.el)
           return;
         this.collapseEl(this.selectedItem.el);
+      },
+
+      lockOpeningFiles() {
+        this.canOpenFiles = false;
+        this.$el.classList.add('blocked');
+      },
+      unlockOpeningFiles() {
+        this.canOpenFiles = false;
+        this.$el.classList.remove('blocked');
       }
     }
   }

@@ -9,6 +9,14 @@ export default class LiveEditor {
   ws = null;
   editor = null;
   client = null;
+  callbacks = {
+    open: () => {},
+    close: () => {},
+    doc: (text) => {},
+    registered: () => {},
+    join: ({client_id, username}) => {},
+    quit: (clientId) => {},
+  };
 
   isDocGotten = false;
   username = undefined;
@@ -40,11 +48,13 @@ export default class LiveEditor {
     // Connect to server
     this.ws.handlers.open = () => {
       console.log('WS live redactor connected to server');
+      this.callbacks.open();
     };
 
     // Disconnect form server
     this.ws.handlers.close = () => {
       console.log('WS live redactor disconnected from server');
+      this.callbacks.close();
     };
 
     // Get initial text that other users typed.
@@ -58,21 +68,26 @@ export default class LiveEditor {
       this.serverAdapter = new WsServerAdapter(this.ws);
       this.editorAdapter = new ot.AceEditorAdapter(this.editor);
       this.client = new ot.EditorClient(data.revision, data.clients, this.serverAdapter, this.editorAdapter);
+
+      this.callbacks.doc(data.document);
     };
 
     // Our client registered => we can type text
     this.ws.handlers.registered = () => {
       this.editor.setOption('readOnly', false);
+      this.callbacks.registered();
     };
 
     // New user joined
     this.ws.handlers.join = (data) => {
       console.log("User joined: ", data);
+      this.callbacks.join(data);
     };
 
     // Some user quit
     this.ws.handlers.quit = (clientId) => {
       console.log("User quit with id: ", clientId);
+      this.callbacks.quit(clientId);
     };
   }
 

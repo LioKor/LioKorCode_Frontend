@@ -5,13 +5,15 @@ export default class WsServerAdapter {
   constructor(ws) {
     this.ws = ws;
 
+    this.quitOld = this.ws.handlers.quit;
     this.ws.handlers.quit = (clientId) => {
-      this.ws.handlers.quit(clientId);
+      this.quitOld(clientId);
       this.callbacks.client_left(clientId);
     };
 
+    this.joinOld = this.ws.handlers.join;
     this.ws.handlers.join = (data) => {
-      this.ws.handlers.join(data);
+      this.joinOld(data);
       this.callbacks.set_name(data.client_id, data.username);
     };
 
