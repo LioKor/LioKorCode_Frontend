@@ -36,8 +36,6 @@
         showNeedToLogin: false,
         isMounted: false,
         textWhenMounted: "",
-        deletions: [],
-        additions: [],
       }
     },
     mounted() {
@@ -63,10 +61,6 @@
         this.aceEditor.setReadOnly(true);
         this.showNeedToLogin = true;
       }
-
-      this.watcherInterval = setInterval(() => {
-        this.$emit('editDiff', this.deletions, this.additions);
-      }, watcherIntervalTime);
     },
 
     methods: {

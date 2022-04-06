@@ -59,6 +59,14 @@
       }
     },
 
+    mounted() {
+      window.addEventListener('keydown', (ev) => {
+        if (ev.key === 'F9') {
+          this.checkStartEmit();
+        }
+      });
+    },
+
     methods: {
       showVersion() {
         this.$store.state.popups.alert(`Build date: ${this.buildDate}`)
@@ -79,7 +87,7 @@
       },
 
       async openSession() {
-        if (!await this.$store.state.modal.confirm('Вы уверены, что хотите открыть текущий файл для совместного редактирования?', 'Подключиться сможет любой, кому вы предоставите ID сессии')) {
+        if (!await this.$store.state.modal.confirm('Вы уверены, что хотите открыть текущий файл для совместного редактирования?', 'Подключиться сможет любой, кому вы предоставите ссылку')) {
           return;
         }
 
@@ -89,7 +97,7 @@
           return;
         }
         this.redatorSessionUid = uid.id;
-        this.$store.state.modal.alert('Ваша сессия создана. ID:', uid.id);
+        this.$store.state.popups.success('Сессия создана');
 
         this.$emit('openSession', uid.id);
         this.sessionStatus = 'opened';
@@ -112,14 +120,15 @@
         this.$emit('connectSession', uid);
         this.sessionStatus = 'connected';
       },
-    },
 
-    mounted() {
-      window.addEventListener('keydown', (ev) => {
-        if (ev.key === 'F9') {
-          this.checkStartEmit();
-        }
-      });
-    },
+      async copyLinkToClipboard() {
+        if (!this.redatorSessionUid)
+          return;
+
+        const url = new URL(location.href);
+        url.searchParams.append('session-id', this.redatorSessionUid);
+        await navigator.clipboard.writeText(url.toString());
+      }
+    }
   }
 </script>

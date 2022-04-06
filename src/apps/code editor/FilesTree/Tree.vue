@@ -79,7 +79,7 @@
 
 <template>
   <div class="tree-container">
-    <ul class="tree context-tree-root root" ref="root"
+    <ul class="tree context-tree-root root scrollable" ref="root"
       @keyup.delete="proxyFileFoo(deleteItem, true)"
       @keyup.ctrl.c="proxyFileFoo(copyItem)"
       @keyup.ctrl.x="proxyFileFoo(cutItem)"
