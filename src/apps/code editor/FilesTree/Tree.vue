@@ -378,6 +378,7 @@
       },
       loadTree(list) {
         this.reactiveItems = list;
+        this.sortFilesAndSave();
       },
 
       // --- Controls by keys

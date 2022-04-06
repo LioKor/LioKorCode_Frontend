@@ -137,12 +137,43 @@
       },
 
       parseSourceCode(sourceCode) {
-        const filesList = []
-        for (const [name, content] of Object.entries(sourceCode)) {
-          filesList.push({
-            name: name,
-            value: content,
-          });
+        const filesList = [];
+
+        for (const [strPath, content] of Object.entries(sourceCode)) {
+          const path = strPath.split('/');
+
+          function recursiveCreate(list = filesList) {
+            const el = list.find(file => file.name === path[0]);
+
+            if (el !== undefined) { // file already exists
+              if (typeof el.value !== 'string') { // existing file is directory
+                if (path.length === 1) // we're trying to add file instead directory
+                  throw Error('Trying to add file instead existing directory');
+                // go into existing directory
+                path.splice(0, 1);
+                recursiveCreate(el.value);
+                return;
+              }
+              // existing file is a file
+              if (path.length > 1) // we're trying to add directory instead file
+                throw Error('Trying to add directory instead existing file');
+              // create file and exit
+              list.push({name: path[0], value: content});
+              return;
+            }
+            // file not exists
+            if (path.length > 1) { // add directory and go inside it
+              const newDir = {name: path[0], value: []};
+              list.push(newDir);
+              path.splice(0, 1);
+              recursiveCreate(newDir.value);
+              return;
+            }
+            // create file and exit
+            list.push({name: path[0], value: content});
+          }
+
+          recursiveCreate();
         }
         return filesList;
       },
@@ -153,7 +184,7 @@
         const fileList = this.parseSourceCode(checkInfo.sourceCode);
         this.$refs.tree.loadTree(fileList);
 
-        this.allFilesClosed()
+        this.allFilesClosed();
 
         this.$refs.tabsVertical.selectTabIndex(1);
         this.$refs.tabs.closeAllTabs();
