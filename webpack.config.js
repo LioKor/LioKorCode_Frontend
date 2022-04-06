@@ -83,6 +83,15 @@ module.exports = {
                 test: /\.tsx?$/,
                 loader: 'ts-loader',
             },
+            // FIXME: Оно не работаеть! Потому я дописал
+            //  этот модуль через import в "LiveEditor.js"
+            // {
+            //     test: /\.js$/,
+            //     include: path.resolve(__dirname, 'src', 'vendor'),
+            //     use: [
+            //       'script-loader'
+            //     ]
+            // }
         ],
     }
 };

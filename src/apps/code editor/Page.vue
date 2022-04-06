@@ -81,9 +81,7 @@
   import SlideLine from '../SlideLine.vue';
   import Tree from "./FilesTree/Tree.vue";
   import Tabs from "../Tabs.vue";
-  import wsRedactorApi from "./wsRedactorApi";
   import LiveEditor from "./LiveEditor/LiveEditor";
-
 
   export default {
     components: {Tabs, Tree, Header, TaskInfo, Editor, Solutions, SlideLine},
@@ -190,6 +188,7 @@
       },
       removeLiveEditor() {
         this.liveEditor.leave();
+        delete this.liveEditor;
       },
     }
   }

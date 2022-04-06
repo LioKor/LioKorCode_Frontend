@@ -1,5 +1,9 @@
-import WS from "../../../utils/ws.js";
+import WS from "/src/utils/ws.js";
 import WsServerAdapter from "./WsServerAdapter.js";
+
+// FIXME: сделать, чтобы заработало либо тут, либо в конфиге вебпака
+// import 'script-loader!/src/vendor/ot-0.0.14.js';
+// import 'script-loader!/src/vendor/ot-0.0.14-ace-editor-adapter.js';
 
 export default class LiveEditor {
   ws = null;
@@ -9,13 +13,7 @@ export default class LiveEditor {
   constructor(editor, roomId) {
     // Get and setup ace editor
     this.editor = editor;
-    editor.setOptions({
-      fontSize: '12pt',
-      tabSize: 4,
-      useSoftTabs: true,
-
-      readOnly: true,
-    });
+    editor.setOption('readOnly', true);
 
     // Create WebSocket connection
     //this.ws = new WS([location.protocol.replace('http', 'ws'), '//', location.host, '/redactor/', roomId].join(''));
@@ -47,13 +45,12 @@ export default class LiveEditor {
     };
 
     // Get initial text that other users typed.
-    // Set EditorAdapter that will do main logic - merge changes form other users
+    // Set EditorAdapter that will get editor's actions and set server's actions on it
     this.ws.handlers.doc = (data) => {
       this.editor.setValue(data.document, 1);
-      const
-        serverAdapter = new WsServerAdapter(this.ws),
-        editorAdapter = new ot.AceEditorAdapter(this.editor);
-      this.client = new ot.EditorClient(data.revision, data.clients, serverAdapter, editorAdapter);
+      this.serverAdapter = new WsServerAdapter(this.ws);
+      this.editorAdapter = new ot.AceEditorAdapter(this.editor);
+      this.client = new ot.EditorClient(data.revision, data.clients, this.serverAdapter, this.editorAdapter);
     };
 
     // Our client registered => we can type text
@@ -81,5 +78,6 @@ export default class LiveEditor {
   leave() {
     this.ws.send('leave', { username: this.username });
     this.ws.close();
+    this.editorAdapter.detach();
   }
 }

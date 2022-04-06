@@ -19,19 +19,20 @@ ot.AceEditorAdapter = (function (global) {
 
     function AceEditorAdapter (ae) {
         this.ae = ae;
+        this.aeElement = ae.renderer.container;
+
         this.ignoreNextChange = false;
         this.changeInProgress = false;
         this.selectionChanged = false;
 
-        this.LINE_HEIGHT = 19;
-        this.SYMBOL_WIDTH = 9;
-        this.LEFT_MARGIN = 2;
+        this.updateAceEditorSizes();
+
         this.markersElement = document.createElement('div');
         this.markersElement.id = 'ot-ace-addon-markers';
         this.markersElement.style.position = 'absolute';
-        this.markersElement.style.inset = 0;
+        this.markersElement.style.inset = '0';
         this.markersElement.style.left = this.LEFT_MARGIN + 'px';
-        document.querySelector('#editor > div.ace_scroller').appendChild(this.markersElement);
+        this.aeElement.querySelector('.ace_scroller').appendChild(this.markersElement);
 
         bind(this, 'onChange');
         bind(this, 'onCursorActivity');
@@ -46,8 +47,25 @@ ot.AceEditorAdapter = (function (global) {
         ae.session.on('changeScrollTop', this.onScrollVertical);
     }
 
+    AceEditorAdapter.prototype.updateAceEditorSizes = function () {
+        this.LINE_HEIGHT = this.aeElement.querySelector('.ace_line').scrollHeight;
+        this.LEFT_MARGIN = Number(this.aeElement.querySelector('.ace_text-layer').style.getPropertyValue('margin-left').replace(/px$/, ''));
+
+        // To get symbol width in current monospace(!) font we need
+        // to create new element inside .ace_editor (root element)
+        // with 1 character and measure it's width
+        var el = document.createElement('span');
+        el.innerText = 'x';
+        el.style.visibility = 'hidden';
+        this.aeElement.appendChild(el); // append el to root el
+        this.SYMBOL_WIDTH = el.offsetWidth; // measure width
+        el.remove(); // remove el
+    }
+
     // Removes all event listeners from the AceEditor instance.
     AceEditorAdapter.prototype.detach = function () {
+        this.markersElement.remove();
+
         this.ae.off('change', this.onChange);
         this.ae.off('changeSelection', this.onCursorActivity);
         this.ae.off('focus', this.onFocus);
@@ -213,19 +231,6 @@ ot.AceEditorAdapter = (function (global) {
             this.ae.selection.addRange(new ace.Range(sR, sC, eR, eC));
         }
     };
-
-    var addStyleRule = (function () {
-        var added = {};
-        var styleElement = document.createElement('style');
-        document.documentElement.getElementsByTagName('head')[0].appendChild(styleElement);
-        var styleSheet = styleElement.sheet;
-
-        return function (css) {
-            if (added[css]) { return; }
-            added[css] = true;
-            styleSheet.insertRule(css, (styleSheet.cssRules || styleSheet.rules).length);
-        };
-    }());
 
     AceEditorAdapter.prototype.setOtherCursor = function (position, color, clientId) {
         var cursorPos = this.ae.session.doc.indexToPosition(position);
