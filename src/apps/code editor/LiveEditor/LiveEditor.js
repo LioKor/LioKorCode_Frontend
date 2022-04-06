@@ -10,6 +10,9 @@ export default class LiveEditor {
   editor = null;
   client = null;
 
+  isDocGotten = false;
+  username = undefined;
+
   constructor(editor, roomId) {
     // Get and setup ace editor
     this.editor = editor;
@@ -47,6 +50,10 @@ export default class LiveEditor {
     // Get initial text that other users typed.
     // Set EditorAdapter that will get editor's actions and set server's actions on it
     this.ws.handlers.doc = (data) => {
+      if (this.username !== undefined)
+        this.__sendJoin();
+      this.isDocGotten = true;
+
       this.editor.setValue(data.document, 1);
       this.serverAdapter = new WsServerAdapter(this.ws);
       this.editorAdapter = new ot.AceEditorAdapter(this.editor);
@@ -72,7 +79,12 @@ export default class LiveEditor {
   // Send our 'join' event on server
   join(username) {
     this.username = username;
-    this.ws.send('join', { username });
+    if (this.isDocGotten) {
+      this.__sendJoin();
+    }
+  }
+  __sendJoin() {
+    this.ws.send('join', { username: this.username });
   }
   // Send our 'leave' event on server
   leave() {

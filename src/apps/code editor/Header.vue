@@ -94,7 +94,7 @@
         this.sessionStatus = 'opened';
       },
       async leaveSession() {
-        if (!await this.$store.state.modal.confirm('Вы уверены, что хотите закрыть сессию? ID:', this.redatorSessionUid)) {
+        if (!await this.$store.state.modal.confirm('Вы уверены, что хотите покинуть сессию?', 'Сессия будет закрыта, если все участники выйдут')) {
           return;
         }
 

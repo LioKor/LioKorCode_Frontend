@@ -1945,12 +1945,14 @@
           bind(this, 'onFocus');
           bind(this, 'onBlur');
           bind(this, 'onScrollVertical');
+          bind(this, 'onScrollHorizontal');
 
           ae.on('change', this.onChange);
           ae.on('changeSelection', this.onCursorActivity);
           ae.on('focus', this.onFocus);
           ae.on('blur', this.onBlur);
           ae.session.on('changeScrollTop', this.onScrollVertical);
+          ae.session.on('changeScrollLeft', this.onScrollHorizontal);
         }
 
         AceEditorAdapter.prototype.updateAceEditorSizes = function () {
@@ -1959,12 +1961,12 @@
 
           // To get symbol width in current monospace(!) font we need
           // to create new element inside .ace_editor (root element)
-          // with 1 character and measure it's width
+          // with 100 characters and measure it's width, then divide it by 100
           var el = document.createElement('span');
-          el.innerText = 'x';
+          el.innerText = 'x'.repeat(100);
           el.style.visibility = 'hidden';
           this.aeElement.appendChild(el); // append el to root el
-          this.SYMBOL_WIDTH = el.offsetWidth; // measure width
+          this.SYMBOL_WIDTH = el.offsetWidth / 100; // measure width
           el.remove(); // remove el
         }
 
@@ -1977,6 +1979,7 @@
           this.ae.off('focus', this.onFocus);
           this.ae.off('blur', this.onBlur);
           this.ae.session.off('changeScrollTop', this.onScrollVertical);
+          this.ae.session.off('changeScrollLeft', this.onScrollHorizontal);
         };
 
         function cmpPos (a, b) {
@@ -2106,6 +2109,9 @@
         AceEditorAdapter.prototype.onScrollVertical = function (scroll) {
           this.markersElement.style.top = -scroll + 'px';
         };
+        AceEditorAdapter.prototype.onScrollHorizontal = function (scroll) {
+          this.markersElement.style.left = this.LEFT_MARGIN - scroll + 'px';
+        };
 
 
         AceEditorAdapter.prototype.getValue = function () {
@@ -2154,7 +2160,7 @@
           cursorEl.style.pointerEvents = 'none';
           cursorEl.style.height = this.LINE_HEIGHT + 'px';
           cursorEl.style.top = this.LINE_HEIGHT * cursorPos.row + 'px';
-          cursorEl.style.left = this.SYMBOL_WIDTH * cursorPos.column + this.LEFT_MARGIN + 'px';
+          cursorEl.style.left = this.SYMBOL_WIDTH * cursorPos.column + 'px';
           cursorEl.setAttribute('data-clientid', clientId);
           this.markersElement.appendChild(cursorEl);
           return cursorEl;

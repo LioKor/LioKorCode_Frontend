@@ -183,8 +183,7 @@
 
       createLiveEditor(id) {
         this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, id);
-        //this.liveEditor.join(this.$store.state.user.username);
-        setTimeout(() => console.log(this.liveEditor), 1000);
+        this.liveEditor.join(this.$store.state.user.username);
       },
       removeLiveEditor() {
         this.liveEditor.leave();

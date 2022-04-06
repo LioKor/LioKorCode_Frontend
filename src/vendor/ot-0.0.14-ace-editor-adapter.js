@@ -32,6 +32,7 @@ ot.AceEditorAdapter = (function (global) {
         this.markersElement.style.position = 'absolute';
         this.markersElement.style.inset = '0';
         this.markersElement.style.left = this.LEFT_MARGIN + 'px';
+        this.markersElement.style.pointerEvents = 'none';
         this.aeElement.querySelector('.ace_scroller').appendChild(this.markersElement);
 
         bind(this, 'onChange');
@@ -39,12 +40,14 @@ ot.AceEditorAdapter = (function (global) {
         bind(this, 'onFocus');
         bind(this, 'onBlur');
         bind(this, 'onScrollVertical');
+        bind(this, 'onScrollHorizontal');
 
         ae.on('change', this.onChange);
         ae.on('changeSelection', this.onCursorActivity);
         ae.on('focus', this.onFocus);
         ae.on('blur', this.onBlur);
         ae.session.on('changeScrollTop', this.onScrollVertical);
+        ae.session.on('changeScrollLeft', this.onScrollHorizontal);
     }
 
     AceEditorAdapter.prototype.updateAceEditorSizes = function () {
@@ -53,12 +56,12 @@ ot.AceEditorAdapter = (function (global) {
 
         // To get symbol width in current monospace(!) font we need
         // to create new element inside .ace_editor (root element)
-        // with 1 character and measure it's width
+        // with 100 characters and measure it's width, then divide it by 100
         var el = document.createElement('span');
-        el.innerText = 'x';
+        el.innerText = 'x'.repeat(100);
         el.style.visibility = 'hidden';
         this.aeElement.appendChild(el); // append el to root el
-        this.SYMBOL_WIDTH = el.offsetWidth; // measure width
+        this.SYMBOL_WIDTH = el.offsetWidth / 100; // measure width
         el.remove(); // remove el
     }
 
@@ -71,6 +74,7 @@ ot.AceEditorAdapter = (function (global) {
         this.ae.off('focus', this.onFocus);
         this.ae.off('blur', this.onBlur);
         this.ae.session.off('changeScrollTop', this.onScrollVertical);
+        this.ae.session.off('changeScrollLeft', this.onScrollHorizontal);
     };
 
     function cmpPos (a, b) {
@@ -117,27 +121,27 @@ ot.AceEditorAdapter = (function (global) {
             restLength -= sumLengths(change.lines);
 
             operation = new TextOperation()
-                .retain(fromIndex)
-                .insert(change.lines.join('\n'))
-                .retain(restLength)
-                .compose(operation);
+              .retain(fromIndex)
+              .insert(change.lines.join('\n'))
+              .retain(restLength)
+              .compose(operation);
 
             inverse = inverse.compose(new TextOperation()
-                .retain(fromIndex)
-                ['delete'](sumLengths(change.lines))
-                .retain(restLength)
+              .retain(fromIndex)
+              ['delete'](sumLengths(change.lines))
+              .retain(restLength)
             );
         } else if (change.action === 'remove') {
             operation = new TextOperation()
-                .retain(fromIndex)
-                ['delete'](sumLengths(change.lines))
-                .retain(restLength)
-                .compose(operation);
+              .retain(fromIndex)
+              ['delete'](sumLengths(change.lines))
+              .retain(restLength)
+              .compose(operation);
 
             inverse = inverse.compose(new TextOperation()
-                .retain(fromIndex)
-                .insert(change.lines.join('\n'))
-                .retain(restLength)
+              .retain(fromIndex)
+              .insert(change.lines.join('\n'))
+              .retain(restLength)
             );
         }
 
@@ -146,7 +150,7 @@ ot.AceEditorAdapter = (function (global) {
 
     // Singular form for backwards compatibility.
     AceEditorAdapter.operationFromAceEditorChange =
-        AceEditorAdapter.operationFromAceEditorChanges;
+      AceEditorAdapter.operationFromAceEditorChanges;
 
     // Apply an operation to a AceEditor instance.
     AceEditorAdapter.applyOperationToAceEditor = function (operation, ae) {
@@ -184,14 +188,14 @@ ot.AceEditorAdapter = (function (global) {
     };
 
     AceEditorAdapter.prototype.onFocus =
-        AceEditorAdapter.prototype.onCursorActivity =
-            function () {
-                if (this.changeInProgress) {
-                    this.selectionChanged = true;
-                } else {
-                    this.trigger('selectionChange');
-                }
-            };
+      AceEditorAdapter.prototype.onCursorActivity =
+        function () {
+            if (this.changeInProgress) {
+                this.selectionChanged = true;
+            } else {
+                this.trigger('selectionChange');
+            }
+        };
 
     AceEditorAdapter.prototype.onBlur = function () {
         if (this.ae.selection.isEmpty()) { this.trigger('blur'); }
@@ -199,6 +203,9 @@ ot.AceEditorAdapter = (function (global) {
 
     AceEditorAdapter.prototype.onScrollVertical = function (scroll) {
         this.markersElement.style.top = -scroll + 'px';
+    };
+    AceEditorAdapter.prototype.onScrollHorizontal = function (scroll) {
+        this.markersElement.style.left = this.LEFT_MARGIN - scroll + 'px';
     };
 
 
@@ -214,8 +221,8 @@ ot.AceEditorAdapter = (function (global) {
         for (var i = 0; i < selectionList.length; i++) {
             var sel = selectionList[i];
             ranges[i] = new Selection.Range(
-                ae.session.doc.positionToIndex({row: sel.start.row, column: sel.start.column}),
-                ae.session.doc.positionToIndex({row: sel.end.row, column: sel.end.column})
+              ae.session.doc.positionToIndex({row: sel.start.row, column: sel.start.column}),
+              ae.session.doc.positionToIndex({row: sel.end.row, column: sel.end.column})
             );
         }
 
@@ -248,7 +255,7 @@ ot.AceEditorAdapter = (function (global) {
         cursorEl.style.pointerEvents = 'none';
         cursorEl.style.height = this.LINE_HEIGHT + 'px';
         cursorEl.style.top = this.LINE_HEIGHT * cursorPos.row + 'px';
-        cursorEl.style.left = this.SYMBOL_WIDTH * cursorPos.column + this.LEFT_MARGIN + 'px';
+        cursorEl.style.left = this.SYMBOL_WIDTH * cursorPos.column + 'px';
         cursorEl.setAttribute('data-clientid', clientId);
         this.markersElement.appendChild(cursorEl);
         return cursorEl;
@@ -273,11 +280,11 @@ ot.AceEditorAdapter = (function (global) {
         selEl.style.opacity = '0.3';
         selEl.setAttribute('data-clientid', clientId);
         var clipPathStart = `path('M ${this.SYMBOL_WIDTH * anchorPos.column} ${this.LINE_HEIGHT * anchorPos.row}` +
-            `v ${this.LINE_HEIGHT}`;
+          `v ${this.LINE_HEIGHT}`;
         var clipPathEnd = `L ${this.SYMBOL_WIDTH * headPos.column} ${this.LINE_HEIGHT * headPos.row + this.LINE_HEIGHT} v ${-this.LINE_HEIGHT}  Z')`;
         for (var i = anchorPos.row + 1; i < headPos.row + 1; i++) {
             clipPathStart += `h 10000 v ${-this.LINE_HEIGHT} ` +
-                `M 0 ${this.LINE_HEIGHT * i} v ${this.LINE_HEIGHT}`;
+              `M 0 ${this.LINE_HEIGHT * i} v ${this.LINE_HEIGHT}`;
         }
         selEl.style.clipPath = clipPathStart + clipPathEnd;
         this.markersElement.appendChild(selEl);

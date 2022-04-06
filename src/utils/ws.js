@@ -28,19 +28,15 @@ export default class WS {
         }
         this.ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
-            console.log("GET MESSAGE:", message, event);
+            console.log("GET MESSAGE:", message);
 
             if (message?.e)
                 this.handlers[message.e](message.d, event);
         }
-
-        this.isOpened = true;
     }
 
     send(eventName, data) {
-        if (!this.isOpened)
-            throw Error('WS not opened');
-
+        console.log("SEND MESSAGE:", eventName, data);
         this.ws.send(JSON.stringify({e: eventName, d: data}));
     }
 
