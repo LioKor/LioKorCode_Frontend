@@ -54,10 +54,10 @@
 
       this.aceEditor.setTheme('ace/theme/ambiance');
 
-      // const scrollbar = document.querySelector('.ace_scrollbar');
-      // console.log(scrollbar)
-      // scrollbar.classList.add('scrollable');
-      // delete scrollbar.style.height;
+      const scrollbars = document.querySelectorAll('.ace_scrollbar');
+      scrollbars.forEach(scrollbar => scrollbar.classList.add('scrollable'));
+      scrollbars[0].style.right = '5px';
+      scrollbars[1].style.overflowY = 'hidden';
 
       if (!this.$store.state.user.isLogined) {
         this.aceEditor.setReadOnly(true);
