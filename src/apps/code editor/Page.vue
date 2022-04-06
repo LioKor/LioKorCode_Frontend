@@ -189,7 +189,7 @@
         this.liveEditor.callbacks.join = ({client_id, username}) => {
           this.$store.state.popups.alert('К сессии присоединился:', username);
         };
-        this.liveEditor.callbacks.quit = ({clientId}) => {
+        this.liveEditor.callbacks.quit = (clientId) => {
           this.$store.state.popups.alert('От сессии отключился:', clientId);
         };
         this.liveEditor.join(this.$store.state.user.username);

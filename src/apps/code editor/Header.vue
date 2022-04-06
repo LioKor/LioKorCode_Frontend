@@ -38,7 +38,7 @@
 
       <div v-show="!sessionStatus" @click="openSession">Открыть сессию</div>
       <div v-show="!sessionStatus" @click="connectToSession">Подключиться</div>
-      <div v-show="sessionStatus" @click="leaveSession">Отключиться</div>
+      <div v-show="sessionStatus" @click="leaveSession">Отключиться ({{redatorSessionUid}})</div>
 
       <router-link v-if="$store.state.user.isLogined" to="/profile" class="right">{{$store.state.user.username}}</router-link>
       <router-link v-else to="/signin" class="right">Войти</router-link>
@@ -55,6 +55,7 @@
         isCheckInProgress: false,
         isCheckError: false,
         sessionStatus: '',
+        redatorSessionUid: '',
       }
     },
 
