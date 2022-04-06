@@ -24,6 +24,7 @@
       z-index 0
       cursor default
     li:before
+      content ""
       position absolute
       left -500px
       width 1000px
