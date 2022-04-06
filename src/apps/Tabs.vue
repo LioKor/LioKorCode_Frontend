@@ -209,7 +209,7 @@
         this.$el.classList.add('blocked');
       },
       unlockChangeTabs() {
-        this.canChangeTabs = false;
+        this.canChangeTabs = true;
         this.$el.classList.remove('blocked');
       }
     }

@@ -167,7 +167,7 @@
 
     async mounted() {
       this.loadFromLocalStorage();
-      this.sortFilesAndSave();
+      this.sortFilesRecursive();
 
       await nextTick();
       const path = localStorage.getItem('openedFilePath');
@@ -179,10 +179,10 @@
     },
 
     methods: {
-      sortFilesAndSave(list = this.reactiveItems) {
+      sortFiles(list = this.reactiveItems, isNeedSave = true) {
         list.sort((a, b) => {
-          const isAFile = typeof a.value === 'string';
-          const isBFile = typeof b.value === 'string';
+          const isAFile = (typeof a.value === 'string');
+          const isBFile = (typeof b.value === 'string');
           if (isAFile === isBFile) {
             return a.name.localeCompare(b.name);
           } else if (isAFile) {
@@ -190,6 +190,16 @@
           } else {
             return -1;
           }
+        });
+
+        if (isNeedSave)
+          this.saveToLocalStorage();
+      },
+      sortFilesRecursive(list = this.reactiveItems) {
+        this.sortFiles(list);
+        list.forEach(el => {
+          if (typeof el.value !== 'string')
+            this.sortFilesRecursive(el.value, false);
         });
 
         this.saveToLocalStorage();
@@ -245,7 +255,7 @@
         const path = this.getItemPath(el);
         if (!path.length) { // add to root
           this.reactiveItems.push({name: name, value: itemValue})
-          this.sortFilesAndSave();
+          this.sortFiles();
           return;
         }
         // add into some folder
@@ -254,7 +264,7 @@
         if (typeof toPush === 'string') // selected item is a file
           toPush = list; // let's push to item's folder
         toPush.push({name: name, value: itemValue});
-        this.sortFilesAndSave(toPush);
+        this.sortFiles(toPush);
       },
 
       async deleteItem(el) {
@@ -265,7 +275,7 @@
           return false;
 
         list.splice(idx, 1);
-        this.sortFilesAndSave(list);
+        this.sortFiles(list);
         return true;
       },
 
@@ -283,7 +293,7 @@
           return;
 
         list[idx].name = name;
-        this.sortFilesAndSave(list);
+        this.sortFiles(list);
 
         this.$emit('renameFile', list[idx]);
       },
@@ -306,7 +316,7 @@
         if (typeof toPush === 'string') // selected item is a file
           toPush = listPaste; // let's push to item's folder
         toPush.push(deepClone(listCopy[idxCopy]));
-        this.sortFilesAndSave(toPush);
+        this.sortFiles(toPush);
 
         if (this.copyedItem.mode === 'cut') {
           listCopy.splice(idxCopy, 1); // delete selected element
@@ -316,7 +326,7 @@
       duplicateItem(el) {
         const {list, idx} = this.getItem(this.getItemPath(el));
         list.push(deepClone(list[idx]));
-        this.sortFilesAndSave(list);
+        this.sortFiles(list);
       },
 
       // --- Select and open files
@@ -378,7 +388,7 @@
       },
       loadTree(list) {
         this.reactiveItems = list;
-        this.sortFilesAndSave();
+        this.sortFilesRecursive();
       },
 
       // --- Controls by keys
@@ -483,7 +493,7 @@
         this.$el.classList.add('blocked');
       },
       unlockOpeningFiles() {
-        this.canOpenFiles = false;
+        this.canOpenFiles = true;
         this.$el.classList.remove('blocked');
       }
     }
