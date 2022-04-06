@@ -27,8 +27,6 @@
   import 'ace-builds'
   import 'ace-builds/webpack-resolver'
 
-  const watcherIntervalTime = 2000;
-
   export default {
     data() {
       return {
@@ -36,11 +34,13 @@
         showNeedToLogin: false,
         isMounted: false,
         textWhenMounted: "",
+        onMountAction: () => {},
       }
     },
     mounted() {
       this.aceEditor = ace.edit('aceEditor');
       this.isMounted = true;
+      this.onMountAction();
       this.aceEditor.setValue(this.textWhenMounted, 1); // ', 1' to disable selection
 
       this.aceEditor.setOptions({
@@ -123,6 +123,10 @@
       },
       setReadOnly(state) {
         this.aceEditor.setReadOnly(state);
+      },
+
+      setOnMountAction(callback) {
+        this.onMountAction = callback;
       }
     }
   }

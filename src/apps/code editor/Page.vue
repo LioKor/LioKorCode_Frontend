@@ -41,7 +41,7 @@
 
 <template>
   <div class="code-editor-page">
-    <Header ref="header" @start-check="checkSolution" @open-session="openSession" @connect-session="connectSession" @leave-session="leaveSession"/>
+    <Header ref="header" @start-check="checkSolution" @open-session="connectSession" @connect-session="connectSession" @leave-session="leaveSession"/>
 
     <div id="code-editor-all">
       <div id="task-block" class="task-and-editor">
@@ -127,7 +127,10 @@
         this.$refs.editor.setText(treeItem.value, treeItem.name);
       },
       updateOpenedFileText(text) {
-        const item = this.$refs.tabs.getSelected().uniqueValue;
+        let item = this.$refs.tabs.getSelected();
+        if (item === null)
+          return;
+        item = item.uniqueValue;
         item.value = text;
         this.$refs.tree.saveToLocalStorage();
       },
@@ -196,10 +199,7 @@
       },
 
       // --- WebSockets live editor
-      openSession(uid) {
-        this.connectSession(uid);
-      },
-      connectSession(uid) {
+      connectSession(uid, filename = undefined) {
         const response = this.$store.state.api.checkRedactorSession(uid);
         if (!response.ok_) {
           this.$store.state.popups.error('Не удалось подключиться к сессии', uid);
@@ -208,24 +208,47 @@
 
         this.$refs.tree.lockOpeningFiles();
         this.$refs.tabs.lockChangeTabs();
-        this.createLiveEditor(uid);
+        this.createLiveEditor(uid, filename);
+
+        // if (taskId !== undefined) {
+        //   this.$refs.taskInfo.getTask(taskId);
+        // }
       },
       leaveSession() {
         this.$refs.tree.unlockOpeningFiles();
+        this.$refs.tabs.unlockChangeTabs();
         this.removeLiveEditor();
       },
 
-      createLiveEditor(id) {
-        this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, id);
-        this.liveEditor.callbacks.join = ({client_id, username}) => {
-          this.$store.state.popups.alert('К сессии присоединился:', username);
-        };
-        this.liveEditor.callbacks.quit = (clientId) => {
-          this.$store.state.popups.alert('От сессии отключился:', clientId);
-        };
-        this.liveEditor.join(this.$store.state.user.username);
+      createLiveEditor(id, filename = undefined) {
+        const callbackForAceEditorLoaded = () => {
+          if (filename !== undefined)
+            this.$refs.editor.setSyntaxHighlighting(filename);
+
+          this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, id);
+          this.liveEditor.callbacks.join = ({client_id, username}) => {
+            this.$store.state.popups.alert('К сессии присоединился:', username);
+          };
+          this.liveEditor.callbacks.quit = (clientId) => {
+            this.$store.state.popups.alert('От сессии отключился:', clientId);
+          };
+          this.liveEditor.callbacks.close =
+            this.liveEditor.callbacks.error = () => {
+              this.$store.state.popups.error('Сервер оборвал соединение с сессией');
+              this.leaveSession();
+          };
+          this.liveEditor.join(this.$store.state.user.username);
+        }
+
+        if (this.$refs.editor.isMounted) {
+          callbackForAceEditorLoaded();
+          return;
+        }
+        this.$refs.editor.setOnMountAction(callbackForAceEditorLoaded);
       },
       removeLiveEditor() {
+        this.liveEditor.callbacks.close =
+            this.liveEditor.callbacks.error = () => {};
         this.liveEditor.leave();
         this.$refs.tabs.unlockChangeTabs();
         delete this.liveEditor;
