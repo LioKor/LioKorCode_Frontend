@@ -202,12 +202,12 @@
       },
 
       // --- WebSockets live editor
-      connectSession(uid, filename = undefined) {
-        const response = this.$store.state.api.checkRedactorSession(uid);
-        if (!response.ok_) {
-          this.$store.state.popups.error('Не удалось подключиться к сессии', uid);
-          return;
-        }
+      async connectSession(uid, filename = undefined) {
+        // const response = await this.$store.state.api.checkRedactorSession(uid);
+        // if (!response.ok_) {
+        //   this.$store.state.popups.error('Не удалось подключиться к сессии', uid);
+        //   return;
+        // }
 
         this.$refs.tree.lockOpeningFiles();
         this.$refs.tabs.lockChangeTabs();
@@ -228,11 +228,15 @@
           if (filename !== undefined)
             this.$refs.editor.setSyntaxHighlighting(filename);
 
-          this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, id);
+          let wsUrl = location.protocol.replace('http', 'ws') + '//' + location.host;
+          if (location.host.includes('localhost') || location.host.includes('127.0.0.1') || location.host.includes('192.168.'))
+            wsUrl = 'wss://code.liokor.com';
+          wsUrl += this.$store.state.api.apiUrl + '/ws/redactor/' + id;
+          this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, wsUrl);
           this.liveEditor.callbacks.join = ({client_id, username}) => {
             this.$store.state.popups.alert('К сессии присоединился:', username);
           };
-          this.liveEditor.callbacks.quit = (client_id, username) => {
+          this.liveEditor.callbacks.quit = ({client_id, username}) => {
             this.$store.state.popups.alert('От сессии отключился:', username);
           };
           this.liveEditor.callbacks.close =

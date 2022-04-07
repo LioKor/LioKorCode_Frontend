@@ -117,7 +117,7 @@
           return;
         }
 
-        const uid = this.$store.state.api.openRedactorSession(this.$parent.$refs.editor.aceEditor.getValue());
+        const uid = await this.$store.state.api.openRedactorSession(this.$parent.$refs.editor.aceEditor.getValue());
         if (!uid.ok_) {
           this.$store.state.popups.error('Не удалось создать сессию');
           return;
@@ -140,6 +140,9 @@
         this.redatorSessionUid = undefined;
         this.redactorJoinLink = '';
 
+        this.$parent.$refs.tabs.deleteTabByItem(this.uniqueRemoteTab);
+        this.uniqueRemoteTab = undefined;
+
         this.$emit('leaveSession');
       },
       async connectToSession(uid, filename) {
@@ -151,10 +154,12 @@
 
         this.$store.state.popups.success('Вы подключились к сессии');
         this.redatorSessionUid = uid;
+
+        this.uniqueRemoteTab = {name: null, value: ''};
         await this.$parent.$refs.tabs.addTab({
           name: "remote: " + filename,
           closable: false,
-          uniqueValue: {name: null, value: ''}
+          uniqueValue: this.uniqueRemoteTab
         });
         this.$emit('connectSession', uid, filename);
       },

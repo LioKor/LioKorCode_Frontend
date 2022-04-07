@@ -1683,7 +1683,7 @@ ot.EditorClient = (function () {
     this.editorAdapter.registerRedo(function () { self.redo(); });
 
     this.serverAdapter.registerCallbacks({
-      client_left: function (clientId, name) { self.onClientLeft(clientId); },
+      client_left: function (clientId) { self.onClientLeft(clientId); },
       set_name: function (clientId, name) { self.getClientObject(clientId).setName(name); },
       ack: function () { self.serverAck(); },
       operation: function (operation) {

@@ -1,8 +1,6 @@
 import ApiRequest from "../utils/requests";
 
 export default class Api extends ApiRequest {
-    constructor(url) {super(url)}
-
     signUp = (username, email, password, fullname) => this.post('/users', {username, email, password, fullname});
     signIn = (username, password) => this.post('/user/auth', {username, password});
     getUser = () => this.get('/user');
@@ -26,17 +24,6 @@ export default class Api extends ApiRequest {
 
 
     // Mock redactor requests until backend finished it
-    openRedactorSession = (files) => {
-        return {
-            id: "some_uid_string",
-            ok_: true,
-            status_: 200,
-        }
-    }//this.post(`/redactor`, files);
-    checkRedactorSession = (uid) => {
-        return {
-            ok_: true,
-            status_: 200,
-        }
-    }//this.get(`/redactor/${uid}`);
+    openRedactorSession = (files) => this.post(`/redactor`, files);
+    checkRedactorSession = (uid) => this.get(`/redactor/${uid}`);
 }

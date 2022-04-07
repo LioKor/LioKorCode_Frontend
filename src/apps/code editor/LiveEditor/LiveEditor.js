@@ -15,20 +15,22 @@ export default class LiveEditor {
     doc: (text) => {},
     registered: () => {},
     join: ({client_id, username}) => {},
-    quit: (clientId, name) => {},
+    quit: ({client_id, username}) => {},
   };
 
   isDocGotten = false;
   username = undefined;
 
-  constructor(editor, roomId) {
+  constructor(editor, wsUrl) {
     // Get and setup ace editor
     this.editor = editor;
-    editor.setOption('readOnly', true);
+    editor.setOptions({
+      readOnly: true,
+      enableMultiselect: false,
+    });
 
     // Create WebSocket connection
-    //this.ws = new WS([location.protocol.replace('http', 'ws'), '//', location.host, '/redactor/', roomId].join(''));
-    this.ws = new WS('ws://127.0.0.1:8080/ws');
+    this.ws = new WS(wsUrl);
 
     this.__setupHandlers();
 
@@ -85,9 +87,9 @@ export default class LiveEditor {
     };
 
     // Some user quit
-    this.ws.handlers.quit = (clientId) => {
-      console.log("User quit with id: ", clientId);
-      this.callbacks.quit(clientId);
+    this.ws.handlers.quit = (data) => {
+      console.log("User quit with id: ", data);
+      this.callbacks.quit(data);
     };
   }
 
@@ -105,6 +107,6 @@ export default class LiveEditor {
   leave() {
     this.ws.send('leave', { username: this.username });
     this.ws.close();
-    this.editorAdapter.detach();
+    this.editorAdapter?.detach();
   }
 }

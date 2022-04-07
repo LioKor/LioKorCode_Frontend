@@ -155,6 +155,26 @@
         const el = e.target;
         this.selectTabEl(el, true);
       },
+      findItemByUnique(uniqueValue) {
+        const idx = this.reactiveItems.findIndex(tab => tab.uniqueValue === uniqueValue);
+        if (idx === -1)
+          return null;
+        return {item: this.reactiveItems[idx], idx: idx};
+      },
+      deleteTabByIdx(idx) {
+        this.reactiveItems.splice(idx, 1);
+        //this.$emit('deleteTab', item, idx);
+
+        if (this.reactiveItems.length === 0) {
+          this.$emit('lastTabClosed');  // to clear editor after this event
+        }
+      },
+      deleteTabByItem(uniqueValue) {
+        const item = this.findItemByUnique(uniqueValue);
+        if (!item)
+          return;
+        this.deleteTabByIdx(item.idx);
+      },
       deleteTab(e) {
         if (!this.canChangeTabs)
           return;
@@ -167,12 +187,7 @@
         if (this.selectedEl === el)
             this.selectTabEl(el.previousElementSibling || el.nextElementSibling, true);
 
-        this.reactiveItems.splice(idx, 1);
-        //this.$emit('deleteTab', item, idx);
-
-        if (this.reactiveItems.length === 0) {
-          this.$emit('lastTabClosed');  // to clear editor after this event
-        }
+        this.deleteTabByIdx(idx);
       },
       async addTab(item = {name: "", action: () => {}, closable: true, uniqueValue: undefined}, setSelected = true) {
         const existingItemIdx = this.reactiveItems.findIndex(it => it.uniqueValue === item.uniqueValue);
@@ -193,10 +208,10 @@
         return this.reactiveItems[idx];
       },
       updateTab(uniqueValue, name) {
-        const item = this.reactiveItems.find(tab => tab.uniqueValue === uniqueValue);
+        const item = this.findItemByUnique(uniqueValue);
         if (!item)
           return;
-        item.name = name;
+        item.item.name = name;
       },
 
       closeAllTabs() {
