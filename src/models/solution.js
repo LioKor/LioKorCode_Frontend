@@ -2,16 +2,19 @@ import Model from "./model";
 
 export default class Solution extends Model {
   default = {
-    id: '?',
+    id: null,
     receivedDatetime: Date.now(),
-    datetime: "",
+    checkedDatetime: Date.now(),
     checkResult: -1,
-    checkError: '',
-    checkTime: 0,
+    checkMessage: null,
+    checkTime: null,
+    compileTime: null,
+    tests: [],
+    testsPassed: null,
+    testsTotal: null,
+
     status: 'checking',
-    testsPassed: '?',
-    testsTotal: '?',
-    message: '?',
+    datetime: null
   }
 
   set(data) {
