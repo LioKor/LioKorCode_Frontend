@@ -17,6 +17,10 @@ ot.AceEditorAdapter = (function (global) {
     var TextOperation = ot.TextOperation;
     var Selection = ot.Selection;
 
+    var otherCursorClassName = 'ot-ace-addon-other-cursor';
+    var otherSelectionClassName = 'ot-ace-addon-other-selection';
+    var clientNameAttributeName = 'data-client-name';
+
     function AceEditorAdapter (ae) {
         this.ae = ae;
         this.aeElement = ae.renderer.container;
@@ -26,6 +30,7 @@ ot.AceEditorAdapter = (function (global) {
         this.selectionChanged = false;
 
         this.updateAceEditorSizes();
+        this.addStyles();
 
         this.markersElement = document.createElement('div');
         this.markersElement.id = 'ot-ace-addon-markers';
@@ -65,6 +70,109 @@ ot.AceEditorAdapter = (function (global) {
         el.remove(); // remove el
     }
 
+    // Adding styles of classes for other's selection
+    AceEditorAdapter.prototype.addStyles = function () {
+        var addStyleRules = (function () {
+            var added = {};
+            var styleElement = document.createElement('style');
+            document.documentElement.getElementsByTagName('head')[0].appendChild(styleElement);
+            var styleSheet = styleElement.sheet;
+
+            return function (cssRules) {
+                cssRules.forEach(css => {
+                    if (added[css])
+                        return;
+
+                    added[css] = true;
+                    styleSheet.insertRule(css, (styleSheet.cssRules || styleSheet.rules).length);
+                });
+            };
+        }());
+
+        var collapsedHintSize = 8;
+        var hintFontSize = 14;
+        var rules = [
+            // To make hint expanded when cursor moving
+            `@keyframes ot-ace-addon-keep-hint-open {
+                0%, 80% {
+                    content: attr(${clientNameAttributeName});
+                    width: unset;
+                    height: ${hintFontSize}px;
+                    top: -20px;
+                    padding: 4px;
+                    opacity: 0.7;
+                }
+                99% {
+                    top: ${-collapsedHintSize}px;
+                    height: ${collapsedHintSize}px;
+                    width: ${collapsedHintSize}px;
+                    color: black;
+                    opacity: 1;
+                    padding: 0;
+                    content: "";
+                }
+                100% {
+                }
+            }
+            `,
+            // Make cursors
+            `.${otherCursorClassName} {
+                display: inline-block;
+                padding: 0px;
+                margin-right: -1px;
+                margin-left: -1px;
+                z-index: 0;
+                position: absolute;
+                border-left-width: 2px;
+                border-left-style: solid;
+            }`,
+            // For make hover works in bigger area around cursor
+            `.${otherCursorClassName}::after {
+                content: "";
+                pointer-events: all;
+                position: absolute;
+                inset: -5px -5px -5px -10px;
+            }`,
+            // Make circle above the cursor
+            `.${otherCursorClassName}::before {
+                content: "";
+                position: absolute;
+                top: ${-collapsedHintSize}px;
+                left: ${-collapsedHintSize / 2 - 1}px;
+                height: ${collapsedHintSize}px;
+                width: ${collapsedHintSize}px;
+                background: inherit;
+                font-size: ${hintFontSize}px;
+                transition: all 0.2s ease;
+                line-height: ${hintFontSize}px;
+                border-radius: ${hintFontSize / 2}px;
+                color: black;
+                white-space: nowrap;
+
+                animation: 2s ease ot-ace-addon-keep-hint-open;
+            }`,
+            // Transform circle into username hint
+            `.${otherCursorClassName}:hover::before {
+                content: attr(${clientNameAttributeName});
+                width: unset;
+                height: ${hintFontSize}px;
+                top: -20px;
+                padding: 4px;
+                opacity: 0.85;
+            }`,
+
+            // Make other selections
+            `.${otherSelectionClassName} {
+                display: inline-block;
+                padding: 0px;
+                z-index: 0;
+                position: absolute;
+                inset: 0;
+                opacity: 0.3;
+            }`];
+        addStyleRules(rules);
+    }
+
     // Removes all event listeners from the AceEditor instance.
     AceEditorAdapter.prototype.detach = function () {
         this.markersElement.remove();
@@ -92,6 +200,7 @@ ot.AceEditorAdapter = (function (global) {
 
     // Converts a AceEditor change (as returned
     // by the 'change' event in AceEditor) into a
+    // TextOperation and its inverse and returns them as a two-element array.
     // TextOperation and its inverse and returns them as a two-element array.
     AceEditorAdapter.operationFromAceEditorChanges = function (change, doc) {
         // Approach: Replay the changes, beginning with the most recent one, and
@@ -217,13 +326,23 @@ ot.AceEditorAdapter = (function (global) {
         var ae = this.ae;
 
         var selectionList = ae.selection.getAllRanges();
+
         var ranges = [];
+        var isAllRangesNotEmpty = true;
         for (var i = 0; i < selectionList.length; i++) {
             var sel = selectionList[i];
             ranges[i] = new Selection.Range(
               ae.session.doc.positionToIndex({row: sel.start.row, column: sel.start.column}),
               ae.session.doc.positionToIndex({row: sel.end.row, column: sel.end.column})
             );
+            if (ranges[i].isEmpty())
+                isAllRangesNotEmpty = false;
+        }
+
+        // Need to add empty range on cursor position to draw it in other side as cursor
+        if (isAllRangesNotEmpty) {
+            var cursorPosIndex = ae.session.doc.positionToIndex(ae.selection.getCursor());
+            ranges[ranges.length] = new Selection.Range(cursorPosIndex, cursorPosIndex);
         }
 
         return new Selection(ranges);
@@ -239,29 +358,21 @@ ot.AceEditorAdapter = (function (global) {
         }
     };
 
-    AceEditorAdapter.prototype.setOtherCursor = function (position, color, clientId) {
+    AceEditorAdapter.prototype.setOtherCursor = function (position, color, clientId, clientName) {
         var cursorPos = this.ae.session.doc.indexToPosition(position);
-        var scrollTop = this.ae.session.getScrollTop();
         var cursorEl = document.createElement('span');
-        cursorEl.className = 'other-client';
-        cursorEl.style.display = 'inline-block';
-        cursorEl.style.padding = '0';
-        cursorEl.style.marginLeft = cursorEl.style.marginRight = '-1px';
-        cursorEl.style.borderLeftWidth = '2px';
-        cursorEl.style.borderLeftStyle = 'solid';
+        cursorEl.classList.add(otherCursorClassName);
+        cursorEl.style.background = color;
         cursorEl.style.borderLeftColor = color;
-        cursorEl.style.zIndex = 0;
-        cursorEl.style.position = 'absolute';
-        cursorEl.style.pointerEvents = 'none';
         cursorEl.style.height = this.LINE_HEIGHT + 'px';
         cursorEl.style.top = this.LINE_HEIGHT * cursorPos.row + 'px';
         cursorEl.style.left = this.SYMBOL_WIDTH * cursorPos.column + 'px';
-        cursorEl.setAttribute('data-clientid', clientId);
+        cursorEl.setAttribute(clientNameAttributeName, clientName ? clientName : ('Unknown #' + clientId));
         this.markersElement.appendChild(cursorEl);
         return cursorEl;
     };
 
-    AceEditorAdapter.prototype.setOtherSelectionRange = function (range, color, clientId) {
+    AceEditorAdapter.prototype.setOtherSelectionRange = function (range, color, clientId, clientName) {
         //var match = /^#([0-9a-fA-F]{6})$/.exec(color);
         //if (!match) { throw new Error("only six-digit hex colors are allowed."); }
 
@@ -269,16 +380,9 @@ ot.AceEditorAdapter = (function (global) {
         var headPos   = this.ae.session.doc.indexToPosition(range.head);
 
         var selEl = document.createElement('span');
-        selEl.className = 'other-client';
-        selEl.style.display = 'inline-block';
-        selEl.style.padding = '0';
+        selEl.classList.add(otherSelectionClassName);
         selEl.style.background = color;
-        selEl.style.zIndex = 0;
-        selEl.style.position = 'absolute';
-        selEl.style.top = selEl.style.left = selEl.style.right = selEl.style.bottom = 0;
-        selEl.style.pointerEvents = 'none';
-        selEl.style.opacity = '0.3';
-        selEl.setAttribute('data-clientid', clientId);
+        selEl.setAttribute(clientNameAttributeName, clientName);
         var clipPathStart = `path('M ${this.SYMBOL_WIDTH * anchorPos.column} ${this.LINE_HEIGHT * anchorPos.row}` +
           `v ${this.LINE_HEIGHT}`;
         var clipPathEnd = `L ${this.SYMBOL_WIDTH * headPos.column} ${this.LINE_HEIGHT * headPos.row + this.LINE_HEIGHT} v ${-this.LINE_HEIGHT}  Z')`;
@@ -288,24 +392,23 @@ ot.AceEditorAdapter = (function (global) {
         }
         selEl.style.clipPath = clipPathStart + clipPathEnd;
         this.markersElement.appendChild(selEl);
+
         return selEl;
     };
 
-    AceEditorAdapter.prototype.setOtherSelection = function (selection, color, clientId) {
+    AceEditorAdapter.prototype.setOtherSelection = function (selection, color, clientId, clientName) {
         var selectionObjects = [];
         for (var i = 0; i < selection.ranges.length; i++) {
             var range = selection.ranges[i];
             if (range.isEmpty()) {
-                selectionObjects[i] = this.setOtherCursor(range.head, color, clientId);
+                selectionObjects[i] = this.setOtherCursor(range.head, color, clientId, clientName);
             } else {
-                selectionObjects[i] = this.setOtherSelectionRange(range, color, clientId);
+                selectionObjects[i] = this.setOtherSelectionRange(range, color, clientId, clientName);
             }
         }
         return {
             clear: function () {
-                for (var i = 0; i < selectionObjects.length; i++) {
-                    selectionObjects[i].remove(); // Remove old HTML elements
-                }
+                selectionObjects.forEach(el => el.remove()); // Remove old selection HTML elements
             }
         };
     };
@@ -328,13 +431,6 @@ ot.AceEditorAdapter = (function (global) {
     AceEditorAdapter.prototype.registerRedo = function (redoFn) {
         this.ae.redo = redoFn;
     };
-
-    // Throws an error if the first argument is falsy. Useful for debugging.
-    function assert (b, msg) {
-        if (!b) {
-            throw new Error(msg || "assertion error");
-        }
-    }
 
     // Bind a method to an object, so it doesn't matter whether you call
     // object.method() directly or pass object.method as a reference to another

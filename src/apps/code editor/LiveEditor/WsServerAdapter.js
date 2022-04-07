@@ -6,9 +6,9 @@ export default class WsServerAdapter {
     this.ws = ws;
 
     this.quitOld = this.ws.handlers.quit;
-    this.ws.handlers.quit = (clientId) => {
+    this.ws.handlers.quit = (clientId, name) => {
       this.quitOld(clientId);
-      this.callbacks.client_left(clientId);
+      this.callbacks.client_left(clientId, name);
     };
 
     this.joinOld = this.ws.handlers.join;

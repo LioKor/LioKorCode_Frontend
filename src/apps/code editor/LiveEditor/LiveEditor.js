@@ -15,7 +15,7 @@ export default class LiveEditor {
     doc: (text) => {},
     registered: () => {},
     join: ({client_id, username}) => {},
-    quit: (clientId) => {},
+    quit: (clientId, name) => {},
   };
 
   isDocGotten = false;

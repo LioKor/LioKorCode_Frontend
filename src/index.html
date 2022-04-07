@@ -1657,7 +1657,8 @@
           this.mark = this.editorAdapter.setOtherSelection(
             selection,
             selection.position === selection.selectionEnd ? this.color : this.lightColor,
-            this.id
+            this.id,
+            this.name
           );
         };
 
@@ -1747,7 +1748,7 @@
             clientId,
             this.clientListEl,
             this.editorAdapter,
-            clientObj.name || clientId,
+            clientObj.name || 'Unknown #' + clientId,
             clientObj.selection ? Selection.fromJSON(clientObj.selection) : null
           );
         };
@@ -1994,22 +1995,23 @@
             };
           }());
 
-          var hintSize = 8;
+          var collapsedHintSize = 8;
+          var hintFontSize = 14;
           var rules = [
             // To make hint expanded when cursor moving
             `@keyframes ot-ace-addon-keep-hint-open {
                 0%, 80% {
                     content: attr(${clientNameAttributeName});
                     width: unset;
-                    height: 12px;
+                    height: ${hintFontSize}px;
                     top: -20px;
                     padding: 4px;
                     opacity: 0.7;
                 }
                 99% {
-                    top: ${-hintSize}px;
-                    height: ${hintSize}px;
-                    width: ${hintSize}px;
+                    top: ${-collapsedHintSize}px;
+                    height: ${collapsedHintSize}px;
+                    width: ${collapsedHintSize}px;
                     color: black;
                     opacity: 1;
                     padding: 0;
@@ -2041,16 +2043,17 @@
             `.${otherCursorClassName}::before {
                 content: "";
                 position: absolute;
-                top: ${-hintSize}px;
-                left: ${-hintSize / 2 - 1}px;
-                height: ${hintSize}px;
-                width: ${hintSize}px;
+                top: ${-collapsedHintSize}px;
+                left: ${-collapsedHintSize / 2 - 1}px;
+                height: ${collapsedHintSize}px;
+                width: ${collapsedHintSize}px;
                 background: inherit;
-                font-size: 12px;
+                font-size: ${hintFontSize}px;
                 transition: all 0.2s ease;
-                line-height: 12px;
-                border-radius: 6px;
+                line-height: ${hintFontSize}px;
+                border-radius: ${hintFontSize / 2}px;
                 color: black;
+                white-space: nowrap;
 
                 animation: 2s ease ot-ace-addon-keep-hint-open;
             }`,
@@ -2058,10 +2061,10 @@
             `.${otherCursorClassName}:hover::before {
                 content: attr(${clientNameAttributeName});
                 width: unset;
-                height: 12px;
+                height: ${hintFontSize}px;
                 top: -20px;
                 padding: 4px;
-                opacity: 0.7;
+                opacity: 0.85;
             }`,
 
             // Make other selections
@@ -2229,13 +2232,23 @@
           var ae = this.ae;
 
           var selectionList = ae.selection.getAllRanges();
+
           var ranges = [];
+          var isAllRangesNotEmpty = true;
           for (var i = 0; i < selectionList.length; i++) {
             var sel = selectionList[i];
             ranges[i] = new Selection.Range(
               ae.session.doc.positionToIndex({row: sel.start.row, column: sel.start.column}),
               ae.session.doc.positionToIndex({row: sel.end.row, column: sel.end.column})
             );
+            if (ranges[i].isEmpty())
+              isAllRangesNotEmpty = false;
+          }
+
+          // Need to add empty range on cursor position to draw it in other side as cursor
+          if (isAllRangesNotEmpty) {
+            var cursorPosIndex = ae.session.doc.positionToIndex(ae.selection.getCursor());
+            ranges[ranges.length] = new Selection.Range(cursorPosIndex, cursorPosIndex);
           }
 
           return new Selection(ranges);
@@ -2260,9 +2273,9 @@
           cursorEl.style.height = this.LINE_HEIGHT + 'px';
           cursorEl.style.top = this.LINE_HEIGHT * cursorPos.row + 'px';
           cursorEl.style.left = this.SYMBOL_WIDTH * cursorPos.column + 'px';
-          cursorEl.setAttribute(clientNameAttributeName, clientName);
+          cursorEl.setAttribute(clientNameAttributeName, clientName)
           this.markersElement.appendChild(cursorEl);
-          return [cursorEl];
+          return cursorEl;
         };
 
         AceEditorAdapter.prototype.setOtherSelectionRange = function (range, color, clientId, clientName) {
@@ -2286,9 +2299,7 @@
           selEl.style.clipPath = clipPathStart + clipPathEnd;
           this.markersElement.appendChild(selEl);
 
-          var cursorEl = this.setOtherCursor(range.head, color, clientId, clientName);
-
-          return [selEl, cursorEl[0]];
+          return selEl;
         };
 
         AceEditorAdapter.prototype.setOtherSelection = function (selection, color, clientId, clientName) {
@@ -2296,11 +2307,10 @@
           for (var i = 0; i < selection.ranges.length; i++) {
             var range = selection.ranges[i];
             if (range.isEmpty()) {
-              selectionObjects = selectionObjects.concat(this.setOtherCursor(range.head, color, clientId, clientName));
+              selectionObjects[i] = this.setOtherCursor(range.head, color, clientId, clientName);
             } else {
-              selectionObjects = selectionObjects.concat(this.setOtherSelectionRange(range, color, clientId, clientName));
+              selectionObjects[i] = this.setOtherSelectionRange(range, color, clientId, clientName);
             }
-            console.log(selectionObjects);
           }
           return {
             clear: function () {
@@ -2341,7 +2351,6 @@
         return AceEditorAdapter;
 
       }(this));
-
     </script>
 
 

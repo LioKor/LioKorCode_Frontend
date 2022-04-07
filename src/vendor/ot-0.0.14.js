@@ -1395,8 +1395,8 @@ ot.SocketIOAdapter = (function () {
 
     var self = this;
     socket
-      .on('client_left', function (clientId) {
-        self.trigger('client_left', clientId);
+      .on('client_left', function (clientId, name) {
+        self.trigger('client_left', clientId, name);
       })
       .on('set_name', function (clientId, name) {
         self.trigger('set_name', clientId, name);
@@ -1645,7 +1645,8 @@ ot.EditorClient = (function () {
     this.mark = this.editorAdapter.setOtherSelection(
       selection,
       selection.position === selection.selectionEnd ? this.color : this.lightColor,
-      this.id
+      this.id,
+      this.name
     );
   };
 
@@ -1682,7 +1683,7 @@ ot.EditorClient = (function () {
     this.editorAdapter.registerRedo(function () { self.redo(); });
 
     this.serverAdapter.registerCallbacks({
-      client_left: function (clientId) { self.onClientLeft(clientId); },
+      client_left: function (clientId, name) { self.onClientLeft(clientId); },
       set_name: function (clientId, name) { self.getClientObject(clientId).setName(name); },
       ack: function () { self.serverAck(); },
       operation: function (operation) {
@@ -1735,7 +1736,7 @@ ot.EditorClient = (function () {
       clientId,
       this.clientListEl,
       this.editorAdapter,
-      clientObj.name || clientId,
+      clientObj.name || 'Unknown #' + clientId,
       clientObj.selection ? Selection.fromJSON(clientObj.selection) : null
     );
   };
