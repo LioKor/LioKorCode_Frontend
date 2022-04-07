@@ -151,6 +151,11 @@
 
         this.$store.state.popups.success('Вы подключились к сессии');
         this.redatorSessionUid = uid;
+        await this.$parent.$refs.tabs.addTab({
+          name: "remote: " + filename,
+          closable: false,
+          uniqueValue: {name: null, value: ''}
+        });
         this.$emit('connectSession', uid, filename);
       },
 
