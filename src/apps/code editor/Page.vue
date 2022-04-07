@@ -182,15 +182,18 @@
       },
 
       async openSolution(solutionId) {
+        // todo: check for errors
         const checkInfo = await this.$store.state.api.getSolution(this.taskId, solutionId)
 
-        const fileList = this.parseSourceCode(checkInfo.sourceCode);
-        this.$refs.tree.loadTree(fileList);
-
+        // closing current solution
+        this.$refs.tree.loadTree([]);
         this.allFilesClosed();
-
         this.$refs.tabsVertical.selectTabIndex(1);
         this.$refs.tabs.closeAllTabs();
+
+        // opening new solution
+        const fileList = this.parseSourceCode(checkInfo.sourceCode);
+        this.$refs.tree.loadTree(fileList);
       },
 
       allFilesClosed() {

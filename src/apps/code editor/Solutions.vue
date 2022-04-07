@@ -61,12 +61,12 @@
 
         <td class="min-width">{{ solution.datetime }}</td>
         <td class="min-width">{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>
-        <td class="min-width">{{ solution.checkTime }} <span v-show="solution.checkTime">s</span></td>
-        <td class="min-width">{{ solution.checkTime }} <span v-show="solution.checkTime">s</span></td>
+        <td class="min-width">{{ solution.checkTime }} s</td>
+        <td class="min-width">{{ solution.compileTime }} s</td>
 
-        <td class="message" v-html="solution.checkError"></td>
+        <td class="message" v-html="solution.checkMessage"></td>
 
-        <td class="min-width"><span class="action" @click="openSolution(solution.id)">Загрузить</span></td>
+        <td class="min-width"><span class="action" @click="openSolution(solution.id)">Открыть</span></td>
       </tr>
     </table>
   </div>
@@ -137,7 +137,7 @@
         if (idx === -1) {
           return;
         }
-        solution.checkError = solution.checkError.replaceAll('\n', '<br>')
+        solution.checkMessage = solution.checkMessage.replaceAll('\n', '<br>')
         this.solutions[idx].set(solution);
       },
 
