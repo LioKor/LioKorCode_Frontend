@@ -228,7 +228,7 @@
           if (filename !== undefined)
             this.$refs.editor.setSyntaxHighlighting(filename);
 
-          const wsProtocol = (location.protocol === 'http')? 'ws': 'wss';
+          const wsProtocol = (location.protocol === 'http:')? 'ws': 'wss';
           let wsUrl = `${wsProtocol}://${location.host}`;
           if (location.host.includes('localhost') || location.host.includes('127.0.0.1') || location.host.includes('192.168.')) {
             wsUrl = 'wss://code.liokor.com';
