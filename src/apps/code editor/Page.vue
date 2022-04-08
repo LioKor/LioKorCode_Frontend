@@ -228,10 +228,13 @@
           if (filename !== undefined)
             this.$refs.editor.setSyntaxHighlighting(filename);
 
-          let wsUrl = location.protocol.replace('http', 'ws') + '//' + location.host;
-          if (location.host.includes('localhost') || location.host.includes('127.0.0.1') || location.host.includes('192.168.'))
+          const wsProtocol = (location.protocol === 'http')? 'ws': 'wss';
+          let wsUrl = `${wsProtocol}://${location.host}`;
+          if (location.host.includes('localhost') || location.host.includes('127.0.0.1') || location.host.includes('192.168.')) {
             wsUrl = 'wss://code.liokor.com';
+          }
           wsUrl += this.$store.state.api.apiUrl + '/ws/redactor/' + id;
+
           this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, wsUrl);
           this.liveEditor.callbacks.join = ({client_id, username}) => {
             this.$store.state.popups.alert('К сессии присоединился:', username);
