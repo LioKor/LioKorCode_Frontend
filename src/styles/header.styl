@@ -4,14 +4,16 @@ betweenItems = 30px
 headerHeight = 50px
 headerBG = color2lighter
 highLightColor = color4
-empColor = color5
+empColor1 = linear-gradient(90deg, #a26c1e, #4c2c79)
+empColor2 = linear-gradient(#32507a, #4c2c79)
+empColor3 = linear-gradient(#32507a, #4c2c79)
 border-color = color4
 
 sidePartHeight = 280px
 borderRadiusTop = 40px
 borderRadiusBottom = 20px
 degree = 26.5deg
-shadow = -5px 5px 5px black
+shadow = -5px 5px 5px #00000080
 
 .header
   height headerHeight
@@ -38,6 +40,7 @@ shadow = -5px 5px 5px black
       list-style none
       display inline-block
       z-index 0
+      user-select none
     > *:first-child
       padding-left (betweenItems * 2)
       margin-left (- betweenItems)
@@ -73,41 +76,131 @@ shadow = -5px 5px 5px black
     padding-right 20%
     height sidePartHeight
     right 0
-  .sidePart:after
+  .sidePart:before
     content ""
     background headerBG
-    border-bottom-left-radius borderRadiusBottom
+    //border-bottom-left-radius borderRadiusBottom
     box-shadow shadow
-    border-left empColor solid 3px
+    //border-left empColor solid 3px
     border-top transparent solid borderRadiusTop*2
     position absolute
     left 0
     right 0
     top -1px
     bottom 0
-    transform skew(degree)
+    transform skewX(degree)
     z-index -1
-  .sidePart:before
-    content ""
-    position absolute
-    width borderRadiusTop
-    height borderRadiusTop
-    left (- borderRadiusTop - sidePartHeight/4 + borderRadiusTop/4)
-    top 0
-    background  linear-gradient(to bottom, headerBG, transparent) 50% 0 / 100% 10px no-repeat, radial-gradient(circle at 0 100%, transparent 55%, black 70%, empColor 70% 72%, headerBG 78%) no-repeat
-    transform skew(degree)
+  //.sidePart:before
+  //  content ""
+  //  position absolute
+  //  width borderRadiusTop
+  //  height borderRadiusTop
+  //  left (- borderRadiusTop - sidePartHeight/4 + borderRadiusTop/4)
+  //  top 0
+  //  background  linear-gradient(to bottom, headerBG, transparent) 50% 0 / 100% 10px no-repeat, radial-gradient(circle at 0 100%, transparent 55%, black 70%, empColor 70% 72%, headerBG 78%) no-repeat
+  //  transform skew(degree)
 
   .sidePart
+    position relative
     padding-top 50px
-    div
+    > div
       margin 15px 40px 15px 0
       font-size 25px
       color textColor3
-    div:nth-child(1)
+    > div:nth-child(1)
       margin-left 20px
-    div:nth-child(2)
+    > div:nth-child(2)
       margin-left 40px
-    div:nth-child(3)
+    > div:nth-child(3)
       margin-left 60px
-    div:nth-child(4)
+    > div:nth-child(4)
       margin-left 80px
+
+  .top-decoration
+  .bottom-decoration
+    position absolute
+    padding 0
+    margin 0
+    top 0
+    height sidePartHeight
+
+  .top-decoration > div
+  .bottom-decoration > div
+    background empColor1
+    position absolute
+    transform skewX(degree)
+
+  .top-decoration
+    left (- sidePartHeight/4)
+    top (- headerHeight)
+    > div
+      transform-origin 0 headerHeight
+
+    > div:nth-child(1)
+      left -45px
+      top 0
+      width 17px
+      height (sidePartHeight / 8 + headerHeight)
+    > div:nth-child(2)
+      left -18px
+      top 0
+      width 10px
+      height (sidePartHeight / 3 * 2 + headerHeight)
+      background empColor3
+    > div:nth-child(3)
+      left 100px
+      top 0
+      width 200px
+      height 10px
+      background empColor3
+    > div:nth-child(4)
+      left (sidePartHeight / 4 + 5px + headerHeight / 2)
+      top (sidePartHeight / 2 + headerHeight)
+      width 150px
+      height 2px
+    > div:nth-child(5)
+      left 0
+      top 0
+      width 7px
+      height (sidePartHeight + headerHeight)
+    > div:nth-child(6)
+      left 50px
+      top 0
+      width 60px
+      height (10px + headerHeight)
+      background empColor2
+
+  .bottom-decoration
+    left (sidePartHeight / 4)
+
+    > div
+      transform-origin 0 100%
+
+    > div:nth-child(1)
+      left 80px
+      bottom 0
+      width 200px
+      height 10px
+      background empColor2
+    > div:nth-child(2)
+      left 0
+      bottom 0
+      width 25px
+      height (sidePartHeight / 3)
+    > div:nth-child(3)
+      left 55px
+      bottom 0
+      width 25px
+      height (sidePartHeight / 8)
+      background empColor3
+    > div:nth-child(4)
+      left 300px
+      bottom 60px
+      width 300px
+      height 4px
+    > div:nth-child(5)
+      left 250px
+      bottom 80px
+      width 300px
+      height 2px
+      background empColor3

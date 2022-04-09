@@ -22,8 +22,6 @@ export default class Api extends ApiRequest {
     getSolution = (taskId, solutionId) => this.get(`/tasks/${taskId}/solutions/${solutionId}`);
     deleteSolution = (taskId, solutionId) => this.delete(`/tasks/${taskId}/solutions/${solutionId}`);
 
-
-    // Mock redactor requests until backend finished it
     openRedactorSession = (files) => this.post(`/redactor`, files);
     checkRedactorSession = (uid) => this.get(`/redactor/${uid}`);
 }
