@@ -6,7 +6,7 @@
 </style>
 
 <template>
-  <div id="router">
+  <div id="router" class="scrollable">
     <router-view></router-view>
   </div>
 
