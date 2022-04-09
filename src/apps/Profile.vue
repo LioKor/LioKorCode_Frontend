@@ -50,33 +50,44 @@
 
                   <div class="form-group">
                     <label>ЛОГИН<span class="error-text"></span></label>
-                    <input name="username" type="text" class="form-control" :value="username" autocomplete="off">
+                    <input name="username" type="text" class="form-control" :value="username" autocomplete="off" readonly>
                   </div>
-                  <div class="form-group">
-                      <label>ПОЛНОЕ ИМЯ<span class="error-text"></span></label>
-                      <input name="fullname" type="text" class="form-control" :value="fullname" autocomplete="off">
+
+                  <div class="form-group" :class="{ error: errorsInfo.fullname }" @input="errorsInfo.fullname = ''" @keydown.enter.prevent="updateUserInfo">
+                      <label>ПОЛНОЕ ИМЯ<span class="error-text">{{ errorsInfo.fullname }}</span></label>
+                      <input name="fullname" type="text" class="form-control" v-model="fullname" autocomplete="off">
                   </div>
-                  <div class="form-group">
-                      <label>ЗАПАСНОЙ E-MAIL<span class="error-text"></span></label>
-                      <input name="reserveEmail" type="email" class="form-control" :value="email" autocomplete="off">
+
+                  <div class="form-group" :class="{ error: errorsInfo.email }" @input="errorsInfo.email = ''" @keydown.enter.prevent="updateUserInfo">
+                      <label>EMAIL<span class="error-text">{{ errorsInfo.email }}</span></label>
+                      <input name="reserveEmail" type="email" class="form-control" v-model="email" autocomplete="off">
                       <!-- <div class="muted">Необходимо будет подтвердить на старом и новом ящиках</div> -->
                   </div>
+
                   <div class="form-group">
-                    <div class="btn" @click="updateUserInfo">Сохранить</div>
+                    <div class="btn" :class="{ 'btn-disabled': !enabledInfo}" @click="updateUserInfo">Сохранить</div>
                   </div>
-                  <div class="roll-closed" ref="changePasswordFields">
-                    <div class="form-group">
-                      <label>СТАРЫЙ ПАРОЛЬ<span class="error-text"></span></label>
-                      <input name="oldPassword" type="password" class="form-control" :value="oldPassword" autocomplete="off">
+
+                  <div class="roll-closed" ref="changePasswordFields" @keydown.enter.prevent="changePassword">
+                    <div class="form-group" :class="{ error: errorsPassword.oldPassword }" @input="errorsPassword.oldPassword = ''">
+                      <label>СТАРЫЙ ПАРОЛЬ<span class="error-text">{{ errorsPassword.oldPassword }}</span></label>
+                      <input name="oldPassword" type="password" class="form-control" v-model="oldPassword" autocomplete="off">
+                      <div class="muted">Если вы не задавали пароль - оставьте поле пустым</div>
                     </div>
-                    <div class="form-group">
-                      <label>НОВЫЙ ПАРОЛЬ<span class="error-text"></span></label>
-                      <input name="newPassword" type="password" class="form-control" :value="newPassword" autocomplete="off">
+                    <div class="form-group" :class="{ error: errorsPassword.newPassword }" @input="errorsPassword.newPassword = ''; errorsPassword.confirmPassword = ''">
+                      <label>НОВЫЙ ПАРОЛЬ<span class="error-text">{{ errorsPassword.newPassword }}</span></label>
+                      <input name="newPassword" type="password" class="form-control" v-model="newPassword" autocomplete="off">
+                    </div>
+                    <div class="form-group" :class="{ error: errorsPassword.confirmPassword }" @input="errorsPassword.newPassword = ''; errorsPassword.confirmPassword = ''">
+                      <label>ПОДТВЕРЖДЕНИЕ<span class="error-text">{{ errorsPassword.confirmPassword }}</span></label>
+                      <input name="newPassword" type="password" class="form-control" v-model="confirmPassword" autocomplete="off">
                     </div>
                   </div>
+
                   <div class="form-group">
-                      <div class="btn" @click="changePassword">Сменить пароль</div>
+                      <div class="btn" :class="{ 'btn-disabled': !enabledPassword}" @click="changePassword">Сменить пароль</div>
                   </div>
+
                   <div class="form-group">
                       <div @click="signOut" class="btn btn-danger">Выйти</div>
                   </div>
@@ -100,47 +111,115 @@
         email: this.$store.state.user.email,
         avatarUrl: this.$store.state.user.avatarUrl,
         fullname: this.$store.state.user.fullname,
-        oldPassword: "",
-        newPassword: "",
+
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+
+        errorsInfo: {},
+        enabledInfo: true,
+
+        errorsPassword: {},
+        enabledPassword: true,
       }
     },
 
     methods: {
-      async updateUserInfo() {
+      async __updateUserInfoAction() {
         const response = await this.$store.state.api.updateUser({
-          username: this.username,
           email: this.email,
-          avatarUrl: this.avatarUrl,
           fullname: this.fullname,
-        });
-        if (!response.ok_) {
-          this.$store.state.popups.error("Не удалось изменить данные");
-          return;
+        })
+
+        if (response.ok_) {
+          this.$store.state.popups.success("Данные успешно изменены")
+          // todo: update data without getting user
+          await this.$store.dispatch('GET_USER')
+          return
         }
-        this.$store.state.popups.success("Данные изменены");
-        this.$router.push('/signin');
+
+        const status = response.status_;
+        if (status === 400) {
+          this.errorsInfo.fullname = 'Некорректное полное имя!'
+          this.errorsInfo.email = 'Или некорректный email... Мы точно не знаем)'
+        } else {
+          this.$store.state.popups.error('Не удалось изменить данные', 'Произошла непредвиденная ошибка!')
+        }
       },
+
+
+      async updateUserInfo() {
+        if (!this.enabledInfo) {
+          return
+        }
+        this.enabledInfo = false
+
+        this.errorsInfo = {}
+        await this.__updateUserInfoAction()
+
+        this.enabledInfo = true
+      },
+
+
       async signOut() {
-        const response = await this.$store.state.api.signOut();
+        const response = await this.$store.state.api.signOut()
         if (!response.ok_) {
-          this.$store.state.popups.error("Не удалось выйти из аккаунта. Пiпався, розбiйник? А всё...");
-          return;
+          this.$store.state.popups.error("Не удалось выйти из аккаунта", 'Произошла непредвиденная ошибка')
+          return
         }
-        await this.$store.dispatch('DELETE_USER');
-        this.$router.push('/signin');
+
+        await this.$store.dispatch('DELETE_USER')
+        await this.$router.push('/signin')
+        this.$store.state.popups.success('Вы успешно вышли из аккаунта')
       },
+
+
+      async __changePasswordAction() {
+        if (this.newPassword.length === 0) {
+          this.errorsPassword.newPassword = 'Пароль не может быть пустым'
+          return
+        }
+        if (this.newPassword !== this.confirmPassword) {
+          const error = 'Пароли не совпадают'
+          this.errorsPassword.newPassword = error
+          this.errorsPassword.confirmPassword = error
+          return
+        }
+
+        const response = await this.$store.state.api.updatePassword(this.oldPassword, this.newPassword);
+        if (response.ok_) {
+          this.oldPassword = ''
+          this.newPassword = ''
+          this.confirmPassword = ''
+          this.$store.state.popups.success("Пароль успешно изменен")
+          closeRoll(this.$refs.changePasswordFields)
+          return
+        }
+
+        const status = response.status_
+        if (status === 400) {
+          this.errorsPassword.oldPassword = 'Неверный старый пароль'
+        } else {
+          this.$store.state.popups.error('Не удалось изменить пароль', 'Произошла непредвиденная ошибка')
+        }
+      },
+
+
       async changePassword() {
         if (isClosedRoll(this.$refs.changePasswordFields)) {
           openRoll(this.$refs.changePasswordFields);
           return;
         }
-        const response = await this.$store.state.api.updatePassword(this.oldPassword, this.newPassword);
-        if (!response.ok_) {
-          this.$store.state.popups.error("Не удалось сменить пароль");
-          return;
+
+        if (!this.enabledPassword) {
+          return
         }
-        this.$store.state.popups.success("Пароль изменен");
-        closeRoll(this.$refs.changePasswordFields);
+        this.enabledPassword = false
+
+        this.errorsPassword = {}
+        await this.__changePasswordAction()
+
+        this.enabledPassword = true
       }
     },
   }
