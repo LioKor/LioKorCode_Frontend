@@ -23,7 +23,7 @@
               <!-- <div class="muted"><linkButton href="#">Забыли пароль?</linkButton> -->
             </div>
             <div class="form-group">
-              <div class="btn" @click="signIn">Войти</div>
+              <div class="btn" :class="{ 'btn-disabled': !enabled }" @click="signIn">Войти</div>
               <div class="muted">Нужен аккаунт? <router-link to="/signup" class="router-link">Создать</router-link></div>
             </div>
           </form>
@@ -43,14 +43,15 @@
       return {
         username: "",
         password: "",
+
+        enabled: true,
+
         errors: {}
       }
     },
 
     methods: {
-      async signIn() {
-        this.errors = {}
-
+      async __signInAction() {
         if (this.username.length === 0) {
           this.errors.username = 'Логин не может быть пустым!'
           return;
@@ -61,10 +62,10 @@
 
         const response = await this.$store.state.api.signIn(this.username, this.password);
         if (response.ok_) {
-          await this.$store.dispatch('GET_USER');
-          await this.$router.push('/profile');
+          await this.$store.dispatch('GET_USER')
+          await this.$router.push('/profile')
           this.$store.state.popups.success('Успешный вход!')
-          return;
+          return
         }
 
         const status = response.status_;
@@ -75,6 +76,18 @@
         } else {
           this.$store.state.popups.error('Не удалось войти!', 'Произошла непредвиденная ошибка!')
         }
+      },
+
+      async signIn() {
+        if (!this.enabled) {
+          return;
+        }
+        this.enabled = false;
+
+        this.errors = {}
+        await this.__signInAction();
+
+        this.enabled = true;
       }
     }
   }

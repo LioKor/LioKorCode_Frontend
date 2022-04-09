@@ -41,7 +41,7 @@
             </div>
 
             <div class="form-group">
-              <div @click="signUp" class="btn">Создать</div>
+              <div class="btn" :class="{ 'btn-disabled': !enabled }" @click="signUp" >Создать</div>
               <div class="muted">Уже с нами? <router-link to="/signin" class="router-link">Войти</router-link></div>
             </div>
           </form>
@@ -64,14 +64,15 @@
         password: "",
         passwordConfirm: "",
         fullname: "",
+
+        enabled: true,
+
         errors: {}
       }
     },
 
     methods: {
-      async signUp() {
-        this.errors = {}
-
+      async __signUpAction() {
         if (this.username.length === 0) {
           this.errors.username = 'Логин не может быть пустым'
           return
@@ -103,6 +104,18 @@
         } else {
           this.$store.state.popups.error("Не удалось создать пользователя", 'Произошла неизвестная ошибка!');
         }
+      },
+
+      async signUp() {
+        if (!this.enabled) {
+          return
+        }
+        this.enabled = false;
+
+        this.errors = {}
+        await this.__signUpAction();
+
+        this.enabled = true;
       }
     }
   }
