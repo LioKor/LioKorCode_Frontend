@@ -23,10 +23,8 @@
         <div></div>
         <div></div>
         <div></div>
-        <div></div>
       </span>
       <span class="bottom-decoration">
-        <div></div>
         <div></div>
         <div></div>
         <div></div>

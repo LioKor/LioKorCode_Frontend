@@ -13,7 +13,9 @@ sidePartHeight = 280px
 borderRadiusTop = 40px
 borderRadiusBottom = 20px
 degree = 26.5deg
-shadow = -5px 5px 5px #00000080
+shadow1 = -5px 5px 5px colorShadow
+shadow2 = -2px 2px 4px colorShadow
+shadow = shadow1
 
 .header
   height headerHeight
@@ -141,18 +143,21 @@ shadow = -5px 5px 5px #00000080
       top 0
       width 17px
       height (sidePartHeight / 8 + headerHeight)
+      box-shadow shadow1
     > div:nth-child(2)
       left -18px
       top 0
       width 10px
       height (sidePartHeight / 3 * 2 + headerHeight)
       background empColor3
+      box-shadow shadow2
     > div:nth-child(3)
       left 100px
       top 0
       width 200px
       height 10px
       background empColor3
+      box-shadow shadow2
     > div:nth-child(4)
       left (sidePartHeight / 4 + 5px + headerHeight / 2)
       top (sidePartHeight / 2 + headerHeight)
@@ -169,9 +174,11 @@ shadow = -5px 5px 5px #00000080
       width 60px
       height (10px + headerHeight)
       background empColor2
+      box-shadow shadow1
 
   .bottom-decoration
     left (sidePartHeight / 4)
+    width (100% / 3 * 2)
 
     > div
       transform-origin 0 100%
@@ -182,6 +189,7 @@ shadow = -5px 5px 5px #00000080
       width 200px
       height 10px
       background empColor2
+      box-shadow shadow2
     > div:nth-child(2)
       left 0
       bottom 0
@@ -193,14 +201,16 @@ shadow = -5px 5px 5px #00000080
       width 25px
       height (sidePartHeight / 8)
       background empColor3
+      box-shadow shadow2
     > div:nth-child(4)
-      left 300px
+      right 0
       bottom 60px
-      width 300px
+      width 200px
       height 4px
+      box-shadow shadow2
     > div:nth-child(5)
-      left 250px
+      right 0
       bottom 80px
-      width 300px
+      width 250px
       height 2px
       background empColor3
