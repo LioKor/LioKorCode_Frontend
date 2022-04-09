@@ -6,63 +6,68 @@
     height 100vh
     overflow hidden
 
-  .previews-container
-    display flex
-    flex-wrap wrap
-    position relative
-    height 100vh
-    overflow auto
+    .standalone-form
+      height 100px
 
-  .header
-    z-index 999
+    .previews-container
+      display flex
+      flex-wrap wrap
+      position relative
 
-  float-button-height = 50px
-  .float-button
-    cursor pointer
-    overflow hidden
-    position absolute
-    bottom 30px
-    right 30px
-    height float-button-height
-    border-radius (float-button-height / 2)
+    .previews-container.scrollable
+      height 100vh
+      overflow auto
 
-    padding 10px
-    display flex
-    align-items center
-    text-align center
-    flex-direction row
-    background color2
-    box-shadow 3px 3px 5px colorShadow
-    box-sizing border-box
-    transition all 0.3s ease
-    text-decoration none
-    svg
-      transition all 0.3s ease
-      width 40px
-      height 40px
-      fill textColor2
-    .hover-text
-      color textColor1
-      transition all 0.3s ease
+    .header
+      z-index 999
+
+    float-button-height = 50px
+    .float-button
+      cursor pointer
       overflow hidden
-      width 0
-      pointer-events none
-      opacity 0
-  .float-button:hover
-    box-shadow 5px 5px 8px colorShadow
-    .hover-text
-      width 120px
-      opacity 1
-    svg
-      transform scale(1.1)
-      fill textColor1
+      position absolute
+      bottom 30px
+      right 30px
+      height float-button-height
+      border-radius (float-button-height / 2)
+
+      padding 10px
+      display flex
+      align-items center
+      text-align center
+      flex-direction row
+      background color2
+      box-shadow 3px 3px 5px colorShadow
+      box-sizing border-box
+      transition all 0.3s ease
+      text-decoration none
+      svg
+        transition all 0.3s ease
+        width 40px
+        height 40px
+        fill textColor2
+      .hover-text
+        color textColor1
+        transition all 0.3s ease
+        overflow hidden
+        width 0
+        pointer-events none
+        opacity 0
+    .float-button:hover
+      box-shadow 5px 5px 8px colorShadow
+      .hover-text
+        width 120px
+        opacity 1
+      svg
+        transform scale(1.1)
+        fill textColor1
 </style>
 
 <template>
   <div class="my-tasks">
     <Header></Header>
 
-    <div class="previews-container">
+    <div class="previews-container scrollable">
       <div v-if="!tasks.length" class="standalone-form">
         <div class="title">
           <div v-if="$store.state.user.isLogined" class="primary">Вы пока не создали ни одного задания</div>
