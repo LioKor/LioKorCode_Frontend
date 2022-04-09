@@ -15,7 +15,8 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'src/index.html'
+            template: 'src/index.html',
+            favicon: 'src/images/favicon.ico'
         }),
         new VueLoaderPlugin(),
         new webpack.DefinePlugin({
@@ -28,7 +29,7 @@ module.exports = {
         historyApiFallback: {
             rewrites: [
                 {
-                    from: /.(js|png)$/,
+                    from: /.(js|png|ico)$/,
                     to: (context) => {
                         const path = context.parsedUrl.pathname.split('/')
                         return `/${path[path.length - 1]}`

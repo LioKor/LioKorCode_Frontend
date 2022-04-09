@@ -15,15 +15,15 @@
       width logo-width
       text-align center
       div.image
-        padding-top (logo-padding - 5px)
+        padding-top logo-padding
         img
           height image-height
       div.text
         padding-left logo-padding
         color textColor1
-        font-family Consolas
+        font-family Arial
         font-size 2.5rem
-        letter-spacing .4rem
+        letter-spacing .2rem
 </style>
 
 <template>
