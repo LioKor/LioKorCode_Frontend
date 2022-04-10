@@ -25,7 +25,20 @@
 
 <script>
   import 'ace-builds'
-  import 'ace-builds/webpack-resolver'
+
+  import 'ace-builds/src-noconflict/theme-ambiance'
+
+
+  import 'ace-builds/src-noconflict/mode-makefile'
+
+  import 'ace-builds/src-noconflict/mode-c_cpp'
+  import 'ace-builds/src-noconflict/mode-python'
+  import 'ace-builds/src-noconflict/mode-golang'
+  import 'ace-builds/src-noconflict/mode-java'
+  import 'ace-builds/src-noconflict/mode-pascal'
+  import 'ace-builds/src-noconflict/mode-lua'
+
+  import 'ace-builds/src-noconflict/mode-json'
 
   export default {
     data() {
@@ -95,21 +108,14 @@
           mode = 'makefile';
         }
         const rules = [
+          {ends: ['.c', '.cpp', '.h', '.cc', '.c++', '.hpp', '.cxx', '.hxx', '.h++'], mode: 'c_cpp'},
           {ends: ['.py'], mode: 'python'},
           {ends: ['.go'], mode: 'golang'},
-          {ends: ['.c', '.cpp', '.h', '.cc', '.c++', '.hpp', '.cxx', '.hxx', '.h++'], mode: 'c_cpp'},
-          {ends: ['.pas', '.inc'], mode: 'pascal'},
-          {ends: ['.kt', '.kts'], mode: 'kotlin'},
-          {ends: ['.scala', '.sc'], mode: 'scala'},
-          {ends: ['.ts'], mode: 'typescript'},
-          {ends: ['.js'], mode: 'javascript'},
-          {ends: ['.xml'], mode: 'xml'},
-          {ends: ['.yaml'], mode: 'yaml'},
-          {ends: ['.json'], mode: 'json'},
-          {ends: ['.html'], mode: 'html'},
-          {ends: ['.php'], mode: 'php'},
-          {ends: ['.pl', 'pm'], mode: 'perl'},
           {ends: ['.java', '.class', '.jar', '.jad', '.jmod'], mode: 'java'},
+          {ends: ['.pas', '.inc'], mode: 'pascal'},
+          {ends: ['.lua'], mode: 'lua'},
+
+          {ends: ['.json'], mode: 'json'},
         ];
         const rule = rules.find(rule => rule.ends.find(end => name.endsWith(end)) !== undefined);
         if (rule)
