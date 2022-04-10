@@ -1,6 +1,8 @@
 <style lang="stylus">
   @import "../../styles/constants.styl"
 
+  background = linear-gradient(30deg, #0e2028 0%, #2e3f44 40%, #0c2129 100%) repeat scroll 0% 0%;
+
   #task-block
     background-color white
 
@@ -8,35 +10,51 @@
     height 100vh
     overflow hidden
     color textColor1
+    .template-select
+      padding-top 10px
+      padding-left 10px
+      select
+        background background
+        color textColor1
+        border 1px solid #BABABA
+        border-radius 5px
+        font-size 1rem
+        option
+          background #2e3f44
 
-  .task-and-editor
-    display flex
-    height "calc(100vh - %s)" % headerHeight
-    touch-action none
-    .task
-      padding 10px
-      overflow-x hidden
-      overflow-y auto
-      width 30%
-      table
-        max-width 500px
-        width 100%
-        border-collapse collapse
-        td, th
-          border 1px solid #BABABA
-          padding 5px
+    .files-tab
+      width 100%
+      background background
 
-  #taskInfo-and-tree
-    display flex
-    #task-info
-      flex 1
 
-  #editor-block
-    display flex
-    flex-direction column
+    .task-and-editor
+      display flex
+      height "calc(100vh - %s)" % headerHeight
+      touch-action none
+      .task
+        padding 10px
+        overflow-x hidden
+        overflow-y auto
+        width 30%
+        table
+          max-width 500px
+          width 100%
+          border-collapse collapse
+          td, th
+            border 1px solid #BABABA
+            padding 5px
 
-  #code-editor-all
-    height 'calc(100% - %s)' % headerHeight
+    #taskInfo-and-tree
+      display flex
+      #task-info
+        flex 1
+
+    #editor-block
+      display flex
+      flex-direction column
+
+    #code-editor-all
+      height 'calc(100% - %s)' % headerHeight
 </style>
 
 <template>
@@ -52,11 +70,19 @@
           ]"></Tabs>
           <TaskInfo id="task-info" v-show="openedTab === 0" ref="taskInfo" :task-id="taskId"></TaskInfo>
 
-          <Tree v-show="openedTab === 1" ref="tree" name="Project" :items="[
-              {name: 'main.c', value: 'int main() {\n\treturn 0;\n}\n'},
-              {name: 'Makefile', value: `build:\n\tgcc main.c -o solution\nrun: build\n\t./solution`}
-            ]"
-            @open-file-text="openTreeFile" @rename-file="updateFileNameInTabs"></Tree>
+          <div class="files-tab" v-show="openedTab === 1">
+            <div class="template-select">
+              <select v-model="templateSelected">
+                <option value="">шаблоны</option>
+                <option v-for="templateName in Object.keys(templates)">{{ templateName }}</option>
+              </select>
+            </div>
+
+            <Tree ref="tree" name="Project"
+                  :items="this.getDefaultFiles()"
+                  @open-file-text="openTreeFile"
+                  @rename-file="updateFileNameInTabs" />
+          </div>
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" uid="editor-vertical" class="vertical"/>
         <div id="editor-block">
@@ -83,17 +109,53 @@
   import Tabs from "../Tabs.vue";
   import LiveEditor from "./LiveEditor/LiveEditor";
 
+  import SolutionTemplates from "../../utils/solution-templates";
+
   export default {
     components: {Tabs, Tree, Header, TaskInfo, Editor, Solutions, SlideLine},
 
     data() {
       return {
+        templates: SolutionTemplates,
+        templateSelected: '',
+        templateSelectedWatchDisabled: false,
+
         taskId: parseInt(this.$route.params.taskId),
         openedTab: 0,
       }
     },
 
+    watch: {
+      templateSelected(newName) {
+        if (!newName) {
+          return
+        }
+
+        if (this.templateSelectedWatchDisabled) {
+          return
+        }
+        this.templateSelectedWatchDisabled = true
+
+        this.changeTemplate(newName)
+      }
+    },
+
     methods: {
+      changeTemplate: async function (templateName) {
+        if (await this.$store.state.modal.confirm(`Текущее решение будет потеряно и откроется шаблон ${templateName}. Продолжить?`)) {
+          this.closeSolution()
+          this.$refs.tree.loadTree(this.templates[templateName])
+        }
+
+        this.templateSelected = ''
+        await this.$nextTick()
+        this.templateSelectedWatchDisabled = false
+      },
+
+      getDefaultFiles: function() {
+        return Object.values(SolutionTemplates)[0]
+      },
+
       checkSolution: async function() {
         if (!this.$store.state.user.isLogined) {
           this.$refs.header.checkError();
@@ -181,15 +243,18 @@
         return filesList;
       },
 
-      async openSolution(solutionId) {
-        // todo: check for errors
-        const checkInfo = await this.$store.state.api.getSolution(this.taskId, solutionId)
-
-        // closing current solution
+      closeSolution() {
         this.$refs.tree.loadTree([]);
         this.allFilesClosed();
         this.$refs.tabsVertical.selectTabIndex(1);
         this.$refs.tabs.closeAllTabs();
+      },
+
+      async openSolution(solutionId) {
+        // todo: check for errors
+        const checkInfo = await this.$store.state.api.getSolution(this.taskId, solutionId)
+
+        this.closeSolution()
 
         // opening new solution
         const fileList = this.parseSourceCode(checkInfo.sourceCode);

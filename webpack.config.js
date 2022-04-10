@@ -6,8 +6,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
-    mode: 'production',
-
     entry: './src/index.js',
     output: {
         filename: '[name].bundle.js',
