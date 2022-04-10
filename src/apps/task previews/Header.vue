@@ -35,7 +35,7 @@
   </div>
 </template>
 
-<script>1
+<script>
   export default {
 
   }
