@@ -6,10 +6,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
-    entry: './src/index.js',
     mode: 'production',
+
+    entry: './src/index.js',
     output: {
-        filename: 'main.js',
+        filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist'),
         publicPath: '/'
     },
@@ -22,7 +23,7 @@ module.exports = {
         new webpack.DefinePlugin({
             BUILD_TIMESTAMP: Date.now(),
             VERSION: JSON.stringify(require('./package.json').version)
-        }),
+        })
     ],
     devServer: {
         port: 9000,
@@ -84,15 +85,10 @@ module.exports = {
                 test: /\.tsx?$/,
                 loader: 'ts-loader',
             },
-            // FIXME: Оно не работаеть! Потому я дописал
-            //  этот модуль через import в "LiveEditor.js"
-            // {
-            //     test: /\.js$/,
-            //     include: path.resolve(__dirname, 'src', 'vendor'),
-            //     use: [
-            //       'script-loader'
-            //     ]
-            // }
+            {
+                test :/\.exec\.js$/,
+                use: 'script-loader'
+            }
         ],
     }
 };

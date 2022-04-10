@@ -1,9 +1,9 @@
+import '/src/lib/ot.exec.js'
+import '/src/lib/ot-addon.exec.js'
+
 import WS from "/src/utils/ws.js";
 import WsServerAdapter from "./WsServerAdapter.js";
 
-// FIXME: сделать, чтобы заработало либо тут, либо в конфиге вебпака
-// import 'script-loader!/src/vendor/ot-0.0.14.js';
-// import 'script-loader!/src/vendor/ot-0.0.14-ace-editor-adapter.js';
 
 export default class LiveEditor {
   ws = null;
