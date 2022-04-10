@@ -6,6 +6,7 @@
   shadow = -5px 5px 10px colorShadow
   shadow-hover = -10px 10px 20px colorShadow
   border-color = black
+  preview-margin = 30px
 
   colorHover = #9b1616
   border-title-color = wheat
@@ -13,7 +14,7 @@
 
   degree = -30deg
 
-  preview-background = linear-gradient(60deg, gradColor2 0%, color4 50%, colorHover 50%, color5 100%)
+  preview-background = linear-gradient(60deg, gradColor2 0%, mix(color4, transparent) 50%, colorHover 50%, color5 100%)
 
   .preview
     overflow visible
@@ -21,7 +22,7 @@
     width taskWidth
     height taskHeight
     padding 20px 50px 20px 60px
-    margin 30px
+    margin preview-margin
     text-decoration none
     z-index 0
     .title-container
@@ -62,14 +63,7 @@
   .preview:hover::before
     box-shadow shadow-hover
     background-position-x -50%
-  .preview:first-child
-    padding-left 0
-  .preview:first-child::before
-    left (- taskHeight / 2)
-  .preview:last-child
-    padding-right 0
-  .preview:last-child::before
-    right -300%
+
 
   .preview
     .decoration
@@ -184,6 +178,56 @@
     0%
       inset -10px
       opacity 0
+
+  @media (max-width: 758px)
+    .preview:nth-child(1)
+      margin-right 50%
+    .preview
+      width (taskWidth * 2)
+      margin-right 60px
+    .preview::before
+      left (- taskHeight / 2)
+  @media (min-width: 758px) and (max-width: 1118px)
+    .preview:nth-child(2n + 2)
+      padding-left 0
+    .preview:nth-child(2n + 2)::before
+      left (- taskHeight / 2)
+    .preview:nth-child(2n + 1)
+      padding-right 0
+    .preview:nth-child(2n + 1)::before
+      right -300%
+    .preview:nth-child(1)
+      margin-right 50%
+      width (taskWidth * 2)
+    .preview:nth-child(1)::before
+      right 0
+      left (- taskHeight / 2)
+  @media (min-width: 1118px) and (max-width: 1478px)
+    .preview:nth-child(2)
+      margin-right preview-margin + (taskWidth + preview-margin * 2)
+    .preview:nth-child(1)
+    .preview:nth-child(3n + 3)
+      padding-left 0
+    .preview:nth-child(1)::before
+    .preview:nth-child(3n + 3)::before
+      left (- taskHeight / 2)
+    .preview:nth-child(3n + 2)
+      padding-right 0
+    .preview:nth-child(3n + 2)::before
+      right -300%
+  @media (min-width: 1478px)
+    .preview:nth-child(2)
+      margin-right preview-margin + (taskWidth + preview-margin * 2) * 2
+    .preview:nth-child(1)
+    .preview:nth-child(4n + 3)
+      padding-left 0
+    .preview:nth-child(1)::before
+    .preview:nth-child(4n + 3)::before
+      left (- taskHeight / 2)
+    .preview:nth-child(4n + 2)
+      padding-right 0
+    .preview:nth-child(4n + 2)::before
+      right -300%
 </style>
 
 <template>

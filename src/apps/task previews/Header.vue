@@ -127,12 +127,11 @@
 <template>
   <div class="header">
     <div class="topLine" style="z-index: 10">
-      <router-link to="/tasks/my">Мои задания</router-link>
 <!--      <router-link to="#">Туда</router-link>-->
 <!--      <router-link to="#">Сюда</router-link>-->
 
-      <router-link v-if="$store.state.user.isLogined" to="/profile" class="right">{{$store.state.user.username}}</router-link>
-      <router-link v-else to="/signin" class="right">Войти</router-link>
+      <router-link v-if="$store.state.user.isLogined" to="/profile">{{$store.state.user.username}}</router-link>
+      <router-link v-else to="/signin">Войти</router-link>
     </div>
     <div class="sidePart" style="z-index: 5">
       <div class="search-group">

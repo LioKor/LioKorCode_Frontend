@@ -12,8 +12,7 @@
       display flex
       flex-wrap wrap
       position relative
-    .two-previews
-      height sidePartHeight
+      max-width 1750px
 
     .header
       z-index 1000
@@ -21,6 +20,9 @@
     .content-container
       height 100vh
       overflow-x hidden
+
+    .standalone-form
+      margin-top sidePartHeight + 30px
 
   .float-button
     cursor pointer
@@ -68,11 +70,8 @@
     <div class="content-container scrollable">
       <Header @search="updateSearch"></Header>
 
-      <div class="two-previews previews-container">
-        <TaskPreview v-for="task in tasks.slice(0, 2)" :task="task" path-modifier=""></TaskPreview>
-      </div>
       <div class="previews-container">
-        <TaskPreview v-for="task in tasks.slice(2)" :task="task" path-modifier=""></TaskPreview>
+        <TaskPreview v-for="task in tasks" :task="task" path-modifier=""></TaskPreview>
       </div>
 
       <div v-if="!tasks.length" class="standalone-form">
