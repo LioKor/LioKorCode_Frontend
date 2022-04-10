@@ -4,17 +4,12 @@ betweenItems = 30px
 headerHeight = 50px
 headerBG = color2lighter
 highLightColor = color4
-empColor1 = linear-gradient(90deg, #a26c1e, #4c2c79)
-empColor2 = linear-gradient(#32507a, #4c2c79)
-empColor3 = linear-gradient(#32507a, #4c2c79)
 border-color = color4
 
 sidePartHeight = 280px
 borderRadiusTop = 40px
 borderRadiusBottom = 20px
 degree = 26.5deg
-shadow1 = -5px 5px 5px colorShadow
-shadow2 = -2px 2px 4px colorShadow
 shadow = shadow1
 
 .header
@@ -128,7 +123,7 @@ shadow = shadow1
 
   .top-decoration > div
   .bottom-decoration > div
-    background empColor1
+    background decColor1
     position absolute
     transform skewX(degree)
 
@@ -149,14 +144,14 @@ shadow = shadow1
       top 0
       width 10px
       height (sidePartHeight / 3 * 2 + headerHeight)
-      background empColor3
+      background decColor2
       box-shadow shadow2
     > div:nth-child(3)
       left 100px
       top 0
       width 200px
       height 10px
-      background empColor3
+      background decColor2
       box-shadow shadow2
     > div:nth-child(4)
       left (sidePartHeight / 4 + 5px + headerHeight / 2)
@@ -173,7 +168,7 @@ shadow = shadow1
       top 0
       width 60px
       height (10px + headerHeight)
-      background empColor2
+      background decColor2
       box-shadow shadow1
 
   .bottom-decoration
@@ -186,9 +181,9 @@ shadow = shadow1
     > div:nth-child(1)
       left 80px
       bottom 0
-      width 200px
-      height 10px
-      background empColor2
+      width 300px
+      height 7px
+      background decColor2
       box-shadow shadow2
     > div:nth-child(2)
       left 0
@@ -200,7 +195,7 @@ shadow = shadow1
       bottom 0
       width 25px
       height (sidePartHeight / 8)
-      background empColor3
+      background decColor2
       box-shadow shadow2
     > div:nth-child(4)
       right 0
@@ -213,4 +208,4 @@ shadow = shadow1
       bottom 80px
       width 250px
       height 2px
-      background empColor3
+      background decColor2

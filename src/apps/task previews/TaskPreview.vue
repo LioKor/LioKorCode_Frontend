@@ -11,6 +11,8 @@
   border-title-color = wheat
   border-title-width = 1px
 
+  degree = -30deg
+
   .preview
     overflow visible
     position relative
@@ -50,7 +52,7 @@
     right 0
     top 0
     bottom 0
-    transform skew(-30deg)
+    transform skewX(degree)
     background linear-gradient(60deg, gradColor2 0%, color4 50%, colorHover 50%, color5 100%)
     background-size 300% 100%
     background-position-x 0
@@ -69,6 +71,114 @@
     padding-right 0
   .preview:last-child:before
     right -300%
+
+  .preview
+    .decoration
+      position absolute
+      inset 1px
+      opacity 1
+      transition all 0.3s cubic-bezier(0.57, 0.17, 0, 0.9)
+      transform skewX(degree)
+      > *
+        position absolute
+        background decColor1
+      > *:nth-child(1)
+        top 0
+        right 20px
+        width 13px
+        height 25px
+        background decColor2
+        box-shadow shadow2
+      > *:nth-child(3)
+        bottom 60px
+        left 0
+        width 5px
+        height 40px
+  .preview:last-child
+    .decoration
+      right -10000px
+  .preview:hover
+    .decoration
+      inset -10px
+      opacity 0
+  .preview:nth-child(2n + 1)
+    .decoration
+      > *:nth-child(1)
+        top 10px
+        right 0
+        width 80px
+        height 10px
+        background decColor2
+      > *:nth-child(2)
+        top 20px
+        right 0
+        width 30px
+        height 3px
+      > *:nth-child(3)
+        bottom 0
+        left 100px
+        width 10px
+        height 30px
+        box-shadow shadow2
+      > *:nth-child(4)
+        bottom 0
+        left 120px
+        width 5px
+        height 13px
+        box-shadow shadow2
+  .preview:nth-child(3n)
+    .decoration
+      > *:nth-child(1)
+        top 0
+        right 20px
+        width 13px
+        height 25px
+        background decColor2
+        box-shadow shadow2
+      > *:nth-child(2)
+        top 0
+        right 40px
+        width 5px
+        height 15px
+        box-shadow shadow2
+      > *:nth-child(3)
+        bottom 0
+        left 0
+        width 15px
+        height 30px
+      > *:nth-child(4)
+        bottom 0
+        left 0
+        width 130px
+        height 10px
+  .preview:nth-child(4n)
+    .decoration
+      > *:nth-child(1)
+        top unset
+        bottom 60px
+        left 0
+        width 70px
+        height 10px
+        background decColor2
+      > *:nth-child(2)
+        top unset
+        bottom 50px
+        left 0
+        width 100px
+        height 3px
+      > *:nth-child(3)
+        left unset
+        bottom 0
+        right 20px
+        width 30px
+        height 40px
+        box-shadow shadow2
+      > *:nth-child(4)
+        bottom 0
+        right 60px
+        width 15px
+        height 20px
+        box-shadow shadow2
 </style>
 
 <template>
@@ -77,7 +187,12 @@
       <span class="id">{{ task.id }}</span><span class="title">{{ task.name }}</span>
     </div>
     <div class="description">{{ task.description }}</div>
-    <!--div class="scale" style="--scale: {{ task.hardness }};"></div-->
+    <div class="decoration">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
   </router-link>
 </template>
 
