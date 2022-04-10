@@ -66,7 +66,7 @@
 
         <td class="message" v-html="solution.checkMessage"></td>
 
-        <td class="min-width"><span class="action" @click="openSolution(solution.id)">Открыть</span></td>
+        <td class="min-width"><span class="action" @click="openSolution(solution.id)">Загрузить</span></td>
       </tr>
     </table>
   </div>
