@@ -19,11 +19,11 @@
         width 20px
         fill textColor3
 
-  .control-button:before
+  .control-button::before
     background linear-gradient(#2A9922, highLightColorTransparent, transparent) 0 100% / 100% 200% no-repeat
-  .control-button.warning:before
+  .control-button.warning::before
     background linear-gradient(#ffe344, transparent) 0 100% / 100% 200% no-repeat
-  .control-button.danger:before
+  .control-button.danger::before
     background linear-gradient(#ff2e1f, transparent) 0 100% / 100% 200% no-repeat
 
   .logo

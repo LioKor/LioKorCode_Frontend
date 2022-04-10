@@ -134,7 +134,7 @@ ot.AceEditorAdapter = (function (global) {
                 inset: -5px -5px -5px -10px;
             }`,
             // Make circle above the cursor
-            `.${otherCursorClassName}::before {
+            `.${otherCursorClassName}:::before {
                 content: "";
                 position: absolute;
                 top: ${-collapsedHintSize}px;
@@ -152,7 +152,7 @@ ot.AceEditorAdapter = (function (global) {
                 animation: 2s ease ot-ace-addon-keep-hint-open;
             }`,
             // Transform circle into username hint
-            `.${otherCursorClassName}:hover::before {
+            `.${otherCursorClassName}:hover:::before {
                 content: attr(${clientNameAttributeName});
                 width: unset;
                 height: ${hintFontSize}px;

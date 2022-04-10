@@ -46,7 +46,7 @@ shadow = shadow1
     > *.right:last-child
       padding-right (betweenItems * 2)
       margin-right (- betweenItems)
-    > *:before
+    > *::before
     > *:after
       content ""
       position absolute
@@ -58,10 +58,10 @@ shadow = shadow1
       z-index -1
     > *:after
       background linear-gradient(transparent 0, border-color 50%, transparent 70%) 100% 50% / 2px 200% no-repeat, linear-gradient(transparent 0%, border-color 50%, transparent 80%) 0% 50% / 2px 200% no-repeat
-    > *:before
+    > *::before
       background linear-gradient(highLightColor, transparent) 0 100% / 100% 200% no-repeat
       transition all 0.2s ease
-    > *:hover:before
+    > *:hover::before
       background-position-y 0
 
   .sidePart
@@ -73,7 +73,7 @@ shadow = shadow1
     padding-right 20%
     height sidePartHeight
     right 0
-  .sidePart:before
+  .sidePart::before
     content ""
     background headerBG
     box-shadow shadow
@@ -88,18 +88,6 @@ shadow = shadow1
   .sidePart
     position relative
     padding-top 50px
-    > div
-      margin 15px 40px 15px 0
-      font-size 25px
-      color textColor3
-    > div:nth-child(1)
-      margin-left 20px
-    > div:nth-child(2)
-      margin-left 40px
-    > div:nth-child(3)
-      margin-left 60px
-    > div:nth-child(4)
-      margin-left 80px
 
   .top-decoration
   .bottom-decoration
@@ -108,6 +96,7 @@ shadow = shadow1
     margin 0
     top 0
     height sidePartHeight
+    pointer-events none
 
   .top-decoration > div
   .bottom-decoration > div

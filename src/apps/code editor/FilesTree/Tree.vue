@@ -23,7 +23,7 @@
       outline none
       z-index 0
       cursor default
-    li:before
+    li::before
       content ""
       position absolute
       left -500px
@@ -32,7 +32,7 @@
       z-index -1
     li:hover
       color textColor1
-    li:hover:before
+    li:hover::before
       content ""
       background color1mostLighter
     li.name
@@ -41,10 +41,10 @@
       list-style none
     li:selected
       color textColor1
-    li.selected:before
+    li.selected::before
       content ""
       background color3
-    li.selected:focus:before
+    li.selected:focus::before
       background color4
 
     li.name.folder

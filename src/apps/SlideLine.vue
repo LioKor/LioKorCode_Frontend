@@ -15,21 +15,21 @@
     background-color line-color
 
     font-size points-font-size
-  .slide-line:before
+  .slide-line::before
     color points-color
 
   .slide-line.vertical
     cursor ew-resize
     height 100%
     width line-width
-  .slide-line.vertical:before
+  .slide-line.vertical::before
     content "⋮"
 
   .slide-line.horizontal
     cursor ns-resize
     width 100%
     height line-width
-  .slide-line.horizontal:before
+  .slide-line.horizontal::before
     content "⋯"
 </style>
 

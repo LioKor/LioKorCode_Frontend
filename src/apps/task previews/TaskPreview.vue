@@ -13,6 +13,8 @@
 
   degree = -30deg
 
+  preview-background = linear-gradient(60deg, gradColor2 0%, color4 50%, colorHover 50%, color5 100%)
+
   .preview
     overflow visible
     position relative
@@ -45,31 +47,28 @@
       text-shadow -2px 2px 5px colorShadow
     .description
       color textColor1
-  .preview:before
+  .preview::before
     content ""
     position absolute
-    left 0
-    right 0
-    top 0
-    bottom 0
+    inset 0
     transform skewX(degree)
-    background linear-gradient(60deg, gradColor2 0%, color4 50%, colorHover 50%, color5 100%)
+    background preview-background
     background-size 300% 100%
     background-position-x 0
     border border-color 1px solid
     transition all 0.2s ease, background-position-x 1s cubic-bezier(0.2, 1, 0.5, 1)
     box-shadow shadow
     z-index -1
-  .preview:hover:before
+  .preview:hover::before
     box-shadow shadow-hover
     background-position-x -50%
   .preview:first-child
     padding-left 0
-  .preview:first-child:before
+  .preview:first-child::before
     left (- taskHeight / 2)
   .preview:last-child
     padding-right 0
-  .preview:last-child:before
+  .preview:last-child::before
     right -300%
 
   .preview
@@ -79,6 +78,7 @@
       opacity 1
       transition all 0.3s cubic-bezier(0.57, 0.17, 0, 0.9)
       transform skewX(degree)
+      animation 0.4s inset-from--10px
       > *
         position absolute
         background decColor1
@@ -179,6 +179,11 @@
         width 15px
         height 20px
         box-shadow shadow2
+
+  @keyframes inset-from--10px
+    0%
+      inset -10px
+      opacity 0
 </style>
 
 <template>

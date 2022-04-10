@@ -15,17 +15,17 @@
   }
   .cross:hover
     transform: rotate(135deg) scale(1.1);
-  .cross:hover:before,
+  .cross:hover::before,
   .cross:hover:after
     background cross-color
 
-  .cross:before, .cross:after {
+  .cross::before, .cross:after {
     content: "";
     position: absolute;
     z-index: -1;
     background: cross-color;
   }
-  .cross:before {
+  .cross::before {
     top: 0;
     left: 50%;
     width: cross-lines-width;

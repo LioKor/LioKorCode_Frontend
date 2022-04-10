@@ -35,10 +35,10 @@
       writing-mode vertical-lr
       transform rotate(180deg)
       padding padding-sides padding-top padding-sides 0
-    .tab:before
+    .tab::before
       transform skewY(30deg)
       background linear-gradient(90deg, transparent 0, border-color 50%, transparent 70%) 50% 100% / 200% 1px no-repeat, linear-gradient(90deg, transparent 0%, border-color 50%, transparent 80%) 50% 0% / 200% 1px no-repeat, tab-color
-    .tab:first-child:before
+    .tab:first-child::before
       bottom -1000%
 
   .tabs.horizontal
@@ -48,10 +48,10 @@
     .tab
       height 100%
       padding padding-top padding-sides padding-bottom padding-sides
-    .tab:before
+    .tab::before
       transform skewX(30deg)
       background linear-gradient(transparent 0, border-color 50%, transparent 70%) 100% 50% / 1px 200% no-repeat, linear-gradient(transparent 0%, border-color 50%, transparent 80%) 0% 50% / 1px 200% no-repeat, tab-color
-    .tab:first-child:before
+    .tab:first-child::before
       left -1000%
 
   .tabs
@@ -62,7 +62,7 @@
       cursor default
       position relative
       z-index 0
-    .tab:before
+    .tab::before
       content ""
       position absolute
       left 0
@@ -72,11 +72,11 @@
       z-index -1
     .tab:hover
       color text-color-hover
-    .tab:hover:before
+    .tab:hover::before
       background tab-color-hover
     .tab.selected
       color text-color-hover
-    .tab.selected:before
+    .tab.selected::before
       background tab-color-select
 
   .close-tab-svg

@@ -9,6 +9,7 @@ import './styles/forms.styl'
 import './styles/header.styl'
 import './styles/scrollbars.styl'
 import './styles/show-hide.styl'
+import './styles/components.styl'
 
 
 const app = createApp(App);
