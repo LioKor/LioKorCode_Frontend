@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import Task from './code editor/Page.vue'
-import MyTasks from './my tasks/Page.vue'
 import TaskEdit from './TaskEdit.vue'
 import SignIn from './SignIn.vue'
 import Profile from './Profile.vue'
@@ -15,7 +14,6 @@ export default function createVueRouter(Store) {
         {path: '/', component: TaskList},
         {path: '/task/create', component: TaskCreate},
         {path: '/task/:taskId', component: Task},
-        {path: '/tasks/my', component: MyTasks},
         {path: '/task/edit/:taskId', component: TaskEdit},
         {path: '/signin', component: SignIn, meta: {noLoginRequired: true}},
         {path: '/signup', component: SignUp, meta: {noLoginRequired: true}},

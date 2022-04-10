@@ -187,7 +187,7 @@
 </style>
 
 <template>
-  <router-link :to="'/task' + pathModifier + '/' + task.id" id="taskPreview" class="preview">
+  <router-link :to="'/task' + (task.isMy ? '/edit/' : '/') + task.id" id="taskPreview" class="preview">
     <div class="title-container">
       <span class="id">{{ task.id }}</span><span class="title">{{ task.name }}</span>
     </div>
