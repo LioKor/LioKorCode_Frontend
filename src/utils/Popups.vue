@@ -56,7 +56,6 @@
   </div>
 </template>
 <script>
-  import {nextTick} from "vue";
   import {getChildrenHeight} from "./utils";
 
   const DEFAULT_DISSAPPEAR_AFTER_MS = 3000;
