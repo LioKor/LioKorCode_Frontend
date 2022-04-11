@@ -165,9 +165,7 @@
         this.reactiveItems.splice(idx, 1);
         //this.$emit('deleteTab', item, idx);
 
-        if (this.reactiveItems.length === 0) {
-          this.$emit('lastTabClosed');  // to clear editor after this event
-        }
+        this.$emit('tabsCountChange', this.reactiveItems.length);
       },
       deleteTabByItem(uniqueValue) {
         const item = this.findItemByUnique(uniqueValue);
@@ -200,6 +198,8 @@
         this.reactiveItems.push(item);
         await nextTick();
         this.selectTabEl(this.$refs.items[this.$refs.items.length-1]);
+
+        this.$emit('tabsCountChange', this.reactiveItems.length);
       },
       getSelected() {
         if (!this.selectedEl)
@@ -217,6 +217,8 @@
       closeAllTabs() {
         this.reactiveItems = [];
         this.selectedEl = null;
+
+        this.$emit('tabsCountChange', this.reactiveItems.length);
       },
 
       lockChangeTabs() {

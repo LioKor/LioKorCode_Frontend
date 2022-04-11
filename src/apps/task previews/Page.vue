@@ -108,15 +108,16 @@
       this.allTasks = await this.getTasks('getTasks');
       this.tasks = this.allTasks.concat();
 
-      this.myTasks = await this.getTasks('getMyTasks');
+      this.myTasks = await this.getTasks('getMyTasks', true);
       this.myTasks.forEach(task => task.isMy = true);
     },
     methods: {
-      async getTasks(apiRequestName) {
+      async getTasks(apiRequestName, silent = false) {
         const tasks = await this.$store.state.api[apiRequestName]();
         if (!tasks.ok_) {
-          this.$store.state.popups.error("Не удалось получить список заданий");
-          return;
+          if (!silent)
+            this.$store.state.popups.error("Не удалось получить список заданий");
+          return [];
         }
 
         return tasks;

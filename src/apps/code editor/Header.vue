@@ -116,6 +116,11 @@
           return;
         }
 
+        if (this.$parent.isAllFilesClosed) {
+          this.$store.state.popups.error('Сперва откройте файл, чтобы открыть его для редактирования');
+          return;
+        }
+
         const uid = await this.$store.state.api.openRedactorSession(this.$parent.$refs.editor.aceEditor.getValue());
         if (!uid.ok_) {
           this.$store.state.popups.error('Не удалось создать сессию');

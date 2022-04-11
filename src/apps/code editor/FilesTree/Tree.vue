@@ -273,8 +273,11 @@
         if (!conf)
           return false;
 
+        this.$emit('deleteFile', list[idx]);
+
         list.splice(idx, 1);
         this.sortFiles(list);
+
         return true;
       },
 

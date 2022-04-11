@@ -10,7 +10,6 @@
     left 0
     width 100%
     height 100vh
-
     z-index 999
 
     .modal-background
@@ -48,13 +47,13 @@
 </style>
 <template>
   <div class="modal" v-show="isShowed" @keydown.enter.prevent="__resolve(true)" @keydown.esc="__resolve(false)">
-    <div class="modal-background" @click="__resolve(false)">
+    <div class="modal-background" @click="__resolve(null)">
     </div>
 
     <div class="standalone-form" ref="form">
-        <span class="close-btn" @click="__resolve(false)">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/></svg>
-        </span>
+      <span class="close-btn" @click="__resolve(null)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/></svg>
+      </span>
 
       <div class="title">
         <div class="primary">{{ title }}</div>
@@ -67,9 +66,9 @@
         </div>
 
         <div class="form-group">
-          <button class="btn submit" v-if="type !== 'confirm'" type="submit" ref="buttonOk">Ок</button>
+          <button @click="__resolve()" class="btn submit" v-if="type !== 'confirm'" ref="buttonOk">Ок</button>
           <div v-else class="confirm-buttons">
-            <button @click="__resolve(true)" class="confirm-button btn submit" ref="buttonYes" type="submit">Да</button>
+            <button @click="__resolve(true)" class="confirm-button btn submit" ref="buttonYes">Да</button>
             <button @click="__resolve(false)" class="confirm-button btn btn-danger">Нет</button>
           </div>
         </div>
@@ -91,8 +90,22 @@
       };
     },
 
+    mounted() {
+      this.handleEventsFoo = (e) => {
+        if (!this.isShowed)
+          return;
+
+        if (e.key === 'Enter') {
+          this.__resolve(this.type === 'prompt' ? this.text : true);
+        } else if (e.key === 'Escape') {
+          this.__resolve(null);
+        }
+      };
+      window.addEventListener('keyup', this.handleEventsFoo);
+    },
     unmounted() {
       this.isShowed = false;
+      window.removeEventListener('keyup', this.handleEventsFoo);
     },
 
     methods: {
