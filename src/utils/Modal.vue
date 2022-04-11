@@ -57,9 +57,9 @@
         </div>
 
         <div class="form-group">
-          <button class="btn submit" v-if="type !== 'confirm'" type="submit" ref="buttonOk">Ок</button>
+          <button @click="__resolve()" class="btn submit" v-if="type !== 'confirm'" ref="buttonOk">Ок</button>
           <div v-else class="confirm-buttons">
-            <button class="confirm-button btn submit" ref="buttonYes" type="submit">Да</button>
+            <button @click="__resolve(true)" class="confirm-button btn submit" ref="buttonYes">Да</button>
             <button @click="__resolve(false)" class="confirm-button btn btn-danger">Нет</button>
           </div>
         </div>

@@ -52,7 +52,19 @@
     #editor-block
       display flex
       flex-direction column
-
+      position relative
+      .editor-hint
+        position absolute
+        z-index 10
+        inset 0
+        background color2
+        display flex
+        flex-direction column
+        align-items center
+        justify-content center
+        text-align center
+        > *
+          margin-top 20px
     #code-editor-all
       height 'calc(100% - %s)' % headerHeight
 </style>
@@ -81,13 +93,19 @@
             <Tree ref="tree" name="Project"
                   :items="this.getDefaultFiles()"
                   @open-file-text="openTreeFile"
-                  @rename-file="updateFileNameInTabs" />
+                  @rename-file="updateFileNameInTabs"
+                  @delete-file="deleteFromTabs" />
           </div>
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" uid="editor-vertical" class="vertical"/>
         <div id="editor-block">
-          <Tabs class="horizontal" ref="tabs" :items="[]" @lastTabClosed="allFilesClosed"></Tabs>
+          <Tabs class="horizontal" ref="tabs" :items="[]" @tabsCountChange="filesWatchUpdate"></Tabs>
           <Editor ref="editor" @editor-change="updateOpenedFileText"/>
+
+          <div class="editor-hint" v-show="isAllFilesClosed">
+            <div>Все файлы закрыты</div>
+            <div>Откройте файл из вкладки слева, чтобы начать редактирование</div>
+          </div>
         </div>
       </div>
 
@@ -122,6 +140,7 @@
 
         taskId: parseInt(this.$route.params.taskId),
         openedTab: 0,
+        isAllFilesClosed: false,
       }
     },
 
@@ -200,6 +219,9 @@
         this.$refs.tabs.updateTab(treeItem, treeItem.name);
         this.$refs.editor.setSyntaxHighlighting(treeItem.name);
       },
+      deleteFromTabs(treeItem) {
+        this.$refs.tabs.deleteTabByItem(treeItem);
+      },
 
       parseSourceCode(sourceCode) {
         const filesList = [];
@@ -245,7 +267,6 @@
 
       closeSolution() {
         this.$refs.tree.loadTree([]);
-        this.allFilesClosed();
         this.$refs.tabsVertical.selectTabIndex(1);
         this.$refs.tabs.closeAllTabs();
       },
@@ -261,9 +282,15 @@
         this.$refs.tree.loadTree(fileList);
       },
 
-      allFilesClosed() {
-        this.$refs.editor.setReadOnly(true);
-        this.$refs.editor.clear();
+      filesWatchUpdate(count) {
+        if (count === 0) {
+          this.$refs.editor.setReadOnly(true);
+          this.$refs.editor.clear();
+          this.isAllFilesClosed = true;
+          return;
+        }
+        this.$refs.editor.setReadOnly(false);
+        this.isAllFilesClosed = false;
       },
 
       // --- WebSockets live editor
