@@ -11,10 +11,14 @@ import './styles/scrollbars.styl'
 import './styles/show-hide.styl'
 import './styles/components.styl'
 
-
 const app = createApp(App);
 
 app.use(createVueRouter(Store));
 app.use(Store);
+app.use({
+    install: (app, options) => {
+        app.config.globalProperties.$roomsWS = null
+    }
+})
 
 app.mount('#app');
