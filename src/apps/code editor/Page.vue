@@ -10,17 +10,6 @@
     height 100vh
     overflow hidden
     color textColor1
-    .template-select
-      padding-top 10px
-      padding-left 10px
-      select
-        background background
-        color textColor1
-        border 1px solid #BABABA
-        border-radius 5px
-        font-size 1rem
-        option
-          background #2e3f44
 
     .files-tab
       width 100%
@@ -71,12 +60,7 @@
           <TaskInfo id="task-info" v-show="openedTab === 0" ref="taskInfo" :task-id="taskId"></TaskInfo>
 
           <div class="files-tab" v-show="openedTab === 1">
-            <div class="template-select">
-              <select v-model="templateSelected">
-                <option value="">шаблоны</option>
-                <option v-for="templateName in Object.keys(templates)">{{ templateName }}</option>
-              </select>
-            </div>
+            <Templates @openTemplate="openTemplate" />
 
             <Tree ref="tree" name="Project"
                   :items="this.getDefaultFiles()"
@@ -105,6 +89,7 @@
   import Editor from './Editor.vue';
   import Solutions from './Solutions.vue';
   import Header from './Header.vue';
+  import Templates from './Templates.vue'
 
   import SlideLine from '../SlideLine.vue';
   import Tree from "./FilesTree/Tree.vue";
@@ -114,48 +99,23 @@
   import SolutionTemplates from "../../utils/solution-templates";
 
   export default {
-    components: {Tabs, Tree, Header, TaskInfo, Editor, Solutions, SlideLine},
+    components: {Tabs, Tree, Header, Templates, TaskInfo, Editor, Solutions, SlideLine},
 
     data() {
       return {
-        templates: SolutionTemplates,
-        templateSelected: '',
-        templateSelectedWatchDisabled: false,
-
         taskId: parseInt(this.$route.params.taskId),
         openedTab: 0,
       }
     },
 
-    watch: {
-      templateSelected(newName) {
-        if (!newName) {
-          return
-        }
-
-        if (this.templateSelectedWatchDisabled) {
-          return
-        }
-        this.templateSelectedWatchDisabled = true
-
-        this.changeTemplate(newName)
-      }
-    },
-
     methods: {
-      editorSetText(text) {
-        this.$refs.editor.setText(text)
+      openTemplate(items) {
+        this.closeSolution()
+        this.$refs.tree.loadTree(items)
       },
 
-      changeTemplate: async function (templateName) {
-        if (await this.$store.state.modal.confirm(`Текущее решение будет потеряно и откроется шаблон ${templateName}. Продолжить?`)) {
-          this.closeSolution()
-          this.$refs.tree.loadTree(this.templates[templateName])
-        }
-
-        this.templateSelected = ''
-        await this.$nextTick()
-        this.templateSelectedWatchDisabled = false
+      editorSetText(text) {
+        this.$refs.editor.setText(text)
       },
 
       getDefaultFiles: function() {
