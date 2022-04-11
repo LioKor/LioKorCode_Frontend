@@ -81,7 +81,9 @@
             <Tree ref="tree" name="Project"
                   :items="this.getDefaultFiles()"
                   @open-file-text="openTreeFile"
-                  @rename-file="updateFileNameInTabs" />
+                  @rename-file="updateFileNameInTabs"
+                  @editorSetText="editorSetText"
+            />
           </div>
         </div>
         <SlideLine el1="taskInfo-and-tree" el2="editor-block" uid="editor-vertical" class="vertical"/>
@@ -141,6 +143,10 @@
     },
 
     methods: {
+      editorSetText(text) {
+        this.$refs.editor.setText(text)
+      },
+
       changeTemplate: async function (templateName) {
         if (await this.$store.state.modal.confirm(`Текущее решение будет потеряно и откроется шаблон ${templateName}. Продолжить?`)) {
           this.closeSolution()
