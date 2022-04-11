@@ -370,10 +370,18 @@
         if (prefix !== '')
           prefix += '/';
         list.forEach((item) => {
-          if (typeof item.value === 'string')
+          if (typeof item.value === 'string') {
+            // removing spaces from an empty line (for linter)
+            const prevLength = item.value;
+            item.value = item.value.replaceAll(/  *\n/g, '\n')
+            if (prevLength !== item.value.length && item === this.openedItem.item) {
+              this.$emit('editorSetText', item.value)
+            }
+
             source[prefix + item.name] = item.value;
-          else
+          } else {
             Object.assign(source, this.getSource(prefix + item.name, item.value));
+          }
         });
         return source;
       },

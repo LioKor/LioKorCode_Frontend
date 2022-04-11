@@ -4,36 +4,46 @@
 
   close-btn-size = 25px
 
-  .modal-background
+  .modal
     position fixed
-
     top 0
+    left 0
     width 100%
     height 100vh
     z-index 999
 
-    background-color colorShadow
+    .modal-background
+      position fixed
+      left 0
+      top 0
+      width 100%
+      height 100vh
 
-    .confirm-button
-      width 45%
-      display inline-block
-      margin-left 2.5%
-      margin-right 2.5%
-
-    .close-btn
-      position absolute
-      color textColor2
-      text-shadow textLightingNormal2
-      right 20px
-      top 10px
-      width close-btn-size
-      height close-btn-size
-      transition all 0.3s ease
+      background-color colorShadowDark
       cursor pointer
-    .close-btn:hover
-      color textColor1
-      text-shadow textLightingNormal1
 
+    .standalone-form
+      cursor default
+
+      .confirm-button
+        width 45%
+        display inline-block
+        margin-left 2.5%
+        margin-right 2.5%
+
+      .close-btn
+        position absolute
+        color textColor2
+        text-shadow textLightingNormal2
+        right 20px
+        top 10px
+        width close-btn-size
+        height close-btn-size
+        transition all 0.3s ease
+        cursor pointer
+      .close-btn:hover
+        color clHighlight
+        text-shadow textLightingNormal1
 </style>
 <template>
   <div v-show="isShowed" class="modal-background">
