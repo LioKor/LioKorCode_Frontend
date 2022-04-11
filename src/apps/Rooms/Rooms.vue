@@ -95,7 +95,18 @@ textColor2 = #AAA
 
 <template>
   <div @contextmenu.prevent="state = !state">
-    <div v-if="!this.$store.state.user.isLogined">
+    <div v-if="!connected">
+      <h1>Комнаты</h1>
+      <div v-if="wasConnected">
+        <h2>Соединение с сервером разорвано.</h2>
+        <h2>Пробуем подключиться{{ dots }}</h2>
+      </div>
+      <div v-else>
+        <h2>Не удалось подключиться к серверу.</h2>
+        <h2>Пробуем еще{{ dots }}</h2>
+      </div>
+    </div>
+    <div v-else-if="!this.$store.state.user.isLogined">
       <h1>Комнаты</h1>
       <h2><router-link to="/signin">Авторизуйтесь</router-link>, чтобы создать или присоединиться к комнате</h2>
     </div>
@@ -175,7 +186,13 @@ textColor2 = #AAA
 const WS_ADDR = (window.location.hostname === 'localhost')? 'localhost:9090': `${window.location.hostname}/ws`
 const WS_ROOMS_URL = `${(window.location.protocol === 'http:')? 'ws': 'wss'}://${WS_ADDR}`
 
-let ws = null;
+const CONNECT_TIMEOUT = 2000
+
+const BASE_RECONNECT_TIMEOUT = 1000
+const MAX_RECONNECT_TIMEOUT = 60 * 1000
+
+let ws = null
+let reconnectTimeout = BASE_RECONNECT_TIMEOUT
 
 class Message {
   constructor(username, content) {
@@ -199,6 +216,10 @@ export default {
 
   data() {
     return {
+      dots: '...',
+      connected: false,
+      wasConnected: false,
+
       joinedRoom: null, //new Room('asdfasdfsda', 'Wolf', '10', []),
 
       createName: 'Волчачье логово',
@@ -212,6 +233,14 @@ export default {
   },
 
   methods: {
+    updateDots() {
+      if (this.dots.length === 3) {
+        this.dots = '.'
+      } else {
+        this.dots += '.'
+      }
+    },
+
     sendMessage() {
       ws.send(JSON.stringify({
         command: 'sendMessage',
@@ -255,41 +284,66 @@ export default {
         }, 50)
       })
     },
+
+    createWsConnection() {
+      ws = new WebSocket(WS_ROOMS_URL);
+
+      setTimeout(function() {
+        if (ws.readyState === 0) {
+          ws.close()
+        }
+      }.bind(this), CONNECT_TIMEOUT)
+
+      ws.addEventListener('close', function() {
+        this.connected = false
+        ws = null
+        setTimeout(function() {
+          this.updateDots()
+          this.createWsConnection()
+          if (reconnectTimeout < MAX_RECONNECT_TIMEOUT) {
+            reconnectTimeout *= 2
+          }
+        }.bind(this), reconnectTimeout)
+      }.bind(this))
+
+      ws.addEventListener('open', () => {
+        reconnectTimeout = BASE_RECONNECT_TIMEOUT
+        this.connected = true
+        this.wasConnected = true
+
+        ws.send(JSON.stringify({
+          command: 'setInfo',
+          username: this.$store.state.user.username
+        }))
+        ws.send(JSON.stringify({ command: 'getRooms' }));
+      })
+
+      ws.addEventListener('message', (message) => {
+        const data = JSON.parse(message.data)
+
+        if (data.command === 'setRooms') {
+          this.rooms = data.rooms
+        } else if (data.command === 'setRoom') {
+          this.joinedRoom = new Room(data.id, data.name, data.maxUsers, data.users)
+        } else if (data.command === 'leaveRoom') {
+          if (data.kick) {
+            alert('Вы были исключены из комнаты!')
+          }
+          this.joinedRoom = null;
+        } else if (data.command === 'addMessage') {
+          this.messages.push(new Message(data.username, data.content));
+        } else if (data.command === 'error') {
+          console.log(`WS ERROR: ${data.message}`);
+        }
+      });
+    }
   },
 
   async mounted() {
     // only after some time username is available
     await this.waitForUsername();
 
-    ws = new WebSocket(WS_ROOMS_URL);
-    ws.addEventListener('open', () => {
-      console.log('WebSocket connected!')
-
-      ws.send(JSON.stringify({
-        command: 'setInfo',
-        username: this.$store.state.user.username
-      }))
-      ws.send(JSON.stringify({ command: 'getRooms' }));
-    })
-
-    ws.addEventListener('message', (message) => {
-      const data = JSON.parse(message.data)
-
-      if (data.command === 'setRooms') {
-        this.rooms = data.rooms
-      } else if (data.command === 'setRoom') {
-        this.joinedRoom = new Room(data.id, data.name, data.maxUsers, data.users)
-      } else if (data.command === 'leaveRoom') {
-        if (data.kick) {
-          alert('Вы были исключены из комнаты!')
-        }
-        this.joinedRoom = null;
-      } else if (data.command === 'addMessage') {
-        this.messages.push(new Message(data.username, data.content));
-      } else if (data.command === 'error') {
-        alert(data.message);
-      }
-    });
+    this.createWsConnection()
   },
 }
 </script>
