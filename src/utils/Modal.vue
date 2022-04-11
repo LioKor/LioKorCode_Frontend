@@ -47,11 +47,11 @@
 </style>
 <template>
   <div class="modal" v-show="isShowed" @keydown.enter.prevent="__resolve(true)" @keydown.esc="__resolve(false)">
-    <div class="modal-background" @click="__resolve(null)">
+    <div class="modal-background" @click="__resolve(false)">
     </div>
 
     <div class="standalone-form" ref="form">
-      <span class="close-btn" @click="__resolve(null)">
+      <span class="close-btn" @click="__resolve(false)">
         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/></svg>
       </span>
 
@@ -77,8 +77,6 @@
   </div>
 </template>
 <script>
-  import {nextTick} from "vue";
-
   export default {
     data() {
       return {
@@ -90,22 +88,8 @@
       };
     },
 
-    mounted() {
-      this.handleEventsFoo = (e) => {
-        if (!this.isShowed)
-          return;
-
-        if (e.key === 'Enter') {
-          this.__resolve(this.type === 'prompt' ? this.text : true);
-        } else if (e.key === 'Escape') {
-          this.__resolve(null);
-        }
-      };
-      window.addEventListener('keyup', this.handleEventsFoo);
-    },
     unmounted() {
       this.isShowed = false;
-      window.removeEventListener('keyup', this.handleEventsFoo);
     },
 
     methods: {
@@ -114,11 +98,13 @@
         this.title = title;
         this.description = description;
 
-        if (this.isShowed)
+        if (this.isShowed) {
           return this.promise;
+        }
         this.isShowed = true;
 
-        await nextTick();
+        await this.$nextTick();
+
         if (this.type === 'confirm') {
           this.$refs.buttonYes.focus();
         } else if (this.type === 'prompt') {
@@ -135,12 +121,21 @@
         return promise;
       },
       __resolve(result) {
-        if (!this.isShowed)
-          return;
+        if (!this.isShowed) {
+          return
+        }
+
+        if (this.type !== 'confirm') {
+          if (result === false) {
+            result = null
+          } else {
+            result = this.text
+          }
+        }
 
         this.resolvePromise(result);
         this.isShowed = false;
-        this.text = "";
+        this.text = '';
       },
 
       prompt(title, description, defaultText) {
