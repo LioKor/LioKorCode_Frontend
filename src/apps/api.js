@@ -22,6 +22,6 @@ export default class Api extends ApiRequest {
     getSolution = (taskId, solutionId) => this.get(`/tasks/${taskId}/solutions/${solutionId}`);
     deleteSolution = (taskId, solutionId) => this.delete(`/tasks/${taskId}/solutions/${solutionId}`);
 
-    openRedactorSession = (files) => this.post(`/redactor`, files);
+    openRedactorSession = (files) => this.post(`/redactor`, {sourceCode: files});
     checkRedactorSession = (uid) => this.get(`/redactor/${uid}`);
 }
