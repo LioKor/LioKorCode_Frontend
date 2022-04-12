@@ -1,6 +1,3 @@
-import '/src/lib/ot.exec.js'
-import '/src/lib/ot-addon.exec.js'
-
 import WS from "/src/utils/ws.js";
 import WsServerAdapter from "./WsServerAdapter.js";
 
