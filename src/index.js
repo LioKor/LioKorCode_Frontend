@@ -12,9 +12,7 @@ import './styles/show-hide.styl'
 import './styles/components.styl'
 
 
-const app = createApp(App);
-
-app.use(createVueRouter(Store));
-app.use(Store);
-
-app.mount('#app');
+createApp(App)
+  .use(createVueRouter(Store))
+  .use(Store)
+  .mount('#app');
