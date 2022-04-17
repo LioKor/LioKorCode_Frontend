@@ -4,6 +4,7 @@ export class Message {
     constructor(username, content) {
         this.username = username;
         this.content = stripTags(content).replaceAll('\n', '<br />');
+        this.date = new Date()
     }
 }
 

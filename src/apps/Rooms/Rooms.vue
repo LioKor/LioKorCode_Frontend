@@ -33,6 +33,10 @@ width = 640px
     max-width width
     .user
       margin-bottom 10px
+      video
+        margin-top 10px
+        max-width 100%
+        max-height 256px
 </style>
 
 <template>
@@ -91,8 +95,11 @@ width = 640px
       </button>
       <h2>Участники {{ joinedRoom.users.length }}<!-- / {{ joinedRoom.maxUsers }}--></h2>
       <div class="users">
-        <div v-for="user in joinedRoom.users" class="user form-control">
-          <div class="username">{{ user.username }}</div>
+        <div v-for="(user, index) in joinedRoom.users" class="user form-control">
+          <div class="username">{{ user.username }}<span v-show="index === 0"> 👑</span></div>
+          <div v-if="user.stream">
+            <video :srcObject.prop="user.stream" autoplay controls></video>
+          </div>
         </div>
       </div>
 
@@ -131,7 +138,7 @@ export default {
 
       joinedRoom: null, //new Room('asdfasdfsda', 'Wolf', '10', []),
 
-      createName: 'Волчачье логово',
+      createName: 'Волчачье логово 🐺',
       createMaxUsers: 10,
 
       rooms: [],
@@ -149,7 +156,7 @@ export default {
     },
 
     __getUser(id) {
-      for (const user in this.joinedRoom.users) {
+      for (const user of this.joinedRoom.users) {
         if (user.id === id) {
           return user
         }
@@ -210,7 +217,6 @@ export default {
 
       pc.addEventListener('track', async (ev) => {
         user.stream = ev.streams[0];
-        // this.usersView.render(this.users);
       });
 
       pc.addEventListener('datachannel', (ev) => {
@@ -243,10 +249,11 @@ export default {
       await user.pc.setRemoteDescription(offer);
       const answer = await user.pc.createAnswer();
       await user.pc.setLocalDescription(answer);
+
       this.send({
         to: user.id,
         command: 'answer',
-        data: answer
+        answer: answer
       });
     },
 

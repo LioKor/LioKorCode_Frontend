@@ -38,6 +38,7 @@ div.chat
             text-decoration none
             font-weight bold
           span.datetime
+            margin-left 5px
             font-style italic
             font-size 0.9em
             color textColor2
@@ -93,7 +94,7 @@ div.chat
         <div class="body">
           <div class="title">
             <a href="#" class="username" target="_blank">{{ message.username }}</a>
-            <span class="datetime"></span>
+            <span class="datetime">{{ message.date.toLocaleString() }}</span>
           </div>
           <div class="content" v-html="message.content"></div>
         </div>
