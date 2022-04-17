@@ -97,7 +97,7 @@ width = 640px
         <div v-for="(user, index) in joinedRoom.users" class="user form-control">
           <div class="username" :class="{ bold: this.uid === user.id }">{{ user.username }}<span v-show="index === 0"> 👑</span></div>
           <div v-if="user.stream">
-            <video :srcObject.prop="user.stream" autoplay controls></video>
+            <video :srcObject.prop="user.stream" autoplay controls :muted="this.uid === user.id"></video>
           </div>
         </div>
       </div>
