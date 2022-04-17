@@ -69,10 +69,6 @@ width = 640px
             <input v-model="createName" type="text" class="form-control" placeholder="Название" maxlength="48">
           </div>
 
-<!--          <div class="form-group">-->
-<!--            <input v-model="createMaxUsers" type="number" class="form-control" placeholder="Максимальное кол-во участников">-->
-<!--          </div>-->
-
           <div class="form-group">
             <button class="btn" @click.prevent="roomCreate">Создать</button>
           </div>
@@ -85,7 +81,7 @@ width = 640px
 <!--          </form>-->
           <div v-for="room in this.rooms" class="room form-control" @click="roomJoin(room.id)">
             <div class="name">{{ room.name }}</div>
-            <div class="users">{{ room.usersAmount }}<!-- / {{ room.usersMax }}--></div>
+            <div class="users">{{ room.usersAmount }} / {{ room.usersMax }}</div>
           </div>
         </div>
       </div>
@@ -115,19 +111,14 @@ width = 640px
 <script>
 
 import Chat from './Chat.vue'
+import ReconnectingWebSocket from "../../utils/ReconnectingWebSocket";
 
 import { Room, User, Message } from './models'
 
 const WS_ADDR = (window.location.hostname === 'localhost')? 'localhost:9090': `${window.location.hostname}/ws`
 const WS_ROOMS_URL = `${(window.location.protocol === 'http:')? 'ws': 'wss'}://${WS_ADDR}`
 
-const CONNECT_TIMEOUT = 2000
-
-const BASE_RECONNECT_TIMEOUT = 1000
-const MAX_RECONNECT_TIMEOUT = 60 * 1000
-
 let ws = null
-let reconnectTimeout = BASE_RECONNECT_TIMEOUT
 
 export default {
   components: { Chat },
@@ -141,10 +132,10 @@ export default {
       connected: false,
       wasConnected: false,
 
-      joinedRoom: null, //new Room('asdfasdfsda', 'Wolf', '10', []),
+      joinedRoom: null,
 
       createName: 'Волчачье логово 🐺',
-      createMaxUsers: 10,
+      createMaxUsers: 20,
 
       rooms: [],
 
@@ -157,7 +148,7 @@ export default {
 
   methods: {
     send(data) {
-      ws.send(JSON.stringify(data))
+      ws.sendJSON(data)
     },
 
     __getUser(id) {
@@ -178,9 +169,6 @@ export default {
 
     async __getDevices() {
       try {
-        /*if (!window.localStorage.getItem('hasMediaPermission')) {
-          this.$store.state.modal('Доступ к устройствам', 'Сейчас мы попросим предоставить доступ к вашему микрофону и камере.');
-        }*/
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
           video: true
@@ -192,10 +180,8 @@ export default {
           track.stop();
         }
 
-        // window.localStorage.setItem('hasMediaPermission', true);
         return devices;
       } catch (e) {
-        // window.localStorage.getItem('hasMediaPermission', false);
         throw (e);
       }
     },
@@ -319,10 +305,6 @@ export default {
           this.addMessage(currentUser, message)
         }
       }
-      // this.send({
-      //   command: 'sendMessage',
-      //   content: message
-      // })
     },
 
     updateDots() {
@@ -388,13 +370,31 @@ export default {
       })
     },
 
+    setRoom(data) {
+      if (this.joinedRoom) {
+        return
+      }
+      const users = []
+      for (const user in data.users) {
+        users.push(new User(user.id, user.username))
+      }
+
+      let host = false
+      if (data.users.length > 0) {
+        host = this.uid === data.users[0].id
+      }
+      this.joinedRoom = new Room(data.id, data.name, data.maxUsers, host, data.users)
+      if (host) {
+        const currentUser = this.__getUser(this.uid)
+        currentUser.stream = this.stream
+      }
+    },
+
     async userConnected(user) {
       user.pc = this.__createPeerConnection(user, this.stream)
       user.dc = user.pc.createDataChannel('chat');
 
-      const offer = await user.pc.createOffer({
-        offerToReceiveAudio: 1
-      })
+      const offer = await user.pc.createOffer()
       await user.pc.setLocalDescription(offer)
       this.send({
         to: user.id,
@@ -405,106 +405,68 @@ export default {
       this.joinedRoom.addUser(user)
     },
 
-    createWsConnection() {
-      ws = new WebSocket(WS_ROOMS_URL);
+    wsOpenAction() {
+      this.connected = true
+      this.wasConnected = true
 
-      setTimeout(function() {
-        if (ws.readyState === 0) {
-          ws.close()
-        }
-      }.bind(this), CONNECT_TIMEOUT)
-
-      ws.addEventListener('close', function() {
-        this.connected = false
-        this.joinedRoom = null
-        ws = null
-        setTimeout(function() {
-          if (this.connected) {
-            return
-          }
-          this.updateDots()
-          this.createWsConnection()
-          if (reconnectTimeout < MAX_RECONNECT_TIMEOUT) {
-            reconnectTimeout *= 2
-          }
-        }.bind(this), reconnectTimeout)
-      }.bind(this))
-
-      ws.addEventListener('open', () => {
-        reconnectTimeout = BASE_RECONNECT_TIMEOUT
-        this.connected = true
-        this.wasConnected = true
-
-        this.send({
-          command: 'setInfo',
-          username: this.$store.state.user.username
-        })
-        this.send({ command: 'getRooms' })
+      this.send({
+        command: 'setInfo',
+        username: this.$store.state.user.username
       })
+      this.send({ command: 'getRooms' })
+    },
 
-      ws.addEventListener('message', (message) => {
-        const data = JSON.parse(message.data)
+    wsCloseAction() {
+      this.connected = false
+      this.joinedRoom = null
+      this.updateDots()
+    },
 
-        if (data.command === 'setRooms') {
-          this.rooms = data.rooms
-        } else if (data.command === 'setRoom') {
-          if (this.joinedRoom) {
-            return
-          }
-          const users = []
-          for (const user in data.users) {
-            users.push(new User(user.id, user.username))
-          }
+    wsMessageHandler(message) {
+      const data = JSON.parse(message.data)
+      const command = data.command
 
-          let host = false
-          if (data.users.length > 0) {
-            host = this.uid === data.users[0].id
-          }
-          this.joinedRoom = new Room(data.id, data.name, data.maxUsers, host, data.users)
-          if (host) {
-            const currentUser = this.__getUser(this.uid)
-            currentUser.stream = this.stream
-          }
-        } else if (data.command === 'leaveRoom') {
-          if (data.kick) {
-            alert('Вы были исключены из комнаты!')
-          }
-          this.joinedRoom = null;
-        } else if (data.command === 'addMessage') {
-          if (!this.joinedRoom) {
-            return
-          }
-          const message = new Message(data.username, data.content)
-          this.$refs.chat.addMessage(message)
-        } else if (data.command === 'addRoomUser') {
-          this.userConnected(new User(data.id, data.username))
-        } else if (data.command === 'deleteRoomUser') {
-          this.joinedRoom.deleteUser(data.id)
-        } else if (data.command === 'setInfo') {
-          this.uid = data.id
-          this.iceServers = data.iceServers
-        } else if (data.command === 'candidate') {
-          this.__candidateReceived(data.candidate, data.from)
-        } else if (data.command === 'offer') {
-          this.__offerReceived(data.offer, data.from)
-        } else if (data.command === 'answer') {
-          this.__answerReceived(data.answer, data.from)
-        } else if (data.command === 'ping') {
-          this.send({ command: 'pong' })
-        } else if (data.command === 'error') {
-          console.log(`WS ERROR: ${data.message}`);
-        } else {
-          console.log(`WS ERROR: Unknown command ${data.command} received`)
+      if (command === 'setRooms') {
+        this.rooms = data.rooms
+      } else if (command === 'setRoom') {
+        this.setRoom(data)
+      } else if (command === 'leaveRoom') {
+        if (data.kick) {
+          alert('Вы были исключены из комнаты!')
         }
-      });
-    }
+        this.joinedRoom = null;
+      } else if (command === 'addRoomUser') {
+        this.userConnected(new User(data.id, data.username))
+      } else if (command === 'deleteRoomUser') {
+        this.joinedRoom.deleteUser(data.id)
+      } else if (command === 'setInfo') {
+        this.uid = data.id
+        this.iceServers = data.iceServers
+      } else if (command === 'candidate') {
+        this.__candidateReceived(data.candidate, data.from)
+      } else if (command === 'offer') {
+        this.__offerReceived(data.offer, data.from)
+      } else if (command === 'answer') {
+        this.__answerReceived(data.answer, data.from)
+      } else if (command === 'ping') {
+        this.send({ command: 'pong' })
+      } else if (command === 'error') {
+        console.log(`WS ERROR: ${data.message}`);
+      } else {
+        console.log(`WS ERROR: Unknown command ${command} received`)
+      }
+    },
   },
 
   async mounted() {
     // only after some time username is available
     await this.waitForUsername()
 
-    this.createWsConnection()
+    ws = new ReconnectingWebSocket(WS_ROOMS_URL, {
+      open: () => this.wsOpenAction(),
+      close: () => this.wsCloseAction(),
+      message: (message) => this.wsMessageHandler(message)
+    })
   },
 }
 </script>
