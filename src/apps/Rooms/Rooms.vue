@@ -3,6 +3,9 @@
 
 width = 640px
 
+.bold
+  font-weight bold
+
 #rooms
   height 100vh
   background-color #0c2129
@@ -96,7 +99,7 @@ width = 640px
       <h2>Участники {{ joinedRoom.users.length }}<!-- / {{ joinedRoom.maxUsers }}--></h2>
       <div class="users">
         <div v-for="(user, index) in joinedRoom.users" class="user form-control">
-          <div class="username">{{ user.username }}<span v-show="index === 0"> 👑</span></div>
+          <div class="username" :class="{ bold: this.uid === user.id }">{{ user.username }}<span v-show="index === 0"> 👑</span></div>
           <div v-if="user.stream">
             <video :srcObject.prop="user.stream" autoplay controls></video>
           </div>
@@ -131,6 +134,8 @@ export default {
 
   data() {
     return {
+      uid: null,
+
       dots: '...',
 
       connected: false,
@@ -156,6 +161,13 @@ export default {
     },
 
     __getUser(id) {
+      if (!id) {
+        return null;
+      }
+      if (!this.joinedRoom) {
+        return null
+      }
+
       for (const user of this.joinedRoom.users) {
         if (user.id === id) {
           return user
@@ -221,14 +233,9 @@ export default {
 
       pc.addEventListener('datachannel', (ev) => {
         console.log('Data channel created!')
+        console.log(ev)
         ev.channel.addEventListener('message', (ev) => {
-          console.log(ev.data)
-          // addMessage(messagesDiv, {
-          //   username: user.username,
-          //   avatarUrl: user.avatarUrl,
-          //   datetime: new Date(),
-          //   content: ev.data
-          // })
+          this.addMessage(user, ev.data)
           // this.messageSound.play()
         })
       })
@@ -245,6 +252,7 @@ export default {
       console.log(`RTC offer received from ${user.username}`);
 
       user.pc = await this.__createPeerConnection(user);
+      user.dc = user.pc.createDataChannel('chat');
 
       await user.pc.setRemoteDescription(offer);
       const answer = await user.pc.createAnswer();
@@ -290,11 +298,31 @@ export default {
       }
     },
 
+    addMessage(user, content) {
+      if (!this.joinedRoom) {
+        return
+      }
+      const message = new Message(user.username, content)
+      this.$refs.chat.addMessage(message)
+    },
+
     sendMessage(message) {
-      this.send({
-        command: 'sendMessage',
-        content: message
-      })
+      const currentUser = this.__getUser(this.uid)
+
+      if (!this.joinedRoom) {
+        return
+      }
+      for (const user of this.joinedRoom.users) {
+        if (user.id !== this.uid) {
+          user.dc.send(message)
+        } else {
+          this.addMessage(currentUser, message)
+        }
+      }
+      // this.send({
+      //   command: 'sendMessage',
+      //   content: message
+      // })
     },
 
     updateDots() {
@@ -362,6 +390,8 @@ export default {
 
     async userConnected(user) {
       user.pc = this.__createPeerConnection(user, this.stream)
+      user.dc = user.pc.createDataChannel('chat');
+
       const offer = await user.pc.createOffer({
         offerToReceiveAudio: 1
       })
@@ -425,8 +455,16 @@ export default {
           for (const user in data.users) {
             users.push(new User(user.id, user.username))
           }
-          const host = data.users[0].username === this.$store.state.user.username;
+
+          let host = false
+          if (data.users.length > 0) {
+            host = this.uid === data.users[0].id
+          }
           this.joinedRoom = new Room(data.id, data.name, data.maxUsers, host, data.users)
+          if (host) {
+            const currentUser = this.__getUser(this.uid)
+            currentUser.stream = this.stream
+          }
         } else if (data.command === 'leaveRoom') {
           if (data.kick) {
             alert('Вы были исключены из комнаты!')
@@ -443,6 +481,7 @@ export default {
         } else if (data.command === 'deleteRoomUser') {
           this.joinedRoom.deleteUser(data.id)
         } else if (data.command === 'setInfo') {
+          this.uid = data.id
           this.iceServers = data.iceServers
         } else if (data.command === 'candidate') {
           this.__candidateReceived(data.candidate, data.from)
@@ -450,6 +489,8 @@ export default {
           this.__offerReceived(data.offer, data.from)
         } else if (data.command === 'answer') {
           this.__answerReceived(data.answer, data.from)
+        } else if (data.command === 'ping') {
+          this.send({ command: 'pong' })
         } else if (data.command === 'error') {
           console.log(`WS ERROR: ${data.message}`);
         } else {
