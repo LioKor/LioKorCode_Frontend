@@ -28,7 +28,7 @@ module.exports = {
         historyApiFallback: {
             rewrites: [
                 {
-                    from: /.(js|png|ico)$/,
+                    from: /.(js|png|ico|mp3)$/,
                     to: (context) => {
                         const path = context.parsedUrl.pathname.split('/')
                         return `/${path[path.length - 1]}`
@@ -65,6 +65,10 @@ module.exports = {
             },
             {
                 test: /\.png$/,
+                loader: 'file-loader'
+            },
+            {
+                test: /\.mp3$/,
                 loader: 'file-loader'
             },
             {

@@ -29,6 +29,8 @@ width = 640px
       transition 0.2s ease background-color
       .name
         flex-grow 1
+      .has-password
+        margin-right 10px
     .room:hover
       background-color clHighlight
 
@@ -67,6 +69,23 @@ width = 640px
         <form>
           <div class="form-group">
             <input v-model="createName" type="text" class="form-control" placeholder="Название" maxlength="48">
+            <div class="muted"><a href="#" @click.prevent="showSettings = !showSettings">Настройки</a></div>
+          </div>
+
+          <div v-show="showSettings">
+            <div class="form-group">
+              <input v-model="createPassword" type="password" class="form-control" placeholder="Пароль (оставьте пустым для открытой комнаты)" maxlength="32">
+            </div>
+
+            <div class="form-group">
+              <label>МАКСИМАЛЬНОЕ КОЛ-ВО СЛУШАТЕЛЕЙ - {{ createMaxUsers }}</label>
+              <input v-model="createMaxUsers" type="range" min="2" max="20"
+                     class="form-control" placeholder="Пароль" maxlength="32">
+              <div class="muted">
+                <i>Внимание! Ваш компьютер будет передавать видео-аудио поток каждому пользователю отдельно (P2P).
+                  Т. е. чем больше пользователей, тем выше нагрузка на ваш процессор и интернет-канал.</i>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -76,12 +95,20 @@ width = 640px
 
         <h2>Список комнат</h2>
         <div class="rooms-list">
-<!--          <form class="create-room">-->
-<!--            <input type="text" class="form-control" placeholder="Поиск (id или название комнаты)">-->
-<!--          </form>-->
-          <div v-for="room in this.rooms" class="room form-control" @click="roomJoin(room.id)">
-            <div class="name">{{ room.name }}</div>
-            <div class="users">{{ room.usersAmount }} / {{ room.usersMax }}</div>
+          <form class="create-room">
+            <input type="text" class="form-control" placeholder="Поиск по названию..." v-model="roomSearch">
+          </form>
+          <div v-if="this.filteredRooms.length > 0" v-for="room in this.rooms" class="room form-control" @click="roomJoin(room.id)">
+            <div class="name">{{ room.name }} ({{ room.owner.username }})</div>
+            <div v-show="room.hasPassword" class="has-password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+              </svg>
+            </div>
+            <div class="users">{{ room.users.length }} / {{ room.usersMax }}</div>
+          </div>
+          <div v-else class="room form-control">
+            <div class="name">Созданных комнат нет, но вы можете создать свою.</div>
           </div>
         </div>
       </div>
@@ -92,7 +119,7 @@ width = 640px
         <span v-if="joinedRoom.host">Удалить</span>
         <span v-else>Покинуть</span>
       </button>
-      <h2>Участники {{ joinedRoom.users.length }}<!-- / {{ joinedRoom.maxUsers }}--></h2>
+      <h2>Участники {{ joinedRoom.users.length }} / {{ joinedRoom.maxUsers }}</h2>
       <div class="users">
         <div v-for="(user, index) in joinedRoom.users" class="user form-control">
           <div class="username" :class="{ bold: this.uid === user.id }">{{ user.username }}<span v-show="index === 0"> 👑</span></div>
@@ -113,6 +140,10 @@ width = 640px
 import Chat from './Chat.vue'
 import ReconnectingWebSocket from "../../utils/ReconnectingWebSocket";
 
+import pickdilkSoundSrc from '/src/sounds/pickdilk.mp3'
+import awuSoundSrc from '/src/sounds/awu.mp3'
+import wufSoundSrc from '/src/sounds/wuf.mp3'
+
 import { Room, User, Message } from './models'
 
 const WS_ADDR = (window.location.hostname === 'localhost')? 'localhost:9090': `${window.location.hostname}/ws`
@@ -125,6 +156,14 @@ export default {
 
   data() {
     return {
+      sounds: {
+        newMessage: new Audio(pickdilkSoundSrc),
+        userJoined: new Audio(awuSoundSrc),
+        userLeft: new Audio(wufSoundSrc)
+      },
+
+      showSettings: false,
+
       uid: null,
 
       dots: '...',
@@ -135,7 +174,10 @@ export default {
       joinedRoom: null,
 
       createName: 'Волчачье логово 🐺',
+      createPassword: '',
       createMaxUsers: 20,
+
+      roomSearch: '',
 
       rooms: [],
 
@@ -143,6 +185,18 @@ export default {
 
       devices: null,
       stream: null
+    }
+  },
+
+  computed: {
+    filteredRooms: function() {
+      const rooms = []
+      for (const room of this.rooms) {
+        if (room.name.search(this.roomSearch) !== -1) {
+          rooms.push(room)
+        }
+      }
+      return rooms
     }
   },
 
@@ -162,6 +216,19 @@ export default {
       for (const user of this.joinedRoom.users) {
         if (user.id === id) {
           return user
+        }
+      }
+      return null
+    },
+
+    __getRoom(id) {
+      if (!id) {
+        return null
+      }
+
+      for (const room of this.rooms) {
+        if (room.id === id) {
+          return room
         }
       }
       return null
@@ -219,10 +286,9 @@ export default {
 
       pc.addEventListener('datachannel', (ev) => {
         console.log('Data channel created!')
-        console.log(ev)
         ev.channel.addEventListener('message', (ev) => {
           this.addMessage(user, ev.data)
-          // this.messageSound.play()
+          this.sounds.newMessage.play()
         })
       })
 
@@ -315,10 +381,16 @@ export default {
       }
     },
 
-    roomJoin(id) {
+    async roomJoin(id) {
+      const room = this.__getRoom(id)
+      let password = ''
+      if (room.hasPassword) {
+        password = await this.$store.state.modal.prompt('Введите пароль')
+      }
+
       this.send({
         command: 'joinRoom',
-        id: id
+        id, password
       })
     },
 
@@ -335,12 +407,17 @@ export default {
           echoCancellation: true,
           noiseSuppression: true
         },
-        video: true
+        video: {
+          width: 1280,
+          height: 720,
+          frameRate: 30
+        }
       });
 
       const data = {
         command: 'createRoom',
         name: this.createName,
+        password: this.createPassword,
         maxUsers: this.createMaxUsers
       }
       this.send(data);
@@ -371,6 +448,8 @@ export default {
     },
 
     setRoom(data) {
+      data = data.room
+
       if (this.joinedRoom) {
         return
       }
@@ -383,10 +462,16 @@ export default {
       if (data.users.length > 0) {
         host = this.uid === data.users[0].id
       }
-      this.joinedRoom = new Room(data.id, data.name, data.maxUsers, host, data.users)
+
+      const owner = new User(data.owner.id, data.owner.username)
+      this.joinedRoom = new Room(data.id, data.name, owner, data.usersMax, data.hasPassword, host, data.users)
       if (host) {
         const currentUser = this.__getUser(this.uid)
-        currentUser.stream = this.stream
+        if (currentUser) {
+          currentUser.stream = this.stream
+        } else {
+          console.log('WARN: currentUser is undefined')
+        }
       }
     },
 
@@ -403,6 +488,7 @@ export default {
       })
 
       this.joinedRoom.addUser(user)
+      await this.sounds.userJoined.play()
     },
 
     wsOpenAction() {
@@ -439,6 +525,7 @@ export default {
         this.userConnected(new User(data.id, data.username))
       } else if (command === 'deleteRoomUser') {
         this.joinedRoom.deleteUser(data.id)
+        this.sounds.userLeft.play()
       } else if (command === 'setInfo') {
         this.uid = data.id
         this.iceServers = data.iceServers
@@ -451,7 +538,7 @@ export default {
       } else if (command === 'ping') {
         this.send({ command: 'pong' })
       } else if (command === 'error') {
-        console.log(`WS ERROR: ${data.message}`);
+        this.$store.state.popups.error('Ошибка!', data.message)
       } else {
         console.log(`WS ERROR: Unknown command ${command} received`)
       }

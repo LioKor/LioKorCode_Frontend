@@ -20,11 +20,13 @@ export class User {
 }
 
 export class Room {
-    constructor(id, name, maxUsers, host, users) {
+    constructor(id, name, owner, maxUsers, hasPassword, host, users) {
         this.id = id
-        this.name = name;
-        this.maxUsers = maxUsers;
-        this.host = host;
+        this.name = name
+        this.owner = owner
+        this.maxUsers = maxUsers
+        this.hasPassword = hasPassword
+        this.host = host
 
         this.users = users
     }
