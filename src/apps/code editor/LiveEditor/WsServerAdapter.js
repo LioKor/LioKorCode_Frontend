@@ -44,11 +44,11 @@ export default class WsServerAdapter {
 
   // Next functions implements interface that defined in "ot" library
   sendOperation(revision, operation, selection) {
-    this.ws.send('op', [revision, operation, selection]);
+    this.ws.send(['op', [revision, operation, selection]]);
   };
 
   sendSelection(selection) {
-    this.ws.send('sel', selection);
+    this.ws.send(['sel', selection]);
   };
 
   registerCallbacks(callbacks = {
