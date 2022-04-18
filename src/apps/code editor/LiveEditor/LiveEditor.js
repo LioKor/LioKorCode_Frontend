@@ -101,11 +101,11 @@ export default class LiveEditor {
     }
   }
   __sendJoin() {
-    this.ws.send(['join', { username: this.username }]);
+    this.ws.send('join', { username: this.username });
   }
   // Send our 'leave' event on server
   leave() {
-    this.ws.send(['leave', { username: this.username }]);
+    this.ws.send('leave', { username: this.username });
     this.ws.close();
     this.editorAdapter?.detach();
   }
