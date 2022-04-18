@@ -2,6 +2,8 @@ export default class WS {
     ws = undefined;
     url = "";
     protocols = undefined;
+    eventFieldName = '';
+    dataFieldName = '';
     handlers = {
         open: (e) => {console.log(`WS connection to ${this.url} opened`, e)},
         close: (e) => {console.log(`WS connection to ${this.url} closed`, e)},
@@ -10,9 +12,11 @@ export default class WS {
         // more events that will come from server
     }
 
-    constructor(url, protocols = undefined) {
+    constructor(url, eventFieldName = 'e', dataFieldName = 'd', protocols = undefined) {
         this.url = url;
         this.protocols = protocols;
+        this.eventFieldName = eventFieldName;
+        this.dataFieldName = dataFieldName;
     }
 
     open() {
@@ -35,9 +39,12 @@ export default class WS {
         }
     }
 
-    send(eventName, data) {
-        console.log("WS SEND MESSAGE:", eventName, data);
-        this.ws.send(JSON.stringify({e: eventName, d: data}));
+    send(event, data) {
+        console.log("WS SEND MESSAGE:", event, data);
+        const m = {};
+        m[this.eventFieldName] = event;
+        m[this.dataFieldName] = data;
+        this.ws.send(JSON.stringify(m));
     }
 
     close(status, reason) {

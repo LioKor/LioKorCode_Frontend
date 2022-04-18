@@ -30,7 +30,7 @@ export default class LiveEditor {
     });
 
     // Create WebSocket connection
-    this.ws = new WS(wsUrl);
+    this.ws = new WS(wsUrl, ['e', 'd']);
 
     this.__setupHandlers();
 
