@@ -37,7 +37,8 @@
 
           <div class="title">
               <div class="avatar">
-                  <img :src="avatarUrl" alt="">
+                  <img v-if="avatarUrl" :src="avatarUrl" alt="">
+                  <img v-else src="../images/cat_loading.gif" alt="">
                   <div class="cover">
                       Изменить
                   </div>

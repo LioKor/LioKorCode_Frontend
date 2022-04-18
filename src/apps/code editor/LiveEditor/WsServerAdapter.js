@@ -25,7 +25,9 @@ export default class WsServerAdapter {
       const
         clientId = data[0],
         operation = data[1],
-        selection = data[2];
+        selection = data[2],
+        filename = data[3];
+      console.log("OPERATION: ", data);
       this.callbacks.operation(operation);
       this.callbacks.selection(clientId, selection);
     };
@@ -33,7 +35,8 @@ export default class WsServerAdapter {
     this.ws.handlers.sel = (data) => {
       const
         clientId = data[0],
-        selection = data[1];
+        selection = data[1],
+        filename = data[2];
       this.callbacks.selection(clientId, selection);
     };
 
@@ -42,7 +45,7 @@ export default class WsServerAdapter {
     };
   }
 
-  // Next functions implements interface that defined in "ot" library
+  // Functions below implements interface that defined in "ot" library
   sendOperation(revision, operation, selection) {
     this.ws.send('op', [revision, operation, selection]);
   };
