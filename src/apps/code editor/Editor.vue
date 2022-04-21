@@ -81,6 +81,9 @@
         this.aceEditor.resize();
       },
       onChangeAction() {
+        if (this.aceEditor.session.ignoreChangeListners)
+          return;
+
         const text = this.aceEditor.getValue();
         this.$emit('editorChange', text);
       },
@@ -89,12 +92,12 @@
           this.textWhenMounted = text;
         } else {
           if (disableChangeEmit)
-            this.aceEditor.removeAllListeners('change');
+            this.aceEditor.session.ignoreChangeListners = true;
 
           this.aceEditor.setValue(text, 1); // ', 1' to disable selection
 
           if (disableChangeEmit)
-            this.aceEditor.on('change', this.onChangeAction);
+            this.aceEditor.session.ignoreChangeListners = false;
         }
 
         if (name) {

@@ -167,7 +167,18 @@
       },
 
       openTreeFile(treeItem) {
-        this.liveEditor?.setOpenedFilename(treeItem.name);
+        if (this.liveEditor) {
+          this.liveEditor.setOpenedFilename(treeItem.name);
+          let filepath = this.$refs.tree.getPathByItem(treeItem, true);
+          filepath = filepath.join('/');
+          console.log(filepath);
+          const fileText = this.$store.state.api.getRedactorFile(this.$refs.header.redatorSessionUid, filepath);
+          if (!fileText.ok_) {
+            this.$store.state.popups.error("Не удалось получить актуальное состояние файла");
+            return;
+          }
+          treeItem.value = fileText.text;
+        }
 
         this.$refs.tabs.addTab({
           name: treeItem.name,
@@ -296,6 +307,7 @@
             wsUrl = 'wss://code.liokor.com';
           }
           wsUrl += this.$store.state.api.apiUrl + '/ws/redactor/' + id;
+          console.log(wsUrl);
 
           const highLiteFile = (filename) => {
             this.$refs.tree.highlightFile(filename);

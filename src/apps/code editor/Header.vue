@@ -121,7 +121,7 @@
           return;
         }
 
-        const uid = await this.$store.state.api.openRedactorSession(this.$parent.$refs.editor.aceEditor.getValue());
+        const uid = await this.$store.state.api.openRedactorSession(this.$parent.$refs.tree.getSource());
         if (!uid.ok_) {
           this.$store.state.popups.error('Не удалось создать сессию');
           return;

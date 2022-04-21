@@ -210,14 +210,14 @@
       },
 
       // --- Controls by clicks on context menu
-      getPathByItem(item, where = this.reactiveItems, pathPrefix = []) {
+      getPathByItem(item, inStrings = false, where = this.reactiveItems, pathPrefix = []) {
         for (let i = where.length-1; i >= 0; i--) {
           const curItem = where[i];
           if (curItem === item) {
-            return pathPrefix.concat([i]);
+            return pathPrefix.concat([(inStrings ? item.name : i)]);
           }
           if (typeof curItem.value !== 'string') {
-            const res = this.getPathByItem(item, curItem.value, pathPrefix.concat([i]));
+            const res = this.getPathByItem(item, inStrings, curItem.value, pathPrefix.concat([(inStrings ? curItem.name : i)]));
             if (res)
               return res;
           }
@@ -538,7 +538,7 @@
         }
         return a / 360;
       },
-      hsl2hex(h, s, l) {
+      hsl2hex(h, s, l, a = 1) {
         if (s === 0) { return this.rgb2hex(l, l, l); }
         let var2 = l < 0.5 ? l * (1+s) : (l+s) - (s*l);
         let var1 = 2 * l - var2;
@@ -550,9 +550,9 @@
           if (3*hue < 2) { return var1 + (var2-var1)*6*(2/3 - hue); }
           return var1;
         };
-        return this.rgb2hex(hue2rgb(h+1/3), hue2rgb(h), hue2rgb(h-1/3));
+        return this.rgb2hex(hue2rgb(h+1/3), hue2rgb(h), hue2rgb(h-1/3), a);
       },
-      rgb2hex (r, g, b, a = 0) {
+      rgb2hex (r, g, b, a = 1) {
         function digits (n) {
           const m = Math.round(255*n).toString(16);
           return m.length === 1 ? '0'+ m : m;
@@ -564,7 +564,7 @@
         const {path} = this.stringPathToPath(pathToFile);
         const newEl = this.getElByPath(path);
 
-        const color = this.hsl2hex(this.hueFromName(userName), 0.75, 0.5);
+        const color = this.hsl2hex(this.hueFromName(userName), 0.75, 0.5, 0.6);
 
         const oldEl = this.highlightedFiles[userName];
         oldEl?.classList.remove('highlighted');

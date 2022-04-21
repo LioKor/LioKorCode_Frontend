@@ -47,7 +47,6 @@ ot.AceEditorAdapter = (function (global) {
         bind(this, 'onScrollVertical');
         bind(this, 'onScrollHorizontal');
 
-        console.log("SET SOME", this.onChange);
         ae.on('change', this.onChange);
         ae.on('changeSelection', this.onCursorActivity);
         ae.on('focus', this.onFocus);
@@ -287,9 +286,8 @@ ot.AceEditorAdapter = (function (global) {
     };
 
     AceEditorAdapter.prototype.onChange = function (change) {
-        console.log("SOME AAAAAAAAAAA");
         this.changeInProgress = true;
-        if (!this.ignoreNextChange) {
+        if (!this.ignoreNextChange && !this.ae.ignoreChangeListners) {
             var pair = AceEditorAdapter.operationFromAceEditorChanges(change, this.ae);
             this.trigger('change', pair[0], pair[1]);
         }

@@ -24,4 +24,5 @@ export default class Api extends ApiRequest {
 
     openRedactorSession = (sourceCode) => this.post(`/redactor`, {sourceCode});
     checkRedactorSession = (uid) => this.get(`/redactor/${uid}`);
+    getRedactorFile = (uid, filepath) => this.get(`/redactor/${uid}/${encodeURIComponent(filepath)}`);
 }
