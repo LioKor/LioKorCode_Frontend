@@ -1,5 +1,5 @@
 <style lang="stylus">
-  @import "../../../styles/constants.styl"
+  @require "../../../styles/constants.styl"
 
   font-size = 16px
 

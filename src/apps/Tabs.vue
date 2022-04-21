@@ -1,5 +1,5 @@
 <style lang="stylus">
-  @import "../styles/constants.styl"
+  @require "../styles/constants.styl"
 
   //tab-width = 25px
   bg-color = color2

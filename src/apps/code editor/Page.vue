@@ -1,5 +1,5 @@
 <style lang="stylus">
-  @import "../../styles/constants.styl"
+  @require "../../styles/constants.styl"
 
   background = linear-gradient(30deg, #0e2028 0%, #2e3f44 40%, #0c2129 100%) repeat scroll 0% 0%;
 
@@ -56,6 +56,9 @@
           margin-top 20px
     #code-editor-all
       height 'calc(100% - %s)' % headerHeight
+
+    .tabs-vertical-line
+      min-width 23px
 </style>
 
 <template>
@@ -65,7 +68,7 @@
     <div id="code-editor-all">
       <div id="task-block" class="task-and-editor">
         <div id="taskInfo-and-tree">
-          <Tabs class="vertical" ref="tabsVertical" :items="[
+          <Tabs class="vertical tabs-vertical-line" ref="tabsVertical" :items="[
               {name: 'Задание', action: () => {this.openedTab = 0}, closable: false},
               {name: 'Файлы', action: () => {this.openedTab = 1}, closable: false}
           ]"></Tabs>

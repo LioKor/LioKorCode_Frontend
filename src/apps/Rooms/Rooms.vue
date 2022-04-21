@@ -1,5 +1,5 @@
 <style lang="stylus">
-@import '../../styles/constants.styl'
+@require '../../styles/constants.styl'
 
 bgColor1 = #282C34
 bgColor2 = #1D1E1F

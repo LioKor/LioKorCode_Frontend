@@ -1,5 +1,5 @@
 <style lang="stylus">
-  @import "../../styles/constants.styl"
+  @require "../../styles/constants.styl"
 
   background = linear-gradient(20deg, color1, color3)
 

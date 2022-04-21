@@ -1,5 +1,5 @@
 <style lang="stylus">
-  @import "../../styles/constants.styl"
+  @require "../../styles/constants.styl"
 
   taskHeight = 200px
   taskWidth = 300px

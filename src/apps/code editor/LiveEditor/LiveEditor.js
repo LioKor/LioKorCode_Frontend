@@ -53,7 +53,7 @@ export default class LiveEditor {
       this.callbacks.open();
     };
 
-    // Disconnect form server
+    // Disconnect from server
     this.ws.handlers.close = () => {
       console.log('WS live redactor disconnected from server');
       this.callbacks.close();
@@ -82,13 +82,11 @@ export default class LiveEditor {
 
     // New user joined
     this.ws.handlers.join = (data) => {
-      console.log("User joined: ", data);
       this.callbacks.join(data);
     };
 
     // Some user quit
     this.ws.handlers.quit = (data) => {
-      console.log("User quit with id: ", data);
       this.callbacks.quit(data);
     };
   }

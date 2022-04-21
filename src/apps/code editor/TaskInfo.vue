@@ -1,5 +1,5 @@
 <style lang="stylus">
-  @import "../../styles/constants.styl"
+  @require "../../styles/constants.styl"
 
   background = linear-gradient(30deg, #0e2028 0%, #2e3f44 40%, #0c2129 100%) repeat scroll 0% 0%;
 

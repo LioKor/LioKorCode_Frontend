@@ -1,5 +1,5 @@
 <style lang="stylus">
-  @import "../styles/constants.styl"
+  @require "../styles/constants.styl"
 
   line-width = 15px
   line-color = color3
