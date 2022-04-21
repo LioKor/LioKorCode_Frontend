@@ -20,7 +20,9 @@ module.exports = {
         new VueLoaderPlugin(),
         new webpack.DefinePlugin({
             BUILD_TIMESTAMP: Date.now(),
-            VERSION: JSON.stringify(require('./package.json').version)
+            VERSION: JSON.stringify(require('./package.json').version),
+            VUE_OPTIONS_API: true,
+            VUE_PROD_DEVTOOLS: true,
         })
     ],
     devServer: {

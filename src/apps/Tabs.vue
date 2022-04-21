@@ -109,7 +109,7 @@
   export default {
     props: {
       items: {
-        type: [],
+        type: Array,
         default: [],
         required: true,
       },

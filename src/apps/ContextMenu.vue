@@ -50,7 +50,10 @@
 
   export default {
     props: {
-      menus: [],
+      menus: {
+        type: Array,
+        default: []
+      }
       // [
       //   {
       //    targets: "",

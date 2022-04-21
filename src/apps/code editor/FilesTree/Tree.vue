@@ -152,7 +152,7 @@
         default: "",
       },
       items: {
-        type: [],
+        type: Array,
         default: [],
         required: true,
       },
