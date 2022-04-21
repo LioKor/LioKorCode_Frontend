@@ -21,7 +21,13 @@ export default class LiveEditor {
   isDocGotten = false;
   username = undefined;
 
-  constructor(editor, wsUrl) {
+  openedFilename = null;
+
+  constructor(editor, wsUrl, openedFilename, fileSelectionCallback, fileOperationCallback) {
+    this.openedFilename = openedFilename;
+    this.fileSelectionCallback = fileSelectionCallback;
+    this.fileOperationCallback = fileOperationCallback;
+
     // Get and setup ace editor
     this.editor = editor;
     editor.setOptions({
@@ -67,7 +73,9 @@ export default class LiveEditor {
       this.isDocGotten = true;
 
       this.editor.setValue(data.document, 1);
-      this.serverAdapter = new WsServerAdapter(this.ws);
+      this.serverAdapter = new WsServerAdapter(this.ws, this.openedFilename);
+      this.serverAdapter.otherFileSelectionCallback = this.fileSelectionCallback;
+      this.serverAdapter.otherFileOperationCallback = this.fileOperationCallback;
       this.editorAdapter = new ot.AceEditorAdapter(this.editor);
       this.client = new ot.EditorClient(data.revision, data.clients, this.serverAdapter, this.editorAdapter);
 
@@ -106,5 +114,10 @@ export default class LiveEditor {
     this.ws.send('leave', { username: this.username });
     this.ws.close();
     this.editorAdapter?.detach();
+  }
+
+  setOpenedFilename(filename) {
+    this.openedFilename = filename;
+    this.serverAdapter?.setOpenedFilename(filename);
   }
 }

@@ -79,7 +79,7 @@
 
             <Tree ref="tree" name="Project"
                   :items="getDefaultFiles()"
-                  @open-file-text="openTreeFile"
+                  @open-file="openTreeFile"
                   @rename-file="updateFileNameInTabs"
                   @editorSetText="editorSetText"
                   @delete-file="deleteFromTabs" />
@@ -167,12 +167,14 @@
       },
 
       openTreeFile(treeItem) {
+        this.liveEditor?.setOpenedFilename(treeItem.name);
+
         this.$refs.tabs.addTab({
           name: treeItem.name,
           action: () => {this.$refs.tree.openFileByItem(treeItem)},
           uniqueValue: treeItem,
         });
-        this.$refs.editor.setReadOnly(false)
+        this.$refs.editor.setReadOnly(false);
         this.$refs.editor.setText(treeItem.value, treeItem.name);
       },
       updateOpenedFileText(text) {
@@ -269,8 +271,8 @@
         //   return;
         // }
 
-        this.$refs.tree.lockOpeningFiles();
-        this.$refs.tabs.lockChangeTabs();
+        // this.$refs.tree.lockOpeningFiles();
+        // this.$refs.tabs.lockChangeTabs();
         this.createLiveEditor(uid, filename);
 
         // if (taskId !== undefined) {
@@ -295,7 +297,10 @@
           }
           wsUrl += this.$store.state.api.apiUrl + '/ws/redactor/' + id;
 
-          this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, wsUrl);
+          const highLiteFile = (filename) => {
+            this.$refs.tree.highlightFile(filename);
+          }
+          this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, wsUrl, this.openedFilename, highLiteFile, highLiteFile);
           this.liveEditor.callbacks.join = ({client_id, username}) => {
             this.$store.state.popups.alert('К сессии присоединился:', username);
           };

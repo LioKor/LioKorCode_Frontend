@@ -45,6 +45,10 @@
     li.selected:focus::before
       background color4
 
+    li.highlighted::before
+      content ""
+      background var(--color)
+
     li.name.folder
       list-style georgian
       ~ li
@@ -161,6 +165,7 @@
         selectedItem: {el: null, item: {}}, // todo: make non-reactive
         openedItem: {el: null, item: {}}, // todo: make non-reactive
         canOpenFiles: true, // todo: make non-reactive
+        highlightedFiles: {}, // todo: make non-reactive
       }
     },
 
@@ -359,7 +364,7 @@
         }
         localStorage.setItem('openedFilePath', path.join(','));
         this.toggleAndSaveFileClass(el, this.openedItem, 'opened', list, idx);
-        this.$emit("openFileText", this.openedItem.item);
+        this.$emit("openFile", this.openedItem.item);
       },
       openFileByItem(item) {
         this.openFile(this.getElByPath(this.getPathByItem(item)));
@@ -505,7 +510,69 @@
       unlockOpeningFiles() {
         this.canOpenFiles = true;
         this.$el.classList.remove('blocked');
-      }
+      },
+
+      stringPathToPath(path, where = this.reactiveItems) {
+        path = path.split('/');
+        const resultPath = [];
+        let item;
+        path.forEach(filename => {
+          if (item === undefined)
+            throw new Error("Path isn't correct. Trying to find next file in file, not in folder");
+
+          const fileIdx = where.findIndex(el => el.name === filename);
+          resultPath.push(fileIdx);
+          if (fileIdx === -1)
+            throw new Error("Path isn't correct. Can't find file with given name");
+          item = where[fileIdx];
+          where = item.value;
+        });
+        return {path: resultPath, item: item};
+      },
+
+
+      hueFromName (name) {
+        let a = 1;
+        for (let i = 0; i < name.length; i++) {
+          a = 17 * (a + name.charCodeAt(i)) % 360;
+        }
+        return a / 360;
+      },
+      hsl2hex(h, s, l) {
+        if (s === 0) { return this.rgb2hex(l, l, l); }
+        let var2 = l < 0.5 ? l * (1+s) : (l+s) - (s*l);
+        let var1 = 2 * l - var2;
+        let hue2rgb = function (hue) {
+          if (hue < 0) { hue += 1; }
+          if (hue > 1) { hue -= 1; }
+          if (6*hue < 1) { return var1 + (var2-var1)*6*hue; }
+          if (2*hue < 1) { return var2; }
+          if (3*hue < 2) { return var1 + (var2-var1)*6*(2/3 - hue); }
+          return var1;
+        };
+        return this.rgb2hex(hue2rgb(h+1/3), hue2rgb(h), hue2rgb(h-1/3));
+      },
+      rgb2hex (r, g, b, a = 0) {
+        function digits (n) {
+          const m = Math.round(255*n).toString(16);
+          return m.length === 1 ? '0'+ m : m;
+        }
+        return '#' + digits(r) + digits(g) + digits(b) + digits (a);
+      },
+
+      highlightFile(pathToFile, userName) {
+        const {path} = this.stringPathToPath(pathToFile);
+        const newEl = this.getElByPath(path);
+
+        const color = this.hsl2hex(this.hueFromName(userName), 0.75, 0.5);
+
+        const oldEl = this.highlightedFiles[userName];
+        oldEl?.classList.remove('highlighted');
+
+        this.highlightedFiles[userName] = newEl;
+        newEl.style.setProperty('--color', color);
+        newEl.classList.add('highlighted');
+      },
     }
   }
 </script>
