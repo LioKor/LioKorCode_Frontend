@@ -275,7 +275,7 @@
       },
 
       // --- WebSockets live editor
-      async connectSession(uid, filename = undefined) {
+      async connectSession(uid) {
         // const response = await this.$store.state.api.checkRedactorSession(uid);
         // if (!response.ok_) {
         //   this.$store.state.popups.error('Не удалось подключиться к сессии', uid);
@@ -284,7 +284,7 @@
 
         // this.$refs.tree.lockOpeningFiles();
         // this.$refs.tabs.lockChangeTabs();
-        this.createLiveEditor(uid, filename);
+        this.createLiveEditor(uid, this.$refs.tree.openedItem?.name);
 
         // if (taskId !== undefined) {
         //   this.$refs.taskInfo.getTask(taskId);

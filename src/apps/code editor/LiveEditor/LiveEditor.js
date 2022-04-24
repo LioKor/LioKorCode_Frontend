@@ -118,6 +118,6 @@ export default class LiveEditor {
 
   setOpenedFilename(filename) {
     this.openedFilename = filename;
-    this.serverAdapter?.setOpenedFilename(filename);
+    this.serverAdapter.setOpenedFilename?.(filename);
   }
 }
