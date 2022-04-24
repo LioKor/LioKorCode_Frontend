@@ -132,17 +132,25 @@
 
         return solution.uid_;
       },
+
+      __solutionNToBr(solution) {
+        solution.checkMessage = solution.checkMessage.replaceAll('\n', '<br>')
+      },
+
       replaceSolution(uid, solution) {
         const idx = this.solutions.findIndex((sol) => sol.uid_ === uid);
         if (idx === -1) {
           return;
         }
-        solution.checkMessage = solution.checkMessage.replaceAll('\n', '<br>')
+        this.__solutionNToBr(solution)
         this.solutions[idx].set(solution);
       },
 
       async getSolutions(id) {
         const solutions = await this.$store.state.api.getSolutions(id);
+        for (const solution of solutions) {
+          this.__solutionNToBr(solution)
+        }
 
         if (!solutions.ok_) {
           this.$store.state.popups.error("Не удалось получить решения");
