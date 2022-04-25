@@ -4,6 +4,8 @@ export default class Task extends Model {
   default = {
     id: '?',
     name: "",
+    creator: '',
+    creatorId: 0,
     description: "",
     stdinDescription: "",
     stdoutDescription: "",
