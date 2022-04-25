@@ -35,7 +35,7 @@
         <div class="form-group">
           <label>ТЕСТЫ<span class="error-text"></span></label>
           <AddableList v-model="task.tests" ref="list"></AddableList>
-          <div class="btn thin" @click="addTestToList">Добавить тест</div>
+          <div class="btn" @click="addTestToList">Добавить тест</div>
         </div>
         <div class="form-group">
           <div class="btn" @click="createTask(task.toNetwork())">Создать</div>
@@ -66,7 +66,7 @@
           this.$store.state.popups.error("Не получилось создать задание");
           return {};
         }
-        this.$router.push('/tasks/my');
+        this.$router.push('/');
       },
 
       addTestToList() {
