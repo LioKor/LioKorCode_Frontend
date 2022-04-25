@@ -11,9 +11,13 @@ module.exports = env => {
     return {
         entry: './src/index.js',
         output: {
-            filename: '[name].bundle.js',
+            filename: '[name].[contenthash].bundle.js',
             path: path.resolve(__dirname, 'dist'),
-            publicPath: '/'
+            publicPath: '/',
+            clean: true
+        },
+        performance: {
+            maxAssetSize: 368640
         },
         plugins: [
             new HtmlWebpackPlugin({
