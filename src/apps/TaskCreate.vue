@@ -29,13 +29,13 @@
             <textarea class="form-control" v-model="task.stdoutDescription"></textarea>
         </div>
         <div class="form-group">
-          <label>ПОДСКАЗКИ<span class="error-text"></span></label>
+          <label>ОСОБЫЕ УКАЗАНИЯ<span class="error-text"></span></label>
           <textarea class="form-control" v-model="task.hints"></textarea>
         </div>
         <div class="form-group">
           <label>ТЕСТЫ<span class="error-text"></span></label>
           <AddableList v-model="task.tests" ref="list"></AddableList>
-          <div class="btn thin" @click="addTestToList">Добавить тест</div>
+          <div class="btn" @click="addTestToList">Добавить тест</div>
         </div>
         <div class="form-group">
           <div class="btn" @click="createTask(task.toNetwork())">Создать</div>
@@ -66,7 +66,7 @@
           this.$store.state.popups.error("Не получилось создать задание");
           return {};
         }
-        this.$router.push('/tasks/my');
+        this.$router.push('/');
       },
 
       addTestToList() {

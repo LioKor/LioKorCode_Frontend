@@ -1,6 +1,6 @@
 {
   "name": "liokor_code",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "license": "MIT",
   "private": true,
   "author": {
@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "npx webpack-cli serve --mode development",
+    "devLocal": "npx webpack-cli serve --mode development --env=local",
     "dist": "npx webpack-cli build --mode production"
   },
   "dependencies": {

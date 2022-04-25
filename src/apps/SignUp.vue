@@ -92,7 +92,7 @@
         if (response.ok_) {
           this.$store.state.popups.success("Добро пожаловать!", `Пользователь ${this.username} успешно создан!`);
           await this.$store.dispatch('GET_USER');
-          await this.$router.push('/profile');
+          await this.$router.push('/');
           return;
         }
 

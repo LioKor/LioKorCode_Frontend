@@ -1,9 +1,4 @@
 <style lang="stylus">
-  @require '../styles/constants.styl'
-
-  .btn.thin
-    padding-top 4px
-    padding-bottom 4px
 </style>
 
 <template>
@@ -34,13 +29,13 @@
             <textarea class="form-control" v-model="task.stdoutDescription"></textarea>
         </div>
         <div class="form-group">
-          <label>ПОЯСНЕНИЯ<span class="error-text"></span></label>
+          <label>ОСОБЫЕ УКАЗАНИЯ<span class="error-text"></span></label>
           <textarea class="form-control" v-model="task.hints"></textarea>
         </div>
         <div class="form-group">
           <label>ТЕСТЫ<span class="error-text"></span></label>
           <AddableList v-model="task.tests" ref="list"></AddableList>
-          <div class="btn thin" @click="addTestToList">Добавить тест</div>
+          <div class="btn" @click="addTestToList">Добавить тест</div>
         </div>
         <div class="form-group">
           <div class="btn" @click="updateTaskInfo($route.params.taskId, task.toNetwork())">Сохранить</div>
@@ -104,7 +99,7 @@
           this.$store.state.popups.error("Не получилось удалить задание");
           return;
         }
-        this.$router.push('/tasks/my');
+        this.$router.push('/');
       },
 
       addTestToList() {

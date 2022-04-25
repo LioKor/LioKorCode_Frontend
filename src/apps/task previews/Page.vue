@@ -101,15 +101,13 @@
         allTasks: [],
         myTasks: [],
         tasks: [],
+        myTasksReceived: false,
         isSearchedMyTasks: false,
       }
     },
     async mounted() {
       this.allTasks = await this.getTasks('getTasks');
       this.tasks = this.allTasks.concat();
-
-      this.myTasks = await this.getTasks('getMyTasks', true);
-      this.myTasks.forEach(task => task.isMy = true);
     },
     methods: {
       async getTasks(apiRequestName, silent = false) {
@@ -122,13 +120,17 @@
 
         return tasks;
       },
-      updateSearch(text, options) {
+      async updateSearch(text, options) {
         text = text.toLowerCase();
         this.tasks = [];
 
         let tasksToSearch = this.allTasks;
         this.isSearchedMyTasks = false;
         if (options.my === true) {
+          if (!this.myTasksReceived) {
+            this.myTasks = await this.getTasks('getMyTasks', true)
+            this.myTasksReceived = true
+          }
           this.isSearchedMyTasks = true;
           tasksToSearch = this.myTasks;
         }

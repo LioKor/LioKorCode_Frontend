@@ -63,7 +63,7 @@
         const response = await this.$store.state.api.signIn(this.username, this.password);
         if (response.ok_) {
           await this.$store.dispatch('GET_USER')
-          await this.$router.push('/profile')
+          await this.$router.push('/')
           this.$store.state.popups.success('Успешный вход!')
           return
         }

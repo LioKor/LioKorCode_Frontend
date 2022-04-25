@@ -1,14 +1,10 @@
 <style lang="stylus">
 @import '../../styles/constants.styl'
 
-bgColor1 = #282C34
-bgColor2 = #1D1E1F
-bgColor3 = #252627
+width = 640px
 
-highlightColor = orange
-
-textColor1 = #DADADA
-textColor2 = #AAA
+.bold
+  font-weight bold
 
 #rooms
   height 100vh
@@ -19,7 +15,7 @@ textColor2 = #AAA
   padding 0 20px
 
   .room-join-or-create
-    max-width 500px
+    max-width width
 
     .create-room
       margin-bottom 10px
@@ -33,71 +29,37 @@ textColor2 = #AAA
       transition 0.2s ease background-color
       .name
         flex-grow 1
+      .has-password
+        margin-right 10px
     .room:hover
       background-color clHighlight
 
   .room-users
+    max-width width
     .user
       margin-bottom 10px
-
-  div.chat
-    background-color bgColor2
-    border-radius 8px
-    max-width 640px
-    height 480px
-    margin-bottom 32px
-
-    div.messages
-      padding 8px
-      overflow-y scroll
-      height 80%
-
-      div.message
-        display flex
-
-        div.avatar
-          img
-            width 48px
-            height 48px
-            border-radius 32px
-        div.body
-          margin-left 16px
-          div.title
-            a.username
-              text-decoration none
-              font-weight bold
-            span.datetime
-              font-style italic
-              font-size 0.9em
-              color textColor2
-            margin-bottom 8px
-      div.message:not(:last-child)
-        margin-bottom 16px
-    div.message-input
-      height 20%
-
-      textarea
-        height 100%
-        font-family Arial
-        border-radius 0 0 8px 8px
-        border none
-        padding 8px
-
-        color textColor1
-        background-color bgColor3
-
-        display block
-        width 100%
-        resize none
-        box-shadow none
-        outline none
+      video
+        margin-top 10px
+        max-width 100%
+        max-height 256px
 </style>
 
 <template>
-  <div @contextmenu.prevent="state = !state">
+  <div class="rooms">
     <div v-if="!this.$store.state.user.isLogined">
       <h1>Комнаты</h1>
       <h2><router-link to="/signin">Авторизуйтесь</router-link>, чтобы создать или присоединиться к комнате</h2>
+    </div>
+    <div v-else-if="!connected">
+      <h1>Комнаты</h1>
+      <div v-if="wasConnected">
+        <h2>Соединение с сервером разорвано.</h2>
+        <h2>Пробуем подключиться{{ dots }}</h2>
+      </div>
+      <div v-else>
+        <h2>Не удалось подключиться к серверу.</h2>
+        <h2>Пробуем еще{{ dots }}</h2>
+      </div>
     </div>
     <div v-else-if="!joinedRoom">
       <div class="room-join-or-create">
@@ -106,12 +68,25 @@ textColor2 = #AAA
         <h2>Создать</h2>
         <form>
           <div class="form-group">
-            <input v-model="createName" type="text" class="form-control" placeholder="Название">
+            <input v-model="createName" type="text" class="form-control" placeholder="Название" maxlength="48">
+            <div class="muted"><a href="#" @click.prevent="showSettings = !showSettings">Настройки</a></div>
           </div>
 
-<!--          <div class="form-group">-->
-<!--            <input v-model="createMaxUsers" type="number" class="form-control" placeholder="Максимальное кол-во участников">-->
-<!--          </div>-->
+          <div v-show="showSettings">
+            <div class="form-group">
+              <input v-model="createPassword" type="password" class="form-control" placeholder="Пароль (оставьте пустым для открытой комнаты)" maxlength="32">
+            </div>
+
+            <div class="form-group">
+              <label>МАКСИМАЛЬНОЕ КОЛ-ВО СЛУШАТЕЛЕЙ - {{ createMaxUsers }}</label>
+              <input v-model="createMaxUsers" type="range" min="2" max="20"
+                     class="form-control" placeholder="Пароль" maxlength="32">
+              <div class="muted">
+                <i>Внимание! Ваш компьютер будет передавать видео-аудио поток каждому пользователю отдельно (P2P).
+                  Т. е. чем больше пользователей, тем выше нагрузка на ваш процессор и интернет-канал.</i>
+              </div>
+            </div>
+          </div>
 
           <div class="form-group">
             <button class="btn" @click.prevent="roomCreate">Создать</button>
@@ -120,128 +95,344 @@ textColor2 = #AAA
 
         <h2>Список комнат</h2>
         <div class="rooms-list">
-<!--          <form class="create-room">-->
-<!--            <input type="text" class="form-control" placeholder="Поиск (id или название комнаты)">-->
-<!--          </form>-->
-          <div v-for="room in this.rooms" class="room form-control" @click="roomJoin(room.id)">
-            <div class="name">{{ room.name }}</div>
-            <div class="users">{{ room.usersAmount }}<!-- / {{ room.usersMax }}--></div>
+          <form class="create-room">
+            <input type="text" class="form-control" placeholder="Поиск по названию..." v-model="roomSearch">
+          </form>
+          <div v-if="this.filteredRooms.length > 0" v-for="room in this.rooms" class="room form-control" @click="roomJoin(room.id)">
+            <div class="name">{{ room.name }} ({{ room.owner.username }})</div>
+            <div v-show="room.hasPassword" class="has-password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+              </svg>
+            </div>
+            <div class="users">{{ room.users.length }} / {{ room.usersMax }}</div>
+          </div>
+          <div v-else class="room form-control">
+            <div class="name">Созданных комнат нет, но вы можете создать свою.</div>
           </div>
         </div>
       </div>
     </div>
     <div v-else class="room-users">
       <h1>{{ joinedRoom.name }}</h1>
-      <button class="btn btn-danger" @click="roomLeave">Покинуть</button>
-      <h2>Участники {{ joinedRoom.users.length }}<!-- / {{ joinedRoom.maxUsers }}--></h2>
+      <button class="btn btn-danger" @click="roomLeave">
+        <span v-if="joinedRoom.host">Удалить</span>
+        <span v-else>Покинуть</span>
+      </button>
+      <h2>Участники {{ joinedRoom.users.length }} / {{ joinedRoom.maxUsers }}</h2>
       <div class="users">
-        <div v-for="user in joinedRoom.users" class="user form-control">
-          <div class="username">{{ user.username }}</div>
+        <div v-for="(user, index) in joinedRoom.users" class="user form-control">
+          <div class="username" :class="{ bold: this.uid === user.id }">{{ user.username }}<span v-show="index === 0"> 👑</span></div>
+          <div v-if="user.stream">
+            <video :srcObject.prop="user.stream" autoplay controls :muted="this.uid === user.id"></video>
+          </div>
         </div>
       </div>
 
       <h2>Chat</h2>
-      <div class="chat">
-        <div id="messagesDiv" class="messages" ref="messages">
-          <div v-for="message in messages" class="message">
-            <div class="avatar">
-              <img alt="" src="">
-            </div>
-            <div class="body">
-              <div class="title">
-                <a href="#" class="username" target="_blank">{{ message.username }}</a>
-                <span class="datetime"></span>
-              </div>
-              <div class="content">{{ message.content }}</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="message-input">
-          <textarea
-              v-model="message"
-              @keydown.ctrl.enter.prevent="sendMessage"
-              placeholder="Your message... (Ctrl+Enter to send)"
-          >
-          </textarea>
-        </div>
-      </div>
+      <Chat ref="chat" @sendMessage="sendMessage" />
     </div>
   </div>
 </template>
 
 <script>
 
+import Chat from './Chat.vue'
+import ReconnectingWebSocket from "../../utils/ReconnectingWebSocket";
+
+import pickdilkSoundSrc from '/src/sounds/pickdilk.mp3'
+import awuSoundSrc from '/src/sounds/awu.mp3'
+import wufSoundSrc from '/src/sounds/wuf.mp3'
+
+import { Room, User, Message } from './models'
+
 const WS_ADDR = (window.location.hostname === 'localhost')? 'localhost:9090': `${window.location.hostname}/ws`
 const WS_ROOMS_URL = `${(window.location.protocol === 'http:')? 'ws': 'wss'}://${WS_ADDR}`
 
-let ws = null;
-
-class Message {
-  constructor(username, content) {
-    this.username = username;
-    this.content = content;
-  }
-}
-
-class Room {
-  constructor(id, name, maxUsers, users) {
-    this.id = id
-    this.name = name;
-    this.maxUsers = maxUsers;
-
-    this.users = users
-  }
-}
+let ws = null
 
 export default {
-  components: { },
+  components: { Chat },
 
   data() {
     return {
-      joinedRoom: null, //new Room('asdfasdfsda', 'Wolf', '10', []),
+      sounds: {
+        newMessage: new Audio(pickdilkSoundSrc),
+        userJoined: new Audio(awuSoundSrc),
+        userLeft: new Audio(wufSoundSrc)
+      },
 
-      createName: 'Волчачье логово',
-      createMaxUsers: 10,
+      showSettings: false,
+
+      uid: null,
+
+      dots: '...',
+
+      connected: false,
+      wasConnected: false,
+
+      joinedRoom: null,
+
+      createName: 'Волчачье логово 🐺',
+      createPassword: '',
+      createMaxUsers: 20,
+
+      roomSearch: '',
 
       rooms: [],
 
-      message: '',
-      messages: []
+      iceServers: null,
+
+      devices: null,
+      stream: null
+    }
+  },
+
+  computed: {
+    filteredRooms: function() {
+      const rooms = []
+      for (const room of this.rooms) {
+        if (room.name.search(this.roomSearch) !== -1) {
+          rooms.push(room)
+        }
+      }
+      return rooms
     }
   },
 
   methods: {
-    sendMessage() {
-      ws.send(JSON.stringify({
-        command: 'sendMessage',
-        content: this.message
-      }));
-      this.message = '';
+    send(data) {
+      ws.sendJSON(data)
     },
 
-    roomJoin(id) {
-      this.messages = [];
-      ws.send(JSON.stringify({
+    __getUser(id) {
+      if (!id) {
+        return null;
+      }
+      if (!this.joinedRoom) {
+        return null
+      }
+
+      for (const user of this.joinedRoom.users) {
+        if (user.id === id) {
+          return user
+        }
+      }
+      return null
+    },
+
+    __getRoom(id) {
+      if (!id) {
+        return null
+      }
+
+      for (const room of this.rooms) {
+        if (room.id === id) {
+          return room
+        }
+      }
+      return null
+    },
+
+    async __getDevices() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true
+        });
+
+        const devices = await navigator.mediaDevices.enumerateDevices();
+
+        for (const track of stream.getTracks()) {
+          track.stop();
+        }
+
+        return devices;
+      } catch (e) {
+        throw (e);
+      }
+    },
+
+    __createPeerConnection(user, stream = null) {
+      const pc = new RTCPeerConnection({
+        iceServers: this.iceServers
+      });
+
+      if (stream) {
+        for (const track of stream.getTracks()) {
+          pc.addTrack(track, stream);
+        }
+      }
+
+      pc.addEventListener('icecandidate', (ev) => {
+        if (!ev.candidate) {
+          return;
+        }
+
+        this.send({
+          to: user.id,
+          command: 'candidate',
+          candidate: ev.candidate
+        });
+      });
+
+      pc.addEventListener('iceconnectionstatechange', () => {
+        console.log(`RTC status changed for ${user.username}: ${pc.iceConnectionState}`);
+      });
+
+      pc.addEventListener('track', async (ev) => {
+        user.stream = ev.streams[0];
+      });
+
+      pc.addEventListener('datachannel', (ev) => {
+        console.log('Data channel created!')
+        ev.channel.addEventListener('message', (ev) => {
+          this.addMessage(user, ev.data)
+          this.sounds.newMessage.play()
+        })
+      })
+
+      return pc;
+    },
+
+    async __offerReceived(offer, from) {
+      const user = this.__getUser(from);
+      if (!user) {
+        console.log(`ERROR: offer, unable to find user with id = ${from}`);
+        return;
+      }
+      console.log(`RTC offer received from ${user.username}`);
+
+      user.pc = await this.__createPeerConnection(user);
+      user.dc = user.pc.createDataChannel('chat');
+
+      await user.pc.setRemoteDescription(offer);
+      const answer = await user.pc.createAnswer();
+      await user.pc.setLocalDescription(answer);
+
+      this.send({
+        to: user.id,
+        command: 'answer',
+        answer: answer
+      });
+    },
+
+    async __answerReceived(answer, from) {
+      const user = this.__getUser(from);
+
+      if (!user) {
+        console.log(`ERROR: answer, unable to find user with id = ${from}`);
+        return;
+      }
+
+      console.log(`RTC answer received from ${user.username}`);
+
+      if (!user.pc) {
+        console.log(`ERROR: ${user.username} does not have peer connection!`);
+        return;
+      }
+
+      await user.pc.setRemoteDescription(answer);
+    },
+
+    __candidateReceived(candidate, from) {
+      const user = this.__getUser(from);
+      if (!user) {
+        console.log(`ERROR: candidate, unable to find user with id = ${from}`);
+        return;
+      }
+      console.log(`RTC candidate received from ${user.username}: ${candidate.candidate}`);
+
+      try {
+        user.pc.addIceCandidate(candidate);
+      } catch (e) {
+        console.log(`Unable to add candidate from ${user.username}`);
+      }
+    },
+
+    addMessage(user, content) {
+      if (!this.joinedRoom) {
+        return
+      }
+      const message = new Message(user.username, content)
+      this.$refs.chat.addMessage(message)
+    },
+
+    sendMessage(message) {
+      const currentUser = this.__getUser(this.uid)
+
+      if (!this.joinedRoom) {
+        return
+      }
+      for (const user of this.joinedRoom.users) {
+        if (user.id !== this.uid) {
+          user.dc.send(message)
+        } else {
+          this.addMessage(currentUser, message)
+        }
+      }
+    },
+
+    updateDots() {
+      if (this.dots.length === 3) {
+        this.dots = '.'
+      } else {
+        this.dots += '.'
+      }
+    },
+
+    async roomJoin(id) {
+      const room = this.__getRoom(id)
+      let password = ''
+      if (room.hasPassword) {
+        password = await this.$store.state.modal.prompt('Введите пароль')
+      }
+
+      this.send({
         command: 'joinRoom',
-        id: id
-      }));
+        id, password
+      })
     },
 
-    roomCreate() {
-      this.messages = []
-      const data = JSON.stringify({
+    async roomCreate() {
+      if (this.createName.length === 0) {
+        this.$store.state.modal.alert('Название не может быть пустым')
+        return
+      }
+
+      this.devices = await this.__getDevices()
+
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true
+        },
+        video: {
+          width: 1280,
+          height: 720,
+          frameRate: 30
+        }
+      });
+
+      const data = {
         command: 'createRoom',
         name: this.createName,
+        password: this.createPassword,
         maxUsers: this.createMaxUsers
-      })
-      ws.send(data);
+      }
+      this.send(data);
     },
 
     roomLeave() {
-      ws.send(JSON.stringify({
+      if (this.stream) {
+        for (const track of this.stream.getTracks()) {
+          track.stop()
+        }
+      }
+
+      this.send({
         command: 'leaveRoom',
-      }))
+      })
     },
 
     async waitForUsername() {
@@ -252,44 +443,117 @@ export default {
             clearInterval(checkInterval);
             resolve()
           }
-        }, 50)
+        }, 100)
       })
+    },
+
+    setRoom(data) {
+      data = data.room
+
+      if (this.joinedRoom) {
+        return
+      }
+      const users = []
+      for (const user in data.users) {
+        users.push(new User(user.id, user.username))
+      }
+
+      let host = false
+      if (data.users.length > 0) {
+        host = this.uid === data.users[0].id
+      }
+
+      const owner = new User(data.owner.id, data.owner.username)
+      this.joinedRoom = new Room(data.id, data.name, owner, data.usersMax, data.hasPassword, host, data.users)
+      if (host) {
+        const currentUser = this.__getUser(this.uid)
+        if (currentUser) {
+          currentUser.stream = this.stream
+        } else {
+          console.log('WARN: currentUser is undefined')
+        }
+      }
+    },
+
+    async userConnected(user) {
+      user.pc = this.__createPeerConnection(user, this.stream)
+      user.dc = user.pc.createDataChannel('chat');
+
+      const offer = await user.pc.createOffer()
+      await user.pc.setLocalDescription(offer)
+      this.send({
+        to: user.id,
+        command: 'offer',
+        offer: offer
+      })
+
+      this.joinedRoom.addUser(user)
+      await this.sounds.userJoined.play()
+    },
+
+    wsOpenAction() {
+      this.connected = true
+      this.wasConnected = true
+
+      this.send({
+        command: 'setInfo',
+        username: this.$store.state.user.username
+      })
+      this.send({ command: 'getRooms' })
+    },
+
+    wsCloseAction() {
+      this.connected = false
+      this.joinedRoom = null
+      this.updateDots()
+    },
+
+    wsMessageHandler(message) {
+      const data = JSON.parse(message.data)
+      const command = data.command
+
+      if (command === 'setRooms') {
+        this.rooms = data.rooms
+      } else if (command === 'setRoom') {
+        this.setRoom(data)
+      } else if (command === 'leaveRoom') {
+        if (data.kick) {
+          alert('Вы были исключены из комнаты!')
+        }
+        this.joinedRoom = null;
+      } else if (command === 'addRoomUser') {
+        this.userConnected(new User(data.id, data.username))
+      } else if (command === 'deleteRoomUser') {
+        this.joinedRoom.deleteUser(data.id)
+        this.sounds.userLeft.play()
+      } else if (command === 'setInfo') {
+        this.uid = data.id
+        this.iceServers = data.iceServers
+      } else if (command === 'candidate') {
+        this.__candidateReceived(data.candidate, data.from)
+      } else if (command === 'offer') {
+        this.__offerReceived(data.offer, data.from)
+      } else if (command === 'answer') {
+        this.__answerReceived(data.answer, data.from)
+      } else if (command === 'ping') {
+        this.send({ command: 'pong' })
+      } else if (command === 'error') {
+        this.$store.state.popups.error('Ошибка!', data.message)
+      } else {
+        console.log(`WS ERROR: Unknown command ${command} received`)
+      }
     },
   },
 
   async mounted() {
     // only after some time username is available
-    await this.waitForUsername();
+    await this.waitForUsername()
 
-    ws = new WebSocket(WS_ROOMS_URL);
-    ws.addEventListener('open', () => {
-      console.log('WebSocket connected!')
-
-      ws.send(JSON.stringify({
-        command: 'setInfo',
-        username: this.$store.state.user.username
-      }))
-      ws.send(JSON.stringify({ command: 'getRooms' }));
+    ws = new ReconnectingWebSocket(WS_ROOMS_URL, {
+      open: () => this.wsOpenAction(),
+      close: () => this.wsCloseAction(),
+      message: (message) => this.wsMessageHandler(message)
     })
-
-    ws.addEventListener('message', (message) => {
-      const data = JSON.parse(message.data)
-
-      if (data.command === 'setRooms') {
-        this.rooms = data.rooms
-      } else if (data.command === 'setRoom') {
-        this.joinedRoom = new Room(data.id, data.name, data.maxUsers, data.users)
-      } else if (data.command === 'leaveRoom') {
-        if (data.kick) {
-          alert('Вы были исключены из комнаты!')
-        }
-        this.joinedRoom = null;
-      } else if (data.command === 'addMessage') {
-        this.messages.push(new Message(data.username, data.content));
-      } else if (data.command === 'error') {
-        alert(data.message);
-      }
-    });
   },
 }
 </script>

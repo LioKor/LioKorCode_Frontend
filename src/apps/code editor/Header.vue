@@ -40,9 +40,9 @@
       <router-link to="/" class="mobile-hide"><div class="logo"><strong>LioKor Code</strong> <span @contextmenu="showVersion">{{ version }}</span></div></router-link>
       <router-link to="/" class="mobile-show"><div class="logo"><strong>LK Code</strong></div></router-link>
       <router-link to="/">Задания</router-link>
-      <div class="control-button" v-show="!isCheckInProgress && !isCheckError" @click=checkStartEmit>Check<span class="mobile-hide"> (F9)</span></div>
-      <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Checking...</div>
-      <div class="control-button danger" v-show="isCheckError" :disabled="isCheckError">Need auth</div>
+      <div class="control-button" v-show="!isCheckInProgress && !isCheckError" @click=checkStartEmit>Проверить<span class="mobile-hide"> (F9)</span></div>
+      <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Проверяем...</div>
+      <div class="control-button danger" v-show="isCheckError" :disabled="isCheckError">Нужна авторизация...</div>
 
       <div v-show="!redatorSessionUid" @click="openSession">Открыть сессию</div>
       <div v-show="redatorSessionUid" @click="leaveSession">Отключиться</div>
