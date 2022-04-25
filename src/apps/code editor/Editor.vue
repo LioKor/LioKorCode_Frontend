@@ -24,22 +24,6 @@
 </template>
 
 <script>
-  import 'ace-builds'
-
-  import 'ace-builds/src-noconflict/theme-ambiance'
-
-
-  import 'ace-builds/src-noconflict/mode-makefile'
-
-  import 'ace-builds/src-noconflict/mode-c_cpp'
-  import 'ace-builds/src-noconflict/mode-python'
-  import 'ace-builds/src-noconflict/mode-golang'
-  import 'ace-builds/src-noconflict/mode-java'
-  import 'ace-builds/src-noconflict/mode-pascal'
-  import 'ace-builds/src-noconflict/mode-lua'
-
-  import 'ace-builds/src-noconflict/mode-json'
-
   export default {
     data() {
       return {
@@ -50,7 +34,10 @@
         onMountAction: () => {},
       }
     },
-    mounted() {
+
+    async mounted() {
+      const ace = await this.importAce()
+
       this.aceEditor = ace.edit('aceEditor');
       this.isMounted = true;
       this.onMountAction();
@@ -77,14 +64,49 @@
     },
 
     methods: {
-      resize() {
-        this.aceEditor.resize();
+      async importAce() {
+        const { default: ace } = await import('ace-builds')
+
+        await import('ace-builds/src-noconflict/theme-ambiance')
+
+
+        await import('ace-builds/src-noconflict/mode-makefile')
+
+        await import('ace-builds/src-noconflict/mode-c_cpp')
+        await import('ace-builds/src-noconflict/mode-python')
+        await import('ace-builds/src-noconflict/mode-golang')
+        await import('ace-builds/src-noconflict/mode-java')
+        await import('ace-builds/src-noconflict/mode-pascal')
+        await import('ace-builds/src-noconflict/mode-lua')
+
+        await import('ace-builds/src-noconflict/mode-json')
+
+        return ace
       },
-      onChangeAction() {
+
+      async waitForAce() {
+        return new Promise(function(resolve) {
+          const interval = setInterval(function() {
+            if (this.aceEditor !== null) {
+              clearInterval(interval)
+              resolve()
+            }
+          }.bind(this), 1)
+        }.bind(this))
+      },
+
+      async resize() {
+        await this.waitForAce()
+        this.aceEditor.resize()
+      },
+      async onChangeAction() {
+        await this.waitForAce()
         const text = this.aceEditor.getValue();
         this.$emit('editorChange', text);
       },
-      setText(text, name = null, disableChangeEmit = true) {
+      async setText(text, name = null, disableChangeEmit = true) {
+        await this.waitForAce()
+
         if (!this.isMounted) {
           this.textWhenMounted = text;
         } else {
@@ -102,7 +124,9 @@
         }
       },
 
-      setSyntaxHighlighting(name) {
+      async setSyntaxHighlighting(name) {
+        await this.waitForAce()
+
         let mode = 'plain_text';
         if (['GNUmakefile', 'makefile', 'Makefile'].find(el => el === name)) {
           mode = 'makefile';
@@ -127,7 +151,8 @@
       clear() {
         this.setText('')
       },
-      setReadOnly(state) {
+      async setReadOnly(state) {
+        await this.waitForAce()
         this.aceEditor.setReadOnly(state);
       },
 

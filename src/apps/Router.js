@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import Task from './code editor/Page.vue'
-import TaskEdit from './TaskEdit.vue'
-import SignIn from './SignIn.vue'
-import Profile from './Profile.vue'
-import SignUp from './SignUp.vue'
-import TaskList from './task previews/Page.vue'
-import Page404 from './Page404.vue'
-import TaskCreate from './TaskCreate.vue';
+const Task = () => import('./code editor/Page.vue')
+const TaskEdit = () => import('./TaskEdit.vue')
+const SignIn = () => import('./SignIn.vue')
+const Profile = () => import('./Profile.vue')
+const SignUp = () => import('./SignUp.vue')
+const TaskList = () => import('./task previews/Page.vue')
+const Page404 = () => import('./Page404.vue')
+const TaskCreate = () => import('./TaskCreate.vue')
 
 export default function createVueRouter(Store) {
     const routes = [

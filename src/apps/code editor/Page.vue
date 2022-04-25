@@ -126,6 +126,11 @@
       }
     },
 
+    async mounted() {
+      await import('/src/lib/ot.exec.js')
+      await import('/src/lib/ot-addon.exec.js')
+    },
+
     methods: {
       openTemplate(items) {
         this.closeSolution()
