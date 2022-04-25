@@ -29,7 +29,7 @@
             <textarea class="form-control" v-model="task.stdoutDescription"></textarea>
         </div>
         <div class="form-group">
-          <label>ПОЯСНЕНИЯ<span class="error-text"></span></label>
+          <label>ОСОБЫЕ УКАЗАНИЯ<span class="error-text"></span></label>
           <textarea class="form-control" v-model="task.hints"></textarea>
         </div>
         <div class="form-group">
