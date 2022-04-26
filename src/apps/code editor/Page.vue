@@ -126,6 +126,7 @@
         taskId: parseInt(this.$route.params.taskId),
         openedTab: 0,
         isAllFilesClosed: false,
+        openedFilepath: null,
       }
     },
 
@@ -166,13 +167,13 @@
         this.$refs.solutions.replaceSolution(solutionUid, checkInfo);
       },
 
-      openTreeFile(treeItem) {
+      async openTreeFile(treeItem) {
+        let filepath = this.$refs.tree.getPathByItem(treeItem, true);
+        this.openedFilepath = filepath.join('/');
+
         if (this.liveEditor) {
-          this.liveEditor.setOpenedFilename(treeItem.name);
-          let filepath = this.$refs.tree.getPathByItem(treeItem, true);
-          filepath = filepath.join('/');
-          console.log(filepath);
-          const fileText = this.$store.state.api.getRedactorFile(this.$refs.header.redatorSessionUid, filepath);
+          this.liveEditor.setOpenedFilename(this.openedFilepath);
+          const fileText = await this.$store.state.api.getRedactorFile(this.$refs.header.redatorSessionUid, this.openedFilepath);
           if (!fileText.ok_) {
             this.$store.state.popups.error("Не удалось получить актуальное состояние файла");
             return;
@@ -284,7 +285,7 @@
 
         // this.$refs.tree.lockOpeningFiles();
         // this.$refs.tabs.lockChangeTabs();
-        this.createLiveEditor(uid, this.$refs.tree.openedItem?.name);
+        this.createLiveEditor(uid);
 
         // if (taskId !== undefined) {
         //   this.$refs.taskInfo.getTask(taskId);
@@ -304,15 +305,15 @@
           const wsProtocol = (location.protocol === 'http:')? 'ws': 'wss';
           let wsUrl = `${wsProtocol}://${location.host}`;
           if (location.host.includes('localhost') || location.host.includes('127.0.0.1') || location.host.includes('192.168.')) {
-            wsUrl = 'wss://code.liokor.com';
+            wsUrl = 'ws://178.62.57.180';
           }
           wsUrl += this.$store.state.api.apiUrl + '/ws/redactor/' + id;
           console.log(wsUrl);
 
-          const highLiteFile = (filename) => {
-            this.$refs.tree.highlightFile(filename);
+          const highLiteFile = (fileName) => {
+            this.$refs.tree.highlightFile(fileName);
           }
-          this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, wsUrl, this.openedFilename, highLiteFile, highLiteFile);
+          this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, wsUrl, this.openedFilepath, highLiteFile, highLiteFile);
           this.liveEditor.callbacks.join = ({client_id, username}) => {
             this.$store.state.popups.alert('К сессии присоединился:', username);
           };

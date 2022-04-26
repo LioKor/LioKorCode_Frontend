@@ -31,6 +31,7 @@
 
   import 'ace-builds/src-noconflict/mode-makefile'
 
+  import 'ace-builds/src-noconflict/mode-plain_text'
   import 'ace-builds/src-noconflict/mode-c_cpp'
   import 'ace-builds/src-noconflict/mode-python'
   import 'ace-builds/src-noconflict/mode-golang'
