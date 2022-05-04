@@ -135,6 +135,7 @@
       openTemplate(items) {
         this.closeSolution()
         this.$refs.tree.loadTree(items)
+        this.openTreeFile(this.$refs.tree.reactiveItems[0])
       },
 
       editorSetText(text) {
