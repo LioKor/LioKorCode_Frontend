@@ -82,7 +82,7 @@
                   @delete-file="deleteFromTabs" />
           </div>
         </div>
-        <SlideLine el1="taskInfo-and-tree" el2="editor-block" uid="editor-vertical" class="vertical"/>
+        <SlideLine el1="taskInfo-and-tree" el2="editor-block" uid="editor-vertical" initial-value="30" class="vertical"/>
         <div id="editor-block">
           <Tabs class="horizontal" ref="tabs" :items="[]" @tabsCountChange="filesWatchUpdate"></Tabs>
           <Editor ref="editor" @editor-change="updateOpenedFileText"/>
@@ -94,7 +94,7 @@
         </div>
       </div>
 
-      <SlideLine el1="task-block" el2="solutions" uid="editor-horizontal" class="horizontal" @sliderMoved="this.$refs.editor.resize()" />
+      <SlideLine el1="task-block" el2="solutions" uid="editor-horizontal" initial-value="80" class="horizontal" @sliderMoved="this.$refs.editor.resize()" />
 
       <Solutions ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
     </div>

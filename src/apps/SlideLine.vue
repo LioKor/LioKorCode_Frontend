@@ -67,6 +67,11 @@
       uid: {
         type: String,
         required: true,
+      },
+      initialValue: {
+        type: Number,
+        validator: val => (0 <= val) && (val <= 100),
+        default: 30,
       }
     },
     mounted() {
@@ -86,7 +91,7 @@
       window.addEventListener('mousemove', this.slideEvent);
       window.addEventListener('touchmove', this.slideEvent);
 
-      this.applySlide(window.localStorage.getItem(this.uid + '-slide-value') || 30)
+      this.applySlide(window.localStorage.getItem(this.uid + '-slide-value') || this.initialValue)
     },
     methods: {
       applySlide(leftPercentage) {
