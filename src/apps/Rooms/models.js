@@ -9,9 +9,10 @@ export class Message {
 }
 
 export class User {
-    constructor(id, username) {
+    constructor(id, username, fullname = null) {
         this.id = id
         this.username = username
+        this.fullname = fullname
 
         this.stream = null
         this.pc = null

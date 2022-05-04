@@ -99,7 +99,9 @@ width = 640px
             <input type="text" class="form-control" placeholder="Поиск по названию..." v-model="roomSearch">
           </form>
           <div v-if="this.filteredRooms.length > 0" v-for="room in this.rooms" class="room form-control" @click="roomJoin(room.id)">
-            <div class="name">{{ room.name }} ({{ room.owner.username }})</div>
+            <div class="name">
+              {{ room.name }} ({{ room.owner.username }}<span v-show="room.owner.fullname"> - {{ room.owner.fullname }}</span>)
+            </div>
             <div v-show="room.hasPassword" class="has-password">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
                 <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
@@ -122,8 +124,8 @@ width = 640px
       <h2>Участники {{ joinedRoom.users.length }} / {{ joinedRoom.maxUsers }}</h2>
       <div class="users">
         <div v-for="(user, index) in joinedRoom.users" class="user form-control">
-          <div class="username" :class="{ bold: this.uid === user.id }">{{ user.username }}<span v-show="index === 0"> 👑</span></div>
-          <div v-if="user.stream">
+          <div class="username" :class="{ bold: this.uid === user.id }">{{ user.username }}<span v-show="user.fullname"> ({{ user.fullname }})</span><span v-show="index === 0"> 👑</span></div>
+          <div v-if="user.stream && index === 0">
             <video :srcObject.prop="user.stream" autoplay controls :muted="this.uid === user.id"></video>
           </div>
         </div>
@@ -455,7 +457,7 @@ export default {
       }
       const users = []
       for (const user in data.users) {
-        users.push(new User(user.id, user.username))
+        users.push(new User(user.id, user.username, user.fullname))
       }
 
       let host = false
@@ -463,7 +465,7 @@ export default {
         host = this.uid === data.users[0].id
       }
 
-      const owner = new User(data.owner.id, data.owner.username)
+      const owner = new User(data.owner.id, data.owner.username, data.owner.fullname)
       this.joinedRoom = new Room(data.id, data.name, owner, data.usersMax, data.hasPassword, host, data.users)
       if (host) {
         const currentUser = this.__getUser(this.uid)
@@ -497,7 +499,7 @@ export default {
 
       this.send({
         command: 'setInfo',
-        username: this.$store.state.user.username
+        jwtToken: this.$store.state.user.jwtToken
       })
       this.send({ command: 'getRooms' })
     },
@@ -522,7 +524,7 @@ export default {
         }
         this.joinedRoom = null;
       } else if (command === 'addRoomUser') {
-        this.userConnected(new User(data.id, data.username))
+        this.userConnected(new User(data.id, data.username, data.fullname))
       } else if (command === 'deleteRoomUser') {
         this.joinedRoom.deleteUser(data.id)
         this.sounds.userLeft.play()

@@ -10,6 +10,7 @@ export default class User extends Model {
     email: "",
     fullname: "",
     //avatarUrl: "https://i.yapx.ru/GuFDE.gif",
+    jwtToken: '',
     chosenRoomId: -1,
   }
 
