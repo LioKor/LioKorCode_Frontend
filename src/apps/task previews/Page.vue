@@ -38,8 +38,8 @@
     align-items center
     text-align center
     flex-direction row
-    background color2
-    box-shadow 3px 3px 5px colorShadow
+    background decColor1
+    box-shadow 3px 3px 10px colorShadowDark
     box-sizing border-box
     transition all 0.3s ease
     text-decoration none
