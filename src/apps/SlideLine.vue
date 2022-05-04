@@ -53,6 +53,7 @@
         isInSlide: false, // TODO: make non-reactive
         isLeftCollapsed: false,
         isRightCollapsed: false,
+        slideValue: this.initialValue,
       }
     },
     props: {
@@ -116,14 +117,16 @@
           this.isLeftCollapsed = false;
           this.isRightCollapsed = false;
         }
+
+        this.slideValue = leftPercentage;
         this.$emit('sliderMoved')
       },
       startSlide() {
         this.isInSlide = true;
         document.body.style.setProperty('user-select', 'none');
       },
-      endSlide() {
-        if (this.isInSlide) {
+      endSlide(forceSlideState = false) {
+        if (this.isInSlide || forceSlideState) {
           this.isInSlide = false;
           document.body.style.removeProperty('user-select');
 
@@ -156,6 +159,20 @@
           }
           this.applySlide(percPos);
         }
+      },
+
+      applySlideSmothly(slideValue) {
+        const animate = (time) => {
+          const frameSlide = (slideValue - this.slideValue) * 0.015 * time/1000 + Number(this.slideValue);
+          if (Math.abs(slideValue - frameSlide) > 0.5) {
+            this.applySlide(frameSlide);
+            requestAnimationFrame(animate);
+          } else {
+            this.endSlide(true);
+          }
+        };
+
+        requestAnimationFrame(animate);
       }
     }
   }

@@ -132,6 +132,8 @@
 
       <router-link v-if="$store.state.user.isLogined" to="/profile">{{$store.state.user.username}}</router-link>
       <router-link v-else to="/signin">Войти</router-link>
+
+      <div @click="expandRooms">Развернуть комнаты</div>
     </div>
     <div class="sidePart" style="z-index: 5">
       <div class="search-group">
@@ -180,6 +182,10 @@
     methods: {
       updateSearch() {
         this.$emit('search', this.searchText, this.searchOptions);
+      },
+
+      expandRooms() {
+        this.$store.state.eventBus.emit('expandRooms');
       }
     },
   }

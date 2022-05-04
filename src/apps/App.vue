@@ -11,7 +11,7 @@
   </div>
 
   <SlideLine class="vertical" el1="router" el2="rooms" uid="rooms" initial-value="100"
-             @slider-moved="emitSliderMoved" />
+             @slider-moved="emitSliderMoved" ref="slider"/>
 
   <Rooms id="rooms"/>
 
@@ -35,11 +35,20 @@
       this.$store.state.modal = this.$refs.modal;
       this.$store.state.popups = this.$refs.popups;
       this.$store.state.eventBus = new EventBus();
+
+      this.$store.state.eventBus.on('expandRooms', this.expandRooms);
+    },
+    unmounted() {
+      this.$store.state.eventBus.off('expandRooms', this.expandRooms);
     },
 
     methods: {
       emitSliderMoved() {
-        this.$store.state.eventBus?.emit('resizeTaskPreviews', {});
+        this.$store.state.eventBus?.emit('resizeTaskPreviews');
+      },
+
+      expandRooms() {
+        this.$refs.slider.applySlideSmothly(70);
       }
     }
   }
