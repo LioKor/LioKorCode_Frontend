@@ -135,9 +135,14 @@ export default {
   methods: {
     sendMessage() {
       if (this.message.length > 0) {
-        this.$emit('sendMessage', this.message)
+        const message = this.message
         this.message = ''
+        this.$emit('sendMessage', message)
       }
+    },
+
+    setMessage(message) {
+      this.message = message
     },
 
     scrollToBottom() {

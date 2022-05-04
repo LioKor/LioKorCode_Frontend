@@ -366,12 +366,32 @@ export default {
       if (!this.joinedRoom) {
         return
       }
-      for (const user of this.joinedRoom.users) {
-        if (user.id !== this.uid) {
-          user.dc.send(message)
-        } else {
-          this.addMessage(currentUser, message)
+
+      let targetUsername = '';
+      if (message.startsWith('@')) {
+        let i = 1;
+        let chr = message[i];
+        while (!([',', '.', ' ', '!', '?', ';', ':'].includes(chr)) && i < message.length) {
+          targetUsername += chr
+          i += 1
+          chr = message[i]
         }
+      }
+      console.log(targetUsername)
+
+      let messageSent = false;
+      for (const user of this.joinedRoom.users) {
+        if (user.id !== this.uid && (targetUsername.toLowerCase() === user.username.toLowerCase() || !targetUsername)) {
+          user.dc.send(message)
+          messageSent = true;
+        }
+      }
+
+      if (messageSent || this.joinedRoom.users.length === 1) {
+        this.addMessage(currentUser, message)
+      } else {
+        this.$refs.chat.setMessage(message);
+        this.$store.state.modal.alert('Пользователь не найден!', 'Не удалось отправить сообщение!')
       }
     },
 
