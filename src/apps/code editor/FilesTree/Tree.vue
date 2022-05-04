@@ -369,6 +369,10 @@
       openFileByItem(item) {
         this.openFile(this.getElByPath(this.getPathByItem(item)));
       },
+      async openFileByStringPath(path) {
+        await nextTick();
+        this.openFile(this.getElByPath(this.stringPathToPath(path).path));
+      },
 
       getSource(prefix = "", list = this.reactiveItems) {
         const source = {};
@@ -517,7 +521,7 @@
         const resultPath = [];
         let item;
         path.forEach(filename => {
-          if (item === undefined)
+          if (typeof where === "string")
             throw new Error("Path isn't correct. Trying to find next file in file, not in folder");
 
           const fileIdx = where.findIndex(el => el.name === filename);
@@ -528,6 +532,24 @@
           where = item.value;
         });
         return {path: resultPath, item: item};
+      },
+      pathToStringPath(path, where = this.reactiveItems) {
+        let resultPath = '';
+        let item;
+        path.forEach(idx => {
+          if (typeof where === "string")
+            throw new Error("Path isn't correct. Trying to find next file in file, not in folder");
+
+          item = where[idx];
+          resultPath += item.name + '/';
+          where = item.value;
+        });
+
+        resultPath = resultPath.slice(0, -1); // removes ending '/'
+        return {path: resultPath, item: item};
+      },
+      getOpenedItemStringPath() {
+        return this.pathToStringPath(this.getItemPath(this.openedItem.el));
       },
 
 

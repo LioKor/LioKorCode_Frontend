@@ -28,10 +28,10 @@ export default class WsServerAdapter {
 
     this.ws.handlers.op = (data) => {
       const
-        clientId = data[0],
-        operation = data[1],
-        selection = data[2],
-        filename = data[3];
+        clientId = data.data[0],
+        operation = data.data[1],
+        selection = data.data[2],
+        filename = data.filename;
 
       // if someone changed something in our file -> ot lib work with it
       if (this.openedFilename === filename) {
@@ -40,14 +40,14 @@ export default class WsServerAdapter {
         return;
       }
       // else -> we need to indicate different file
-      this.otherFileOperationCallback(filename);
+      this.otherFileOperationCallback(filename, clientId.toString());
     };
 
     this.ws.handlers.sel = (data) => {
       const
-        clientId = data[0],
-        selection = data[1],
-        filename = data[2];
+        clientId = data.data[0],
+        selection = data.data[1],
+        filename = data.filename;
 
       // if someone selected something in our file -> ot lib work with it
       if (this.openedFilename === filename) {
@@ -55,7 +55,7 @@ export default class WsServerAdapter {
         return;
       }
       // else -> we need to indicate different file
-      this.otherFileSelectionCallback(filename);
+      this.otherFileSelectionCallback(filename, clientId.toString());
     };
 
     this.ws.handlers.reconnect = () => {

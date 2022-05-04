@@ -68,7 +68,7 @@ export default class LiveEditor {
     // Get initial text that other users typed.
     // Set EditorAdapter that will get editor's actions and set server's actions on it
     this.ws.handlers.doc = (data) => {
-      if (this.username !== undefined)
+      if (this.username !== undefined && !this.isDocGotten)
         this.__sendJoin();
       this.isDocGotten = true;
 
@@ -118,6 +118,9 @@ export default class LiveEditor {
 
   setOpenedFilename(filename) {
     this.openedFilename = filename;
-    this.serverAdapter.setOpenedFilename?.(filename);
+    this.serverAdapter?.setOpenedFilename?.(filename);
+  }
+  sendChangeFile(filename) {
+    this.ws.send('file', {new: filename});
   }
 }

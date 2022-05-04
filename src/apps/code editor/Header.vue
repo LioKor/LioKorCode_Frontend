@@ -130,7 +130,7 @@
         const url = new URL(location.href);
         url.searchParams.append(queryParamsName.sessionId, this.redatorSessionUid);
         //url.searchParams.append(queryParamsName.taskId, this.$parent.$refs.taskInfo.taskId);
-        url.searchParams.append(queryParamsName.filename, this.$parent.$refs.tabs.getSelected().uniqueValue.name);
+        url.searchParams.append(queryParamsName.filename, this.$parent.$refs.tree.getOpenedItemStringPath().path);
         this.redactorJoinLink = url.toString();
         this.$store.state.popups.success('Сессия создана');
 
@@ -160,11 +160,11 @@
         this.redatorSessionUid = uid;
 
         this.uniqueRemoteTab = {name: null, value: ''};
-        await this.$parent.$refs.tabs.addTab({
-          name: "remote: " + filename,
-          closable: false,
-          uniqueValue: this.uniqueRemoteTab
-        });
+        // await this.$parent.$refs.tabs.addTab({
+        //   name: "remote: " + filename,
+        //   closable: false,
+        //   uniqueValue: this.uniqueRemoteTab
+        // });
         this.$emit('connectSession', uid, filename);
       },
 

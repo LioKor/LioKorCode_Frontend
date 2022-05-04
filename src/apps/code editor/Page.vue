@@ -127,6 +127,7 @@
         openedTab: 0,
         isAllFilesClosed: false,
         openedFilepath: null,
+        isFirstLiveFile: true,
       }
     },
 
@@ -173,6 +174,12 @@
 
         if (this.liveEditor) {
           this.liveEditor.setOpenedFilename(this.openedFilepath);
+
+          if (this.isFirstLiveFile) { // fixme
+            this.liveEditor.sendChangeFile(this.openedFilepath);
+            this.isFirstLiveFile = false;
+          }
+
           const fileText = await this.$store.state.api.getRedactorFile(this.$refs.header.redatorSessionUid, this.openedFilepath);
           if (!fileText.ok_) {
             this.$store.state.popups.error("Не удалось получить актуальное состояние файла");
@@ -276,7 +283,7 @@
       },
 
       // --- WebSockets live editor
-      async connectSession(uid) {
+      async connectSession(uid, filename) {
         // const response = await this.$store.state.api.checkRedactorSession(uid);
         // if (!response.ok_) {
         //   this.$store.state.popups.error('Не удалось подключиться к сессии', uid);
@@ -285,7 +292,8 @@
 
         // this.$refs.tree.lockOpeningFiles();
         // this.$refs.tabs.lockChangeTabs();
-        this.createLiveEditor(uid);
+
+        this.createLiveEditor(uid, filename);
 
         // if (taskId !== undefined) {
         //   this.$refs.taskInfo.getTask(taskId);
@@ -299,19 +307,23 @@
 
       createLiveEditor(id, filename = undefined) {
         const callbackForAceEditorLoaded = () => {
-          if (filename !== undefined)
+          if (filename !== undefined) {
             this.$refs.editor.setSyntaxHighlighting(filename);
+            this.$refs.tree.openFileByStringPath(filename);
+          } else {
+            filename = this.$refs.tree.getOpenedItemStringPath().path;
+          }
 
           const wsProtocol = (location.protocol === 'http:')? 'ws': 'wss';
           let wsUrl = `${wsProtocol}://${location.host}`;
           if (location.host.includes('localhost') || location.host.includes('127.0.0.1') || location.host.includes('192.168.')) {
             wsUrl = 'ws://178.62.57.180';
           }
-          wsUrl += this.$store.state.api.apiUrl + '/ws/redactor/' + id;
+          wsUrl += this.$store.state.api.apiUrl + '/ws/redactor/' + id + '/' + encodeURIComponent(filename);
           console.log(wsUrl);
 
-          const highLiteFile = (fileName) => {
-            this.$refs.tree.highlightFile(fileName);
+          const highLiteFile = (fileName, userName) => {
+            this.$refs.tree.highlightFile(fileName, userName);
           }
           this.liveEditor = new LiveEditor(this.$refs.editor.aceEditor, wsUrl, this.openedFilepath, highLiteFile, highLiteFile);
           this.liveEditor.callbacks.join = ({client_id, username}) => {
