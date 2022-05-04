@@ -62,7 +62,8 @@
 
       <div class="form">
         <div v-if="type === 'prompt'" class="form-group">
-          <input type="text" v-model="text" ref="inputText" class="form-control">
+          <input v-if="!password" type="text" v-model="text" ref="inputText" class="form-control">
+          <input v-else type="password" v-model="text" ref="inputText" class="form-control">
         </div>
 
         <div class="form-group">
@@ -85,6 +86,7 @@
         description: "",
         isShowed: false,
         text: "",
+        password: false,
       };
     },
 
@@ -93,10 +95,11 @@
     },
 
     methods: {
-      async __createModal(title, description = '', type='alert') {
+      async __createModal(title, description = '', type='alert', password = false) {
         this.type = type;
         this.title = title;
         this.description = description;
+        this.password = password
 
         if (this.isShowed) {
           return this.promise;
@@ -138,15 +141,15 @@
         this.text = '';
       },
 
-      prompt(title, description, defaultText) {
+      prompt(title, description, defaultText, password = false) {
         this.text = defaultText;
-        return this.__createModal(title, description, 'prompt');
+        return this.__createModal(title, description, 'prompt', password);
       },
       confirm(title, description) {
-        return this.__createModal(title, description, 'confirm');
+        return this.__createModal(title, description, 'confirm', false);
       },
       alert(title, description) {
-        return this.__createModal(title, description, 'alert');
+        return this.__createModal(title, description, 'alert', false);
       },
     }
   }

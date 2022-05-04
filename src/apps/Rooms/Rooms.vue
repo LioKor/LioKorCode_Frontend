@@ -385,7 +385,7 @@ export default {
       const room = this.__getRoom(id)
       let password = ''
       if (room.hasPassword) {
-        password = await this.$store.state.modal.prompt('Введите пароль')
+        password = await this.$store.state.modal.prompt('Введите пароль', undefined, undefined, true)
       }
 
       this.send({
