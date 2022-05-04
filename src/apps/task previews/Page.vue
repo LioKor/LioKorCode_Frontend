@@ -70,7 +70,7 @@
     <div class="content-container scrollable">
       <Header @search="updateSearch"></Header>
 
-      <div class="previews-container">
+      <div class="previews-container" ref="previews">
         <TaskPreview v-for="task in tasks" :task="task" path-modifier=""></TaskPreview>
       </div>
 
@@ -103,12 +103,24 @@
         tasks: [],
         myTasksReceived: false,
         isSearchedMyTasks: false,
+
+        resizeMutex: false,
       }
     },
+
     async mounted() {
       this.allTasks = await this.getTasks('getTasks');
       this.tasks = this.allTasks.concat();
+
+      window.addEventListener('resize', this.onResizeContainerQueriesPolyfill);
+      this.$store.state.eventBus.on('resizeTaskPreviews', this.onResizeContainerQueriesPolyfill);
+      this.onResizeContainerQueriesPolyfill();
     },
+    unmounted() {
+      window.removeEventListener('resize', this.onResizeContainerQueriesPolyfill);
+      this.$store.state.eventBus.off('resizeTaskPreviews', this.onResizeContainerQueriesPolyfill);
+    },
+
     methods: {
       async getTasks(apiRequestName, silent = false) {
         const tasks = await this.$store.state.api[apiRequestName]();
@@ -138,6 +150,35 @@
           if (String(task.id).includes(text) || task.name.toLowerCase().includes(text))
             this.tasks.push(task);
         });
+      },
+
+      onResizeContainerQueriesPolyfill() {
+        if (this.resizeMutex)
+          return;
+        this.resizeMutex = true;
+
+        const el = this.$refs.previews;
+        const width = el.clientWidth;
+        const classes = ['width-720', 'width-1080', 'width-1440', 'width-1800', 'width-more-1800'];
+        function setClass(idx) {
+          if (!el.classList.contains(classes[idx])) {
+            classes.forEach(cls => el.classList.remove(cls));
+            el.classList.add(classes[idx]);
+          }
+        }
+        if (width < 720) {
+          setClass(0);
+        } else if (width < 1080) {
+          setClass(1);
+        } else if (width < 1440) {
+          setClass(2);
+        } else if (width < 1800) {
+          setClass(3);
+        } else {
+          setClass(4);
+        }
+
+        setTimeout(() => this.resizeMutex = false, 20);
       }
     }
   }

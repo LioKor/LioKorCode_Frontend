@@ -99,9 +99,9 @@
         left 0
         width 5px
         height 40px
-  .preview:last-child
+  /*.preview:last-child
     .decoration
-      right -10000px
+      right -100%*/
   .preview:hover
     .decoration
       inset -10px
@@ -190,15 +190,22 @@
       inset -10px
       opacity 0
 
-  @media (max-width: 758px)
-    .preview:nth-child(1)
-      margin-right 50%
-    .preview
+
+  .previews-container.width-720
+    .preview:nth-child(2n + 1)
       width (taskWidth * 2)
       margin-right 60px
-    .preview::before
+    .preview:nth-child(2n + 1)::before
       left (- taskHeight / 2)
-  @media (min-width: 758px) and (max-width: 1118px)
+    .preview:nth-child(2n + 2)
+      padding-right 0
+      margin-left 60px
+    .preview:nth-child(2n + 2)::before
+      right -300%
+    .preview:nth-child(1)
+      margin-right 50%
+
+  .previews-container.width-1080
     .preview:nth-child(2n + 2)
       padding-left 0
     .preview:nth-child(2n + 2)::before
@@ -213,7 +220,8 @@
     .preview:nth-child(1)::before
       right 0
       left (- taskHeight / 2)
-  @media (min-width: 1118px) and (max-width: 1478px)
+
+  .previews-container.width-1440
     .preview:nth-child(2)
       margin-right preview-margin + (taskWidth + preview-margin * 2)
     .preview:nth-child(1)
@@ -226,7 +234,8 @@
       padding-right 0
     .preview:nth-child(3n + 2)::before
       right -300%
-  @media (min-width: 1478px)
+
+  .previews-container.width-1800
     .preview:nth-child(2)
       margin-right preview-margin + (taskWidth + preview-margin * 2) * 2
     .preview:nth-child(1)
@@ -238,6 +247,20 @@
     .preview:nth-child(4n + 2)
       padding-right 0
     .preview:nth-child(4n + 2)::before
+      right -300%
+
+  .previews-container.width-more-1800
+    .preview:nth-child(2)
+      margin-right preview-margin + (taskWidth + preview-margin * 2) * 2
+    .preview:nth-child(1)
+    .preview:nth-child(5n + 3)
+      padding-left 0
+    .preview:nth-child(1)::before
+    .preview:nth-child(5n + 3)::before
+      left (- taskHeight / 2)
+    .preview:nth-child(5n + 2)
+      padding-right 0
+    .preview:nth-child(5n + 2)::before
       right -300%
 </style>
 
