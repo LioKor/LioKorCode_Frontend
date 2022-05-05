@@ -18,6 +18,7 @@ shadow = shadow1
   left 0
   top 0
   .topLine
+    display flex
     margin 0
     padding 0
     width 100%
@@ -29,19 +30,20 @@ shadow = shadow1
     > *
       color textColor1
       text-decoration none
+      white-space nowrap
+      text-overflow clip
       letter-spacing 2px
       cursor pointer
       padding 0 betweenItems
       position relative
       list-style none
-      display inline-block
       z-index 0
       user-select none
     > *:first-child
       padding-left (betweenItems * 2)
       margin-left (- betweenItems)
     > *.right
-      float right
+      margin-left auto
     > *.right:last-child
       padding-right (betweenItems * 2)
       margin-right (- betweenItems)
