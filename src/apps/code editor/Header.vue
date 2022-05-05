@@ -136,8 +136,8 @@
 
         this.$emit('openSession', uid.id);
       },
-      async leaveSession() {
-        if (!await this.$store.state.modal.confirm('Вы уверены, что хотите покинуть сессию?', 'Сессия будет закрыта, если все участники выйдут')) {
+      async leaveSession(event = null) {
+        if (event && (!await this.$store.state.modal.confirm('Вы уверены, что хотите покинуть сессию?', 'Сессия будет закрыта, если все участники выйдут'))) {
           return;
         }
 
@@ -147,7 +147,8 @@
         this.$parent.$refs.tabs.deleteTabByItem(this.uniqueRemoteTab);
         this.uniqueRemoteTab = undefined;
 
-        this.$emit('leaveSession');
+        if (event)
+          this.$emit('leaveSession');
       },
       async connectToSession(uid, filename) {
         if (uid === undefined) {

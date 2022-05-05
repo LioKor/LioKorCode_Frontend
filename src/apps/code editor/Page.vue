@@ -283,6 +283,7 @@
         this.$refs.tree.unlockOpeningFiles();
         this.$refs.tabs.unlockChangeTabs();
         this.removeLiveEditor();
+        this.$refs.header.leaveSession();
       },
 
       createLiveEditor(id, filename = undefined) {
