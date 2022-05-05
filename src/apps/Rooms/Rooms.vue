@@ -6,10 +6,11 @@ width = 640px
 .bold
   font-weight bold
 
-#rooms
+.rooms
   height 100vh
   background-color #0c2129
   overflow-y auto
+  overflow-x hidden
   color textColor1
   width 100%
   padding 0 20px
