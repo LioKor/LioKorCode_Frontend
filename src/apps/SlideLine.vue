@@ -53,6 +53,7 @@
         isInSlide: false, // TODO: make non-reactive
         isLeftCollapsed: false,
         isRightCollapsed: false,
+        slideValue: this.initialValue,
       }
     },
     props: {
@@ -67,6 +68,11 @@
       uid: {
         type: String,
         required: true,
+      },
+      initialValue: {
+        type: Number,
+        validator: val => (0 <= val) && (val <= 100),
+        default: 30,
       }
     },
     mounted() {
@@ -86,7 +92,7 @@
       window.addEventListener('mousemove', this.slideEvent);
       window.addEventListener('touchmove', this.slideEvent);
 
-      this.applySlide(window.localStorage.getItem(this.uid + '-slide-value') || 30)
+      this.applySlide(window.localStorage.getItem(this.uid + '-slide-value') || this.initialValue)
     },
     methods: {
       applySlide(leftPercentage) {
@@ -111,14 +117,16 @@
           this.isLeftCollapsed = false;
           this.isRightCollapsed = false;
         }
+
+        this.slideValue = leftPercentage;
         this.$emit('sliderMoved')
       },
       startSlide() {
         this.isInSlide = true;
         document.body.style.setProperty('user-select', 'none');
       },
-      endSlide() {
-        if (this.isInSlide) {
+      endSlide(forceSlideState = false) {
+        if (this.isInSlide || forceSlideState) {
           this.isInSlide = false;
           document.body.style.removeProperty('user-select');
 
@@ -151,6 +159,20 @@
           }
           this.applySlide(percPos);
         }
+      },
+
+      applySlideSmothly(slideValue) {
+        const animate = (time) => {
+          const frameSlide = (slideValue - this.slideValue) * 0.015 * time/1000 + Number(this.slideValue);
+          if (Math.abs(slideValue - frameSlide) > 0.5) {
+            this.applySlide(frameSlide);
+            requestAnimationFrame(animate);
+          } else {
+            this.endSlide(true);
+          }
+        };
+
+        requestAnimationFrame(animate);
       }
     }
   }

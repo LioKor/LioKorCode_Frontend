@@ -1,4 +1,6 @@
 <style lang="stylus">
+  @import "../../styles/constants.styl"
+
   .editor-container
     flex 1
     position relative
@@ -9,6 +11,7 @@
 
   #aceEditor
     width 100%
+    background linear-gradient(to right, #3d3d3d 42px, #202020 42px) // to prevent white screen before ace editor loaded
 </style>
 
 <template>

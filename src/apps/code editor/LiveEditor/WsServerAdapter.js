@@ -40,6 +40,10 @@ export default class WsServerAdapter {
     this.ws.handlers.reconnect = () => {
       this.callbacks.reconnect();
     };
+
+    this.ws.handlers.ping = () => {
+      this.ws.send('pong');
+    };
   }
 
   // Next functions implements interface that defined in "ot" library

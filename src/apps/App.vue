@@ -10,7 +10,8 @@
     <router-view></router-view>
   </div>
 
-  <SlideLine class="vertical" el1="router" el2="rooms" uid="rooms"/>
+  <SlideLine class="vertical" el1="router" el2="rooms" uid="rooms" initial-value="100"
+             @slider-moved="emitSliderMoved" ref="slider"/>
 
   <Rooms id="rooms"/>
 
@@ -24,6 +25,8 @@
 
   import SlideLine from './SlideLine.vue';
   import Rooms from './Rooms/Rooms.vue';
+  import EventBus from "./EventBus";
+
 
   export default {
     components: { Modal, Popups, SlideLine, Rooms },
@@ -31,6 +34,22 @@
     mounted() {
       this.$store.state.modal = this.$refs.modal;
       this.$store.state.popups = this.$refs.popups;
+      this.$store.state.eventBus = new EventBus();
+
+      this.$store.state.eventBus.on('expandRooms', this.expandRooms);
+    },
+    unmounted() {
+      this.$store.state.eventBus.off('expandRooms', this.expandRooms);
+    },
+
+    methods: {
+      emitSliderMoved() {
+        this.$store.state.eventBus?.emit('resizeTaskPreviews');
+      },
+
+      expandRooms() {
+        this.$refs.slider.applySlideSmothly(70);
+      }
     }
   }
 </script>
