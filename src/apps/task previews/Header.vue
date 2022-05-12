@@ -122,6 +122,18 @@
         color textColor1
         font-weight bold
 
+  .profile-button
+    display flex
+    align-items center
+    flex-wrap nowrap
+    .avatar-preview
+      width (headerHeight - 10px)
+      height (headerHeight - 10px)
+      border-radius 50%
+      overflow hidden
+      border solid 1px color4
+    .username
+      margin-left 10px
 </style>
 
 <template>
@@ -130,7 +142,10 @@
 <!--      <router-link to="#">Туда</router-link>-->
 <!--      <router-link to="#">Сюда</router-link>-->
 
-      <router-link v-if="$store.state.user.isLogined" to="/profile">{{$store.state.user.username}}</router-link>
+      <router-link class="profile-button" v-if="$store.state.user.isLogined" to="/profile">
+        <img class="avatar-preview gif-hover-activate" :src="$store.state.user.avatarUrl" alt="">
+        <span class="username">{{$store.state.user.username}}</span>
+      </router-link>
       <router-link v-else to="/signin">Войти</router-link>
 
       <div @click="expandRooms">Развернуть комнаты</div>
