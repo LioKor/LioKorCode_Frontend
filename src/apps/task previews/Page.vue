@@ -12,7 +12,6 @@
       display flex
       flex-wrap wrap
       position relative
-      max-width 1750px
 
     .header
       z-index 1000
@@ -67,8 +66,8 @@
 
 <template>
   <div class="task-previews">
-    <div class="content-container scrollable">
-      <Header @search="updateSearch"></Header>
+    <div class="content-container scrollable scrollable-bg">
+      <Header @search="updateSearch" ref="header"></Header>
 
       <div class="previews-container" ref="previews">
         <TaskPreview v-for="task in tasks" :task="task" path-modifier=""></TaskPreview>
@@ -152,10 +151,14 @@
         });
       },
 
-      onResizeContainerQueriesPolyfill() {
+      onResizeContainerQueriesPolyfill(sliderLeftPercentage) {
         if (this.resizeMutex)
           return;
         this.resizeMutex = true;
+
+        console.log(sliderLeftPercentage)
+        if (typeof sliderLeftPercentage === 'number')
+          this.$refs.header.roomsOpenedState = sliderLeftPercentage < 98;
 
         const el = this.$refs.previews;
         const width = el.clientWidth;

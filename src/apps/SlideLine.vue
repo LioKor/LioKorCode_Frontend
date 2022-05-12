@@ -2,7 +2,7 @@
   @import "../styles/constants.styl"
 
   line-width = 15px
-  line-color = color3
+  line-bg-color = color3
   points-color = textColor1
   points-font-size = 20px
 
@@ -12,7 +12,7 @@
     justify-content center
     align-items center
 
-    background-color line-color
+    background-color line-bg-color
 
     font-size points-font-size
   .slide-line::before
@@ -119,7 +119,7 @@
         }
 
         this.slideValue = leftPercentage;
-        this.$emit('sliderMoved')
+        this.$emit('sliderMoved', leftPercentage)
       },
       startSlide() {
         this.isInSlide = true;

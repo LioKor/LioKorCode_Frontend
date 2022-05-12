@@ -148,7 +148,7 @@
       </router-link>
       <router-link v-else to="/signin">Войти</router-link>
 
-      <div @click="expandRooms">Развернуть комнаты</div>
+      <div :class="{'opacity-0': roomsOpenedState}" @click="expandRooms">Развернуть комнаты</div>
     </div>
     <div class="sidePart" style="z-index: 5">
       <div class="search-group">
@@ -190,7 +190,8 @@
         searchText: "",
         searchOptions: {
           my: false,
-        }
+        },
+        roomsOpenedState: false,
       }
     },
 
