@@ -12,13 +12,19 @@
   #aceEditor
     width 100%
     background linear-gradient(to right, #3d3d3d 42px, #202020 42px) // to prevent white screen before ace editor loaded
+
+  .form-centered
+    margin 0
+    left 50%
+    top 30%
+    transform translate(-50%, -50%)
 </style>
 
 <template>
   <div class="editor-container">
     <div id="aceEditor" class="editor"></div>
 
-    <div v-show="showNeedToLogin" class="standalone-form">
+    <div v-show="showNeedToLogin" class="standalone-form form-centered">
       <div class="title">
         <div class="primary">Для отправки решений необходимо <router-link to="/signin">авторизоваться</router-link></div>
       </div>
