@@ -121,19 +121,6 @@
       + label
         color textColor1
         font-weight bold
-
-  .profile-button
-    display flex
-    align-items center
-    flex-wrap nowrap
-    .avatar-preview
-      width (headerHeight - 10px)
-      height (headerHeight - 10px)
-      border-radius 50%
-      overflow hidden
-      border solid 1px color4
-    .username
-      margin-left 10px
 </style>
 
 <template>
