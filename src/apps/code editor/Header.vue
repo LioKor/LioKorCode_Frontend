@@ -148,6 +148,7 @@
         this.redatorSessionUid = undefined;
         this.redactorJoinLink = '';
 
+        console.log(this.uniqueRemoteTab);
         this.$parent.$refs.tabs.deleteTabByItem(this.uniqueRemoteTab);
         this.uniqueRemoteTab = undefined;
 
