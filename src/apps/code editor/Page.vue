@@ -115,6 +115,8 @@
 
   import SolutionTemplates from "../../utils/solution-templates";
 
+  const DEV_SOCKET_URL = 'ws://178.62.57.180';
+
   export default {
     components: {Tabs, Tree, Header, Templates, TaskInfo, Editor, Solutions, SlideLine},
 
@@ -295,7 +297,7 @@
           const wsProtocol = (location.protocol === 'http:')? 'ws': 'wss';
           let wsUrl = `${wsProtocol}://${location.host}`;
           if (location.host.includes('localhost') || location.host.includes('127.0.0.1') || location.host.includes('192.168.')) {
-            wsUrl = 'wss://code.liokor.com';
+            wsUrl = DEV_SOCKET_URL;
           }
           wsUrl += this.$store.state.api.apiUrl + '/ws/redactor/' + id;
 

@@ -8,17 +8,18 @@
   header.lite
     height logo-height
     line-height logo-height
-    div.logo
+    .logo
       padding logo-padding 0
       display flex
       margin 0 auto
       width logo-width
       text-align center
-      div.image
+      text-decoration none
+      .image
         padding-top logo-padding
         img
           height image-height
-      div.text
+      .text
         padding-left logo-padding
         color textColor1
         font-family Arial
@@ -28,14 +29,14 @@
 
 <template>
   <header class="lite mobile-hide">
-    <div class="logo">
+    <router-link to="/" class="logo">
       <div class="image">
         <img src="../images/liokor_logo.png" alt="logo">
       </div>
       <div class="text">
         <span>CODE</span>
       </div>
-    </div>
+    </router-link>
   </header>
 </template>
 

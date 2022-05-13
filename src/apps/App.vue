@@ -43,8 +43,8 @@
     },
 
     methods: {
-      emitSliderMoved() {
-        this.$store.state.eventBus?.emit('resizeTaskPreviews');
+      emitSliderMoved(val) {
+        this.$store.state.eventBus?.emit('resizeTaskPreviews', val);
       },
 
       expandRooms() {

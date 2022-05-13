@@ -121,7 +121,6 @@
       + label
         color textColor1
         font-weight bold
-
 </style>
 
 <template>
@@ -130,10 +129,13 @@
 <!--      <router-link to="#">Туда</router-link>-->
 <!--      <router-link to="#">Сюда</router-link>-->
 
-      <router-link v-if="$store.state.user.isLogined" to="/profile">{{$store.state.user.username}}</router-link>
+      <router-link class="profile-button" v-if="$store.state.user.isLogined" to="/profile">
+        <img class="avatar-preview gif-hover-activate" :src="$store.state.user.avatarUrl" alt="">
+        <span class="username">{{$store.state.user.username}}</span>
+      </router-link>
       <router-link v-else to="/signin">Войти</router-link>
 
-      <div @click="expandRooms">Развернуть комнаты</div>
+      <div :class="{'opacity-0': roomsOpenedState}" @click="expandRooms">Развернуть комнаты</div>
     </div>
     <div class="sidePart" style="z-index: 5">
       <div class="search-group">
@@ -175,7 +177,8 @@
         searchText: "",
         searchOptions: {
           my: false,
-        }
+        },
+        roomsOpenedState: false,
       }
     },
 

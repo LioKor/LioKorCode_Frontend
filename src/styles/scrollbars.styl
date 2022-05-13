@@ -1,11 +1,12 @@
 @require 'constants.styl'
 
+scroll-bg-color-2 = mix(color3, transparent, 70%)
 scroll-bg-color = transparent
 scroll-thumb-color = color5-A
 scroll-thumb-color-hover = color5
 scrollbar-width-worded = thin
 scrollbar-width = 8px
-scrollbar-border = 2px
+scrollbar-border = 0px
 
 .scrollable
   overflow-y auto
@@ -25,3 +26,12 @@ scrollbar-border = 2px
   background-color scroll-thumb-color
   border-radius (scrollbar-width / 2)
   border scrollbar-border solid scroll-bg-color
+
+.scrollable-bg
+  scrollbar-color scroll-thumb-color scroll-bg-color-2
+.scrollable-bg:hover
+  scrollbar-color scroll-thumb-color-hover scroll-bg-color-2
+.scrollable-bg::-webkit-scrollbar-track
+  background scroll-bg-color-2
+.scrollable-bg::-webkit-scrollbar-thumb
+  border scrollbar-border solid scroll-bg-color-2
