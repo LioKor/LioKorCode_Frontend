@@ -289,13 +289,13 @@
         </div>
       </div>
       <div class="description">{{ task.description }}</div>
+      <div class="decoration">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
     </router-link>
-    <div class="decoration">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
   </div>
 </template>
 
