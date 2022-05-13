@@ -104,7 +104,7 @@
 </template>
 
 <script>
-  import {nextTick} from "vue";
+import {nextTick, toRaw} from "vue";
 
   export default {
     props: {
@@ -156,7 +156,9 @@
         this.selectTabEl(el, true);
       },
       findItemByUnique(uniqueValue) {
-        const idx = this.reactiveItems.findIndex(tab => tab.uniqueValue === uniqueValue);
+        const idx = this.reactiveItems.findIndex(tab => {
+          return toRaw(tab.uniqueValue) === toRaw(uniqueValue);
+        });
         if (idx === -1)
           return null;
         return {item: this.reactiveItems[idx], idx: idx};

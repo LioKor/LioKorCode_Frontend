@@ -99,7 +99,6 @@
     methods: {
       showVersion() {
         this.$store.state.popups.alert(`Build date: ${this.buildDate}`)
-        console.log(this.uniqueRemoteTab);
       },
       checkStartEmit() {
         if (this.isCheckInProgress === false) {
@@ -153,7 +152,6 @@
         url.searchParams.delete(queryParamsName.filename);
         history.pushState(null, null, url.toString());
 
-        console.log(this.uniqueRemoteTab);
         this.$parent.$refs.tabs.deleteTabByItem(this.uniqueRemoteTab);
         this.uniqueRemoteTab = undefined;
 
@@ -171,14 +169,12 @@
         this.redatorSessionUid = uid;
 
         this.uniqueRemoteTab = {name: null, value: ''};
-        console.log(this.uniqueRemoteTab);
         await this.$parent.$refs.tabs.addTab({
           name: "remote: " + filename,
           closable: false,
           uniqueValue: this.uniqueRemoteTab
         });
         this.$emit('connectSession', uid, filename);
-        console.log(this.uniqueRemoteTab);
       },
 
       async copyLinkToClipboard() {

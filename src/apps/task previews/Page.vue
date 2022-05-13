@@ -156,7 +156,6 @@
           return;
         this.resizeMutex = true;
 
-        console.log(sliderLeftPercentage)
         if (typeof sliderLeftPercentage === 'number')
           this.$refs.header.roomsOpenedState = sliderLeftPercentage < 98;
 
