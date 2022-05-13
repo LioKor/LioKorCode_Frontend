@@ -179,6 +179,7 @@
           setClass(3);
         } else {
           setClass(4);
+          el.style.setProperty('--additional-width', (width - 1800) + 'px');
         }
 
         setTimeout(() => this.resizeMutex = false, 20);

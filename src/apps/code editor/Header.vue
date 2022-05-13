@@ -99,6 +99,7 @@
     methods: {
       showVersion() {
         this.$store.state.popups.alert(`Build date: ${this.buildDate}`)
+        console.log(this.uniqueRemoteTab);
       },
       checkStartEmit() {
         if (this.isCheckInProgress === false) {
@@ -133,7 +134,6 @@
         this.redatorSessionUid = uid.id;
         const url = new URL(location.href);
         url.searchParams.append(queryParamsName.sessionId, this.redatorSessionUid);
-        //url.searchParams.append(queryParamsName.taskId, this.$parent.$refs.taskInfo.taskId);
         url.searchParams.append(queryParamsName.filename, this.$parent.$refs.tabs.getSelected().uniqueValue.name);
         this.redactorJoinLink = url.toString();
         this.$store.state.popups.success('Сессия создана');
@@ -147,6 +147,11 @@
 
         this.redatorSessionUid = undefined;
         this.redactorJoinLink = '';
+
+        const url = new URL(location.href);
+        url.searchParams.delete(queryParamsName.sessionId);
+        url.searchParams.delete(queryParamsName.filename);
+        history.pushState(null, null, url.toString());
 
         console.log(this.uniqueRemoteTab);
         this.$parent.$refs.tabs.deleteTabByItem(this.uniqueRemoteTab);
@@ -166,12 +171,14 @@
         this.redatorSessionUid = uid;
 
         this.uniqueRemoteTab = {name: null, value: ''};
+        console.log(this.uniqueRemoteTab);
         await this.$parent.$refs.tabs.addTab({
           name: "remote: " + filename,
           closable: false,
           uniqueValue: this.uniqueRemoteTab
         });
         this.$emit('connectSession', uid, filename);
+        console.log(this.uniqueRemoteTab);
       },
 
       async copyLinkToClipboard() {
@@ -179,7 +186,7 @@
           return;
 
         await navigator.clipboard.writeText(this.redactorJoinLink);
-        this.$store.state.popups.success('Ссылка скопирована в буфер обмена')
+        this.$store.state.popups.success('Ссылка скопирована в буфер обмена');
       }
     }
   }

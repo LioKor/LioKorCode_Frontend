@@ -250,18 +250,20 @@
       right -300%
 
   .previews-container.width-more-1800
-    .preview:nth-child(2)
-      margin-right preview-margin + (taskWidth + preview-margin * 2) * 2
+    --additional-width 0
     .preview:nth-child(1)
-    .preview:nth-child(5n + 3)
+    .preview:nth-child(5n + 4)
       padding-left 0
     .preview:nth-child(1)::before
-    .preview:nth-child(5n + 3)::before
+    .preview:nth-child(5n + 4)::before
       left (- taskHeight / 2)
-    .preview:nth-child(5n + 2)
+    .preview:nth-child(5n + 3)
       padding-right 0
-    .preview:nth-child(5n + 2)::before
-      right -300%
+      margin-right var(--additional-width)
+    .preview:nth-child(3)
+      margin-right 'calc(%s + var(--additional-width) - %s)' % ((preview-margin + (taskWidth + preview-margin * 2) * 2) (taskWidth))
+    .preview:nth-child(5n + 3)::before
+        right -99999px
 </style>
 
 <template>
