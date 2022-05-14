@@ -1,7 +1,8 @@
 <style lang="stylus">
 @import '../../styles/constants.styl'
 
-width = 640px
+max-width = 640px
+padding = 20px
 
 .bold
   font-weight bold
@@ -13,27 +14,48 @@ width = 640px
   overflow-x hidden
   color textColor1
   width 100%
-  padding 0 20px
 
   .room-join-or-create
-    max-width width
+    display flex
+    flex-direction column
+    max-width max-width
+    height 100%
+    padding padding
+    .title
+      margin-top 0
+      margin-bottom 20px
 
-    .create-room
-      margin-bottom 10px
-      input
-        width 100%
-
-    .room
+    .rooms-list
+      flex 1
       display flex
-      cursor pointer
-      margin-bottom 10px
-      transition 0.2s ease background-color
-      .name
-        flex-grow 1
-      .has-password
-        margin-right 10px
-    .room:hover
-      background-color clHighlight
+      flex-direction column
+      align-items center
+      .create-room
+        margin-bottom 10px
+        width 100%
+        input
+          width 100%
+      .room
+        width 100%
+        display flex
+        cursor pointer
+        margin-bottom 10px
+        transition 0.2s ease background-color
+        .name
+          flex-grow 1
+        .has-password
+          margin-right 10px
+      .room:hover
+        background-color clHighlight
+
+      .no-rooms-info
+        flex 1
+        display flex
+        align-items center
+        width 50%
+        min-width 200px
+        text-align center
+        color textColor3
 
   .room-users
     max-width width
@@ -43,12 +65,15 @@ width = 640px
         margin-top 10px
         max-width 100%
         max-height 256px
+
+  .chat-component
+    padding-bottom 30px
 </style>
 
 <template>
-  <div class="rooms">
+  <div class="rooms scrollable">
     <div v-if="!this.$store.state.user.isLogined">
-      <h1>Комнаты</h1>
+      <h1 class="title">Комнаты</h1>
       <h2><router-link to="/signin">Авторизуйтесь</router-link>, чтобы создать или присоединиться к комнате</h2>
     </div>
     <div v-else-if="!connected">
@@ -62,57 +87,54 @@ width = 640px
         <h2>Пробуем еще{{ dots }}</h2>
       </div>
     </div>
-    <div v-else-if="!joinedRoom">
-      <div class="room-join-or-create">
-        <h1>Комнаты</h1>
+    <div v-else-if="!joinedRoom" class="room-join-or-create">
+      <h1 class="title">Комнаты</h1>
+      <h2>Создать</h2>
+      <form>
+        <div class="form-group">
+          <input v-model="createName" type="text" class="form-control" placeholder="Название комнаты..." maxlength="48" autocomplete="room-name">
+          <div class="muted"><a href="" @click.prevent="showSettings = !showSettings">Настройки</a></div>
+        </div>
 
-        <h2>Создать</h2>
-        <form>
+        <div v-show="showSettings">
           <div class="form-group">
-            <input v-model="createName" type="text" class="form-control" placeholder="Название комнаты..." maxlength="48" autocomplete="room-name">
-            <div class="muted"><a href="" @click.prevent="showSettings = !showSettings">Настройки</a></div>
-          </div>
-
-          <div v-show="showSettings">
-            <div class="form-group">
-              <input v-model="createPassword" type="password" class="form-control" placeholder="Пароль (оставьте пустым для открытой комнаты)" maxlength="32" autocomplete="room-password">
-            </div>
-
-            <div class="form-group">
-              <label>МАКСИМАЛЬНОЕ КОЛ-ВО СЛУШАТЕЛЕЙ - {{ createMaxUsers }}</label>
-              <input v-model="createMaxUsers" type="range" min="2" max="20"
-                     class="form-control" placeholder="Пароль" maxlength="32">
-              <div class="muted">
-                <i>Внимание! Ваш компьютер будет передавать видео-аудио поток каждому пользователю отдельно (P2P).
-                  Т. е. чем больше пользователей, тем выше нагрузка на ваш процессор и интернет-канал.</i>
-              </div>
-            </div>
+            <input v-model="createPassword" type="password" class="form-control" placeholder="Пароль (оставьте пустым для открытой комнаты)" maxlength="32" autocomplete="room-password">
           </div>
 
           <div class="form-group">
-            <button class="btn" @click.prevent="roomCreate">Создать</button>
+            <label>МАКСИМАЛЬНОЕ КОЛ-ВО СЛУШАТЕЛЕЙ - {{ createMaxUsers }}</label>
+            <input v-model="createMaxUsers" type="range" min="2" max="20"
+                   class="form-control" placeholder="Пароль" maxlength="32">
+            <div class="muted">
+              <i>Внимание! Ваш компьютер будет передавать видео-аудио поток каждому пользователю отдельно (P2P).
+                Т. е. чем больше пользователей, тем выше нагрузка на ваш процессор и интернет-канал.</i>
+            </div>
           </div>
+        </div>
+
+        <div class="form-group">
+          <button class="btn" @click.prevent="roomCreate">Создать</button>
+        </div>
+      </form>
+
+      <h2>Список комнат</h2>
+      <div class="rooms-list">
+        <form class="create-room">
+          <input type="text" class="form-control" placeholder="Поиск по названию..." v-model="roomSearch">
         </form>
-
-        <h2>Список комнат</h2>
-        <div class="rooms-list">
-          <form class="create-room">
-            <input type="text" class="form-control" placeholder="Поиск по названию..." v-model="roomSearch">
-          </form>
-          <div v-if="this.filteredRooms.length > 0" v-for="room in this.rooms" class="room form-control" @click="roomJoin(room.id)">
-            <div class="name">
-              {{ room.name }} ({{ room.owner.username }}<span v-show="room.owner.fullname"> - {{ room.owner.fullname }}</span>)
-            </div>
-            <div v-show="room.hasPassword" class="has-password">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
-                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
-              </svg>
-            </div>
-            <div class="users">{{ room.users.length }} / {{ room.usersMax }}</div>
+        <div v-if="this.filteredRooms.length > 0" v-for="room in this.rooms" class="room form-control" @click="roomJoin(room.id)">
+          <div class="name">
+            {{ room.name }} ({{ room.owner.username }}<span v-show="room.owner.fullname"> - {{ room.owner.fullname }}</span>)
           </div>
-          <div v-else class="room form-control">
-            <div class="name">Созданных комнат нет, но вы можете создать свою.</div>
+          <div v-show="room.hasPassword" class="has-password">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
+              <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+            </svg>
           </div>
+          <div class="users">{{ room.users.length }} / {{ room.usersMax }}</div>
+        </div>
+        <div v-else class="no-rooms-info">
+          <div class="name">Доступных комнат нет, но вы можете создать свою.</div>
         </div>
       </div>
     </div>
@@ -133,7 +155,7 @@ width = 640px
       </div>
 
       <h2>Chat</h2>
-      <Chat ref="chat" @sendMessage="sendMessage" />
+      <Chat ref="chat" class="chat-component" @sendMessage="sendMessage" />
     </div>
   </div>
 </template>

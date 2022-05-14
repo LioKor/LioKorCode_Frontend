@@ -86,7 +86,7 @@ div.chat
 
 <template>
   <div class="chat">
-    <div id="messagesDiv" ref="messagesList" class="messages">
+    <div id="messagesDiv" ref="messagesList" class="messages scrollable">
       <div v-for="message in messages" class="message">
         <div class="avatar">
           <img alt="" :src="message.avatarUrl">
