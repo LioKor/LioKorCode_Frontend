@@ -2,7 +2,7 @@
   @require '../styles/constants.styl'
   @require '../styles/forms.styl'
 
-  close-btn-size = 25px
+  close-btn-size = 20px
 
   .modal
     position fixed
@@ -35,8 +35,8 @@
         position absolute
         color textColor2
         text-shadow textLightingNormal2
-        right 20px
-        top 10px
+        right 8px
+        top 8px
         width close-btn-size
         height close-btn-size
         transition all 0.3s ease

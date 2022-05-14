@@ -69,13 +69,13 @@ width = 640px
         <h2>Создать</h2>
         <form>
           <div class="form-group">
-            <input v-model="createName" type="text" class="form-control" placeholder="Название" maxlength="48">
-            <div class="muted"><a href="#" @click.prevent="showSettings = !showSettings">Настройки</a></div>
+            <input v-model="createName" type="text" class="form-control" placeholder="Название комнаты..." maxlength="48" autocomplete="room-name">
+            <div class="muted"><a href="" @click.prevent="showSettings = !showSettings">Настройки</a></div>
           </div>
 
           <div v-show="showSettings">
             <div class="form-group">
-              <input v-model="createPassword" type="password" class="form-control" placeholder="Пароль (оставьте пустым для открытой комнаты)" maxlength="32">
+              <input v-model="createPassword" type="password" class="form-control" placeholder="Пароль (оставьте пустым для открытой комнаты)" maxlength="32" autocomplete="room-password">
             </div>
 
             <div class="form-group">
@@ -119,7 +119,7 @@ width = 640px
     <div v-else class="room-users">
       <h1>{{ joinedRoom.name }}</h1>
       <button class="btn btn-danger" @click="roomLeave">
-        <span v-if="joinedRoom.host">Удалить</span>
+        <span v-if="joinedRoom.host">Закончить конференцию</span>
         <span v-else>Покинуть</span>
       </button>
       <h2>Участники {{ joinedRoom.users.length }} / {{ joinedRoom.maxUsers }}</h2>
@@ -149,8 +149,12 @@ import wufSoundSrc from '/src/sounds/wuf.mp3'
 
 import { Room, User, Message } from './models'
 
-const WS_ADDR = (window.location.hostname === 'localhost')? 'localhost:9090': `${window.location.hostname}/ws`
-const WS_ROOMS_URL = `${(window.location.protocol === 'http:')? 'ws': 'wss'}://${WS_ADDR}`
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const WS_ADDR = (isLocal)? 'localhost:9090': `${window.location.hostname}/ws`
+let WS_ROOMS_URL = `${(window.location.protocol === 'http:')? 'ws': 'wss'}://${WS_ADDR}`
+if (isLocal) {
+  WS_ROOMS_URL = 'wss://code.liokor.com/ws';
+}
 
 let ws = null
 
@@ -176,7 +180,7 @@ export default {
 
       joinedRoom: null,
 
-      createName: 'Волчачье логово 🐺',
+      createName: '',
       createPassword: '',
       createMaxUsers: 20,
 
@@ -357,7 +361,7 @@ export default {
       if (!this.joinedRoom) {
         return;
       }
-      const message = new Message(user.username, content);
+      const message = new Message(user.username, content, user.avatarUrl);
       this.$refs.chat.addMessage(message);
     },
 
@@ -370,13 +374,7 @@ export default {
 
       let targetUsername = '';
       if (message.startsWith('@')) {
-        let i = 1;
-        let chr = message[i];
-        while (!([',', '.', ' ', '!', '?', ';', ':'].includes(chr)) && i < message.length) {
-          targetUsername += chr;
-          i += 1;
-          chr = message[i];
-        }
+        targetUsername = message.split(/[',. !?;:]/)[0];
       }
       console.log(targetUsername);
 
@@ -458,11 +456,10 @@ export default {
       });
     },
 
-    async waitForUsername() {
-      const self = this;
-      return new Promise(function(resolve) {
-        const checkInterval = setInterval(function() {
-          if (self.$store.state.user.username) {
+    async waitForLogin() {
+      return new Promise((resolve) => {
+        const checkInterval = setInterval(() => {
+          if (this.$store.state.user.isLogined) {
             clearInterval(checkInterval);
             resolve();
           }
@@ -478,7 +475,7 @@ export default {
       }
       const users = [];
       for (const user in data.users) {
-        users.push(new User(user.id, user.username, user.fullname));
+        users.push(new User(user.id, user.username, user.fullname, user.avatarUrl));
       }
 
       let host = false;
@@ -486,7 +483,7 @@ export default {
         host = this.uid === data.users[0].id;
       }
 
-      const owner = new User(data.owner.id, data.owner.username, data.owner.fullname);
+      const owner = new User(data.owner.id, data.owner.username, data.owner.fullname, data.owner.avatarUrl);
       this.joinedRoom = new Room(data.id, data.name, owner, data.usersMax, data.hasPassword, host, data.users);
       if (host) {
         const currentUser = this.__getUser(this.uid);
@@ -545,7 +542,7 @@ export default {
         }
         this.joinedRoom = null;
       } else if (command === 'addRoomUser') {
-        this.userConnected(new User(data.id, data.username, data.fullname));
+        this.userConnected(new User(data.id, data.username, data.fullname, data.avatarUrl));
       } else if (command === 'deleteRoomUser') {
         this.joinedRoom.deleteUser(data.id);
         this.sounds.userLeft.play();
@@ -570,7 +567,7 @@ export default {
 
   async mounted() {
     // only after some time username is available
-    await this.waitForUsername();
+    await this.waitForLogin();
 
     ws = new ReconnectingWebSocket(WS_ROOMS_URL, {
       open: () => this.wsOpenAction(),

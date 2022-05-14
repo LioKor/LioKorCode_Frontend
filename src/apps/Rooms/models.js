@@ -1,7 +1,8 @@
 import { stripTags } from '/src/utils/utils'
 
 export class Message {
-    constructor(username, content) {
+    constructor(username, content, avatarUrl) {
+        this.avatarUrl = avatarUrl;
         this.username = username;
         this.content = stripTags(content).replaceAll('\n', '<br />');
         this.date = new Date();
@@ -9,10 +10,11 @@ export class Message {
 }
 
 export class User {
-    constructor(id, username, fullname = null) {
+    constructor(id, username, fullname, avatarUrl) {
         this.id = id;
         this.username = username;
         this.fullname = fullname;
+        this.avatarUrl = avatarUrl;
 
         this.stream = null;
         this.pc = null;

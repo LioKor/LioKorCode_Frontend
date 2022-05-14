@@ -89,7 +89,7 @@ div.chat
     <div id="messagesDiv" ref="messagesList" class="messages">
       <div v-for="message in messages" class="message">
         <div class="avatar">
-          <img alt="" src="">
+          <img alt="" :src="message.avatarUrl">
         </div>
         <div class="body">
           <div class="title">
