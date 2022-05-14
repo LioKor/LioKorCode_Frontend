@@ -193,19 +193,19 @@ export default {
 
   computed: {
     filteredRooms: function() {
-      const rooms = []
+      const rooms = [];
       for (const room of this.rooms) {
         if (room.name.search(this.roomSearch) !== -1) {
-          rooms.push(room)
+          rooms.push(room);
         }
       }
-      return rooms
+      return rooms;
     }
   },
 
   methods: {
     send(data) {
-      ws.sendJSON(data)
+      ws.sendJSON(data);
     },
 
     __getUser(id) {
@@ -213,28 +213,28 @@ export default {
         return null;
       }
       if (!this.joinedRoom) {
-        return null
+        return null;
       }
 
       for (const user of this.joinedRoom.users) {
         if (user.id === id) {
-          return user
+          return user;
         }
       }
-      return null
+      return null;
     },
 
     __getRoom(id) {
       if (!id) {
-        return null
+        return null;
       }
 
       for (const room of this.rooms) {
         if (room.id === id) {
-          return room
+          return room;
         }
       }
-      return null
+      return null;
     },
 
     async __getDevices() {
@@ -290,8 +290,8 @@ export default {
       pc.addEventListener('datachannel', (ev) => {
         console.log('Data channel created!')
         ev.channel.addEventListener('message', (ev) => {
-          this.addMessage(user, ev.data)
-          this.sounds.newMessage.play()
+          this.addMessage(user, ev.data);
+          this.sounds.newMessage.play();
         })
       })
 
@@ -355,17 +355,17 @@ export default {
 
     addMessage(user, content) {
       if (!this.joinedRoom) {
-        return
+        return;
       }
-      const message = new Message(user.username, content)
-      this.$refs.chat.addMessage(message)
+      const message = new Message(user.username, content);
+      this.$refs.chat.addMessage(message);
     },
 
     sendMessage(message) {
-      const currentUser = this.__getUser(this.uid)
+      const currentUser = this.__getUser(this.uid);
 
       if (!this.joinedRoom) {
-        return
+        return;
       }
 
       let targetUsername = '';
@@ -373,12 +373,12 @@ export default {
         let i = 1;
         let chr = message[i];
         while (!([',', '.', ' ', '!', '?', ';', ':'].includes(chr)) && i < message.length) {
-          targetUsername += chr
-          i += 1
-          chr = message[i]
+          targetUsername += chr;
+          i += 1;
+          chr = message[i];
         }
       }
-      console.log(targetUsername)
+      console.log(targetUsername);
 
       let messageSent = false;
       for (const user of this.joinedRoom.users) {
@@ -389,41 +389,41 @@ export default {
       }
 
       if (messageSent || this.joinedRoom.users.length === 1) {
-        this.addMessage(currentUser, message)
+        this.addMessage(currentUser, message);
       } else {
         this.$refs.chat.setMessage(message);
-        this.$store.state.modal.alert('Пользователь не найден!', 'Не удалось отправить сообщение!')
+        this.$store.state.popups.alert('Пользователь не найден!', 'Не удалось отправить сообщение!');
       }
     },
 
     updateDots() {
       if (this.dots.length === 3) {
-        this.dots = '.'
+        this.dots = '.';
       } else {
-        this.dots += '.'
+        this.dots += '.';
       }
     },
 
     async roomJoin(id) {
-      const room = this.__getRoom(id)
-      let password = ''
+      const room = this.__getRoom(id);
+      let password = '';
       if (room.hasPassword) {
-        password = await this.$store.state.modal.prompt('Введите пароль', undefined, undefined, true)
+        password = await this.$store.state.modal.prompt('Введите пароль', undefined, undefined, true);
       }
 
       this.send({
         command: 'joinRoom',
         id, password
-      })
+      });
     },
 
     async roomCreate() {
       if (this.createName.length === 0) {
-        this.$store.state.modal.alert('Название не может быть пустым')
-        return
+        this.$store.state.modal.alert('Название не может быть пустым');
+        return;
       }
 
-      this.devices = await this.__getDevices()
+      this.devices = await this.__getDevices();
 
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -449,13 +449,13 @@ export default {
     roomLeave() {
       if (this.stream) {
         for (const track of this.stream.getTracks()) {
-          track.stop()
+          track.stop();
         }
       }
 
       this.send({
         command: 'leaveRoom',
-      })
+      });
     },
 
     async waitForUsername() {
@@ -464,119 +464,119 @@ export default {
         const checkInterval = setInterval(function() {
           if (self.$store.state.user.username) {
             clearInterval(checkInterval);
-            resolve()
+            resolve();
           }
-        }, 100)
-      })
+        }, 100);
+      });
     },
 
     setRoom(data) {
-      data = data.room
+      data = data.room;
 
       if (this.joinedRoom) {
-        return
+        return;
       }
-      const users = []
+      const users = [];
       for (const user in data.users) {
-        users.push(new User(user.id, user.username, user.fullname))
+        users.push(new User(user.id, user.username, user.fullname));
       }
 
-      let host = false
+      let host = false;
       if (data.users.length > 0) {
-        host = this.uid === data.users[0].id
+        host = this.uid === data.users[0].id;
       }
 
-      const owner = new User(data.owner.id, data.owner.username, data.owner.fullname)
-      this.joinedRoom = new Room(data.id, data.name, owner, data.usersMax, data.hasPassword, host, data.users)
+      const owner = new User(data.owner.id, data.owner.username, data.owner.fullname);
+      this.joinedRoom = new Room(data.id, data.name, owner, data.usersMax, data.hasPassword, host, data.users);
       if (host) {
-        const currentUser = this.__getUser(this.uid)
+        const currentUser = this.__getUser(this.uid);
         if (currentUser) {
-          currentUser.stream = this.stream
+          currentUser.stream = this.stream;
         } else {
-          console.log('WARN: currentUser is undefined')
+          console.log('WARN: currentUser is undefined');
         }
       }
     },
 
     async userConnected(user) {
-      user.pc = this.__createPeerConnection(user, this.stream)
+      user.pc = this.__createPeerConnection(user, this.stream);
       user.dc = user.pc.createDataChannel('chat');
 
-      const offer = await user.pc.createOffer()
-      await user.pc.setLocalDescription(offer)
+      const offer = await user.pc.createOffer();
+      await user.pc.setLocalDescription(offer);
       this.send({
         to: user.id,
         command: 'offer',
         offer: offer
-      })
+      });
 
-      this.joinedRoom.addUser(user)
-      await this.sounds.userJoined.play()
+      this.joinedRoom.addUser(user);
+      await this.sounds.userJoined.play();
     },
 
     wsOpenAction() {
-      this.connected = true
-      this.wasConnected = true
+      this.connected = true;
+      this.wasConnected = true;
 
       this.send({
         command: 'setInfo',
         jwtToken: this.$store.state.user.jwtToken
-      })
-      this.send({ command: 'getRooms' })
+      });
+      this.send({ command: 'getRooms' });
     },
 
     wsCloseAction() {
-      this.connected = false
-      this.joinedRoom = null
-      this.updateDots()
+      this.connected = false;
+      this.joinedRoom = null;
+      this.updateDots();
     },
 
     wsMessageHandler(message) {
-      const data = JSON.parse(message.data)
-      const command = data.command
+      const data = JSON.parse(message.data);
+      const command = data.command;
 
       if (command === 'setRooms') {
-        this.rooms = data.rooms
+        this.rooms = data.rooms;
       } else if (command === 'setRoom') {
-        this.setRoom(data)
+        this.setRoom(data);
       } else if (command === 'leaveRoom') {
         if (data.kick) {
-          alert('Вы были исключены из комнаты!')
+          this.$store.state.popups.alert('Вы были исключены из комнаты!');
         }
         this.joinedRoom = null;
       } else if (command === 'addRoomUser') {
-        this.userConnected(new User(data.id, data.username, data.fullname))
+        this.userConnected(new User(data.id, data.username, data.fullname));
       } else if (command === 'deleteRoomUser') {
-        this.joinedRoom.deleteUser(data.id)
-        this.sounds.userLeft.play()
+        this.joinedRoom.deleteUser(data.id);
+        this.sounds.userLeft.play();
       } else if (command === 'setInfo') {
-        this.uid = data.id
-        this.iceServers = data.iceServers
+        this.uid = data.id;
+        this.iceServers = data.iceServers;
       } else if (command === 'candidate') {
-        this.__candidateReceived(data.candidate, data.from)
+        this.__candidateReceived(data.candidate, data.from);
       } else if (command === 'offer') {
-        this.__offerReceived(data.offer, data.from)
+        this.__offerReceived(data.offer, data.from);
       } else if (command === 'answer') {
-        this.__answerReceived(data.answer, data.from)
+        this.__answerReceived(data.answer, data.from);
       } else if (command === 'ping') {
-        this.send({ command: 'pong' })
+        this.send({ command: 'pong' });
       } else if (command === 'error') {
-        this.$store.state.popups.error('Ошибка!', data.message)
+        this.$store.state.popups.error('Ошибка!', data.message);
       } else {
-        console.log(`WS ERROR: Unknown command ${command} received`)
+        console.log(`WS ERROR: Unknown command ${command} received`);
       }
     },
   },
 
   async mounted() {
     // only after some time username is available
-    await this.waitForUsername()
+    await this.waitForUsername();
 
     ws = new ReconnectingWebSocket(WS_ROOMS_URL, {
       open: () => this.wsOpenAction(),
       close: () => this.wsCloseAction(),
       message: (message) => this.wsMessageHandler(message)
-    })
+    });
   },
 }
 </script>

@@ -135,24 +135,24 @@ export default {
   methods: {
     sendMessage() {
       if (this.message.length > 0) {
-        const message = this.message
-        this.message = ''
-        this.$emit('sendMessage', message)
+        const message = this.message;
+        this.message = '';
+        this.$emit('sendMessage', message);
       }
     },
 
     setMessage(message) {
-      this.message = message
+      this.message = message;
     },
 
     scrollToBottom() {
-      this.$refs.messagesList.scrollTop = this.$refs.messagesList.scrollHeight
+      this.$refs.messagesList.scrollTop = this.$refs.messagesList.scrollHeight;
     },
 
     async addMessage(message) {
-      this.messages.push(message)
-      await this.$nextTick()
-      this.scrollToBottom()
+      this.messages.push(message);
+      await this.$nextTick();
+      this.scrollToBottom();
     }
   }
 }
