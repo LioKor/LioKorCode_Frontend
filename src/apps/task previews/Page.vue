@@ -67,7 +67,7 @@
 <template>
   <div class="task-previews">
     <div class="content-container scrollable scrollable-bg">
-      <Header @search="updateSearch" ref="header"></Header>
+      <Header @search="updateSearch" ref="header" @change-page="changePaginatorPage"></Header>
 
       <div class="previews-container" ref="previews">
         <TaskPreview v-for="task in tasks" :task="task" path-modifier=""></TaskPreview>
@@ -97,10 +97,7 @@
 
     data() {
       return {
-        allTasks: [],
-        myTasks: [],
         tasks: [],
-        myTasksReceived: false,
         isSearchedMyTasks: false,
 
         resizeMutex: false,
@@ -108,8 +105,7 @@
     },
 
     async mounted() {
-      this.allTasks = await this.getTasks('getTasks');
-      this.tasks = this.allTasks.concat();
+      this.tasks = await this.getTasks('getTasks');
 
       window.addEventListener('resize', this.onResizeContainerQueriesPolyfill);
       this.$store.state.eventBus.on('resizeTaskPreviews', this.onResizeContainerQueriesPolyfill);
@@ -122,7 +118,7 @@
 
     methods: {
       async getTasks(apiRequestName, silent = false) {
-        const tasks = await this.$store.state.api[apiRequestName]();
+        const tasks = await this.$store.state.api[apiRequestName](...(Array.from(arguments).slice(2,-1)));
         if (!tasks.ok_) {
           if (!silent)
             this.$store.state.popups.error("Не удалось получить список заданий");
@@ -132,23 +128,22 @@
         return tasks;
       },
       async updateSearch(text, options) {
-        text = text.toLowerCase();
-        this.tasks = [];
+        this.isSearchedMyTasks = options.my;
 
-        let tasksToSearch = this.allTasks;
-        this.isSearchedMyTasks = false;
         if (options.my === true) {
-          if (!this.myTasksReceived) {
-            this.myTasks = await this.getTasks('getMyTasks', true)
-            this.myTasksReceived = true
-          }
-          this.isSearchedMyTasks = true;
-          tasksToSearch = this.myTasks;
+          this.tasks = await this.getTasks('getMyTasks', true);
+        } else if (options.solved === true) {
+          this.tasks = await this.getTasks('getSolvedTasks', true);
+        } else if (options.unsolved === true) {
+          this.tasks = await this.getTasks('getUnsolvedTasks', true);
+        } else if (text !== '') {
+          this.tasks = await this.getTasks('getSearchTasks', true, text, 1, 10);
+        } else {
+          this.tasks = await this.getTasks('getTasks');
         }
-        tasksToSearch.forEach(task => {
-          if (String(task.id).includes(text) || task.name.toLowerCase().includes(text))
-            this.tasks.push(task);
-        });
+      },
+      async changePaginatorPage({page, count}) {
+        this.tasks = await this.getTasks('getTasks', false, page, count);
       },
 
       onResizeContainerQueriesPolyfill(sliderLeftPercentage) {
@@ -157,7 +152,7 @@
         this.resizeMutex = true;
 
         if (typeof sliderLeftPercentage === 'number')
-          this.$refs.header.roomsOpenedState = sliderLeftPercentage < 98;
+          this.$refs.header.isRoomsOpened = sliderLeftPercentage < 98;
 
         const el = this.$refs.previews;
         const width = el.clientWidth;

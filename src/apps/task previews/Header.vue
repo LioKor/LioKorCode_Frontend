@@ -1,7 +1,6 @@
 <style lang="stylus">
   @require '../../styles/constants.styl'
-
-  degree = 26.5deg
+  @require '../../styles/header.styl'
 
   colorHover = #9b1616
   checkbox-background = linear-gradient(60deg, gradColor2 0%, color4 50%, colorHover 50%, color5 100%)
@@ -10,8 +9,8 @@
     display flex
     position relative
     width 100%
-    margin-left 20px
-    margin-top 10px
+    margin-left 5px
+    margin-top -22px
     > div
       position relative
       padding 10px
@@ -88,7 +87,7 @@
     position relative
     width 100%
     margin-left 35px
-    margin-top 45px
+    margin-top 32px
     color textColor2
     input[type=checkbox]
       position absolute
@@ -121,6 +120,21 @@
       + label
         color textColor1
         font-weight bold
+
+    #my-solved-tasks
+    label[for=my-solved-tasks]
+      position absolute
+      top 30px
+      left 48px
+    #my-unsolved-tasks
+    label[for=my-unsolved-tasks]
+      position absolute
+      top 60px
+      left 63px
+
+  .paginator
+    margin-top 16px
+    margin-left 33px
 </style>
 
 <template>
@@ -135,7 +149,7 @@
       </router-link>
       <router-link v-else to="/signin">Войти</router-link>
 
-      <div :class="{'opacity-0': roomsOpenedState}" @click="expandRooms">Развернуть комнаты</div>
+      <div :class="{'opacity-0': isRoomsOpened}" @click="expandRooms">Развернуть комнаты</div>
     </div>
     <div class="sidePart" style="z-index: 5">
       <div class="search-group">
@@ -143,12 +157,19 @@
         <div>
           <input class="input-with-clear" @input="updateSearch" v-model="searchText" ref="inputSearch" type="text" placeholder="Поиск...">
           <div class="input-bg"></div>
-          <svg class="input-clear svg-button" @click="$refs.inputSearch.value = ''" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12 10.5857864 4.7928932-4.79289318c.3905243-.39052429 1.0236893-.39052429 1.4142136 0s.3905243 1.02368927 0 1.41421356l-4.7928932 4.79289322 4.7928932 4.7928932c.3905243.3905243.3905243 1.0236893 0 1.4142136s-1.0236893.3905243-1.4142136 0l-4.7928932-4.7928932-4.79289322 4.7928932c-.39052429.3905243-1.02368927.3905243-1.41421356 0s-.39052429-1.0236893 0-1.4142136l4.79289318-4.7928932-4.79289318-4.79289322c-.39052429-.39052429-.39052429-1.02368927 0-1.41421356s1.02368927-.39052429 1.41421356 0z"/></svg>
+          <svg class="input-clear svg-button" @click="searchText = ''" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12 10.5857864 4.7928932-4.79289318c.3905243-.39052429 1.0236893-.39052429 1.4142136 0s.3905243 1.02368927 0 1.41421356l-4.7928932 4.79289322 4.7928932 4.7928932c.3905243.3905243.3905243 1.0236893 0 1.4142136s-1.0236893.3905243-1.4142136 0l-4.7928932-4.7928932-4.79289322 4.7928932c-.39052429.3905243-1.02368927.3905243-1.41421356 0s-.39052429-1.0236893 0-1.4142136l4.79289318-4.7928932-4.79289318-4.79289322c-.39052429-.39052429-.39052429-1.02368927 0-1.41421356s1.02368927-.39052429 1.41421356 0z"/></svg>
         </div>
       </div>
+      <Paginator class="paginator" :get-pages-foo="$store.state.api.getTasksPagesCount" elements-on-page="10" @change-page="(data) => $emit('change-page', data)"></Paginator>
       <div class="checkboxes-group">
-        <input id="my-tasks" @change="updateSearch" v-model="searchOptions.my" type="checkbox" name="happy" value="yes">
+        <input id="my-tasks" @change="toggleSolved('my'); updateSearch()" v-model="searchOptions.my" type="checkbox" value="yes">
         <label for="my-tasks">Созданные мной</label>
+
+        <input id="my-solved-tasks" @change="toggleSolved('solved'); updateSearch()" v-model="searchOptions.solved" type="checkbox" value="yes">
+        <label for="my-solved-tasks">Решённые</label>
+
+        <input id="my-unsolved-tasks" @change="toggleSolved('unsolved'); updateSearch()" v-model="searchOptions.unsolved" type="checkbox" value="yes">
+        <label for="my-unsolved-tasks">Не решённые</label>
       </div>
 
       <span class="top-decoration">
@@ -171,18 +192,37 @@
 </template>
 
 <script>
+  import Paginator from "./Paginator.vue";
+
   export default {
+    components: { Paginator },
+
     data() {
       return {
         searchText: "",
         searchOptions: {
           my: false,
+          solved: false,
+          unsolved: false,
         },
-        roomsOpenedState: false,
+        isRoomsOpened: false,
+
+        paginatorPage: 3,
+        paginatorPagesCount: 128,
       }
     },
 
     methods: {
+      uncheckAllWithout(key) {
+        for (const option of Object.keys(this.searchOptions))
+          if (option !== key)
+            this.searchOptions[option] = false;
+      },
+      toggleSolved(key) {
+        if (this.searchOptions[key])
+          this.uncheckAllWithout(key);
+      },
+
       updateSearch() {
         this.$emit('search', this.searchText, this.searchOptions);
       },

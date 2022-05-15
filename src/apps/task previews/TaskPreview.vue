@@ -268,7 +268,7 @@
     .preview:nth-child(3)
       margin-right 'calc(%s + var(--additional-width) - %s)' % ((preview-margin + (taskWidth + preview-margin * 2) * 2) (taskWidth))
     .preview:nth-child(5n + 3)::before
-        right -99999px
+      right calc(-100% - var(--additional-width))
 </style>
 
 <template>
