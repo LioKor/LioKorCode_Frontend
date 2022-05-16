@@ -94,11 +94,11 @@
   <div class="paginator">
     <div class="button" @click="setPage(page - 1)"><svg style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
     </div>
-    <div class="number">{{ firstPage }}</div>
+    <div class="number" @click="setPage(firstPage)">{{ firstPage }}</div>
     <div>...</div>
     <div class="number selected">{{ page }}</div>
     <div>...</div>
-    <div class="number">{{ pagesCount }}</div>
+    <div class="number" @click="setPage(pagesCount)">{{ pagesCount }}</div>
     <div class="button" @click="setPage(page + 1)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
     </div>
   </div>
@@ -156,6 +156,8 @@
 
     methods: {
       setPage(num, preventEmitting = false) {
+        if (num === this.page)
+          return;
         if (num < 1) {
           if (this.page === 1)
             return;

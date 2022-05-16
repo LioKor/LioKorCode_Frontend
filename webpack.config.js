@@ -49,6 +49,11 @@ module.exports = env => {
                     target: proxyTo,
                     secure: false,
                     changeOrigin: true
+                },
+                '/media': {
+                    target: proxyTo,
+                    secure: false,
+                    changeOrigin: true
                 }
             }
         },

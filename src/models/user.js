@@ -9,8 +9,8 @@ export default class User extends Model {
     password: "",
     email: "",
     fullname: "",
-    //avatarUrl: "https://i.yapx.ru/GuFDE.gif",
-    jwtToken: '',
+    avatarUrl: "",
+    jwtToken: "",
     chosenRoomId: -1,
   }
 
@@ -24,7 +24,6 @@ export default class User extends Model {
   set(data) {
     super.set(data);
     this.isLogined = true;
-    this.avatarUrl = "https://i.yapx.ru/GuFDE.gif";
   }
 
   setChosenRoomId(id) {

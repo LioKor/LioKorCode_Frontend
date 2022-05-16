@@ -72,10 +72,10 @@
     transform translate(-50%, -50%)
     opacity 0
     pointer-events none
-    transition all 0.2s ease
     background mix(textColor1, transparent, 10%)
     border-radius 50%
     box-shadow shadow1
+    transition all 0.5s ease
     img
       width 100%
       height 100%
@@ -95,7 +95,7 @@
 
       <div v-if="!tasks.length" class="standalone-form">
         <div class="title">
-          <div v-if="!searchOptions.my" class="primary">Заданий по такому запросу не найдено</div>
+          <div v-if="!searchOptions.my || searchText !== ''" class="primary">Заданий по такому запросу не найдено</div>
           <div v-else class="primary">Вы пока не создали ни одного задания</div>
         </div>
       </div>
@@ -227,20 +227,20 @@
         }
         const stringsCount = Math.floor((window.innerHeight - headerHeight) / taskHeight);
         if (width < 720) {
-          setClass(0, this.updateSearch);
           this.setOnPageCount(stringsCount);
+          setClass(0, this.updateSearch);
         } else if (width < 1080) {
-          setClass(1, this.updateSearch);
           this.setOnPageCount(stringsCount * 2 - 1);
+          setClass(1, this.updateSearch);
         } else if (width < 1440) {
-          setClass(2, this.updateSearch);
           this.setOnPageCount(stringsCount * 3 - 1);
+          setClass(2, this.updateSearch);
         } else if (width < 1800) {
-          setClass(3, this.updateSearch);
           this.setOnPageCount(stringsCount * 4 - 2);
+          setClass(3, this.updateSearch);
         } else {
-          this.setOnPageCount(stringsCount * 5 - 2);
           setClass(4, this.updateSearch);
+          this.setOnPageCount(stringsCount * 5 - 2);
           el.style.setProperty('--additional-width', (width - 1800) + 'px');
         }
 
