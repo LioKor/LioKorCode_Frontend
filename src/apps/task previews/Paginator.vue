@@ -92,39 +92,39 @@
 
 <template>
   <div class="paginator">
-    <div class="button" @click="setPage(currentPage - 1)"><svg style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+    <div class="button" @click="setPage(page - 1)"><svg style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
     </div>
     <div class="number">{{ firstPage }}</div>
     <div>...</div>
-    <div class="number selected">{{ currentPage }}</div>
+    <div class="number selected">{{ page }}</div>
     <div>...</div>
     <div class="number">{{ pagesCount }}</div>
-    <div class="button" @click="setPage(currentPage + 1)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+    <div class="button" @click="setPage(page + 1)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
     </div>
   </div>
 </template>
 
 <script>
   const searchParamPageName = 'page';
+  const searchParamCountOnPageName = 'count';
+  const defaultPage = 1;
+  const defaultOnPageCount = 5;
 
   export default {
     props: {
-      getPagesFoo: {
-        type: Function,
-        required: true,
-      },
+      getPagesFoo: Function,
       currentPage: Number,
-      elementsOnPage: {
-        type: Number,
-        required: true,
-      },
+      elementsOnPage: Number,
     },
 
     data() {
       return {
         firstPage: 1,
-        currentPage: 1,
+        page: 1,
+        onPageCount: undefined,
         pagesCount: 1,
+
+        setPageAfterSettingPagesCount: undefined,
       }
     },
 
@@ -132,32 +132,73 @@
       if (this.$props.currentPage === undefined) {
         const url = new URL(location.href);
         const page = url.searchParams.get(searchParamPageName);
+        const count = url.searchParams.get(searchParamCountOnPageName);
         if (page === null)
-          this.setPage(0);
+          this.setPageAfterSettingPagesCount = defaultPage;
         else
-          this.setPage(page);
+          this.setPageAfterSettingPagesCount = Number(page);
+
+        if (count === null)
+          this.setOnPageCount(defaultOnPageCount);
+        else
+          this.setOnPageCount(Number(count));
       }
 
-      const pagesCount = this.$props.getPagesFoo();
-      if (!pagesCount.ok_) {
-        this.$store.state.popups.error('Не удалось получить количество страниц');
-        return;
+      if (this.$props.getPagesFoo !== undefined) {
+        const pagesCount = this.$props.getPagesFoo();
+        if (!pagesCount.ok_) {
+          this.$store.state.popups.error('Не удалось получить количество страниц');
+          return;
+        }
+        this.pagesCount = pagesCount.count;
       }
-      this.pagesCount = pagesCount.count;
     },
 
     methods: {
-      setPage(num, silent = false) {
-        if (num < 1 || num > this.pagesCount) {
-          return;
+      setPage(num, preventEmitting = false) {
+        if (num < 1) {
+          if (this.page === 1)
+            return;
+          num = 1;
+        } else if (num > this.pagesCount) {
+          if (this.page === this.pagesCount)
+            return;
+          num = this.pagesCount;
         }
-        this.currentPage = num;
+
+        this.page = num;
         const url = new URL(location.href);
         url.searchParams.set(searchParamPageName, num);
         history.pushState(null, null, url.toString());
-        if (!silent)
-          this.$emit('change-page', {num, count: this.elementsOnPage});
+        if (!preventEmitting)
+          this.$emit('change-page', {page: this.page, count: this.onPageCount});
       },
+      setOnPageCount(num, preventEmitting = false) {
+        if (num < 1) {
+          return;
+        }
+        this.onPageCount = Math.floor(num);
+        const url = new URL(location.href);
+        url.searchParams.set(searchParamCountOnPageName, num);
+        history.pushState(null, null, url.toString());
+        if (!preventEmitting)
+          this.$emit('change-on-page-count', {page: this.page, count: this.onPageCount});
+      },
+      setPagesCount(num, preventEmitting = false) {
+        if (num < 1) {
+          return;
+        }
+        this.pagesCount = Math.floor(num);
+        if (this.setPageAfterSettingPagesCount !== undefined) {
+          this.setPage(this.setPageAfterSettingPagesCount, preventEmitting);
+          this.setPageAfterSettingPagesCount = undefined;
+        }
+        if (!preventEmitting)
+          this.$emit('change-pages-count', this.pagesCount);
+
+        if (this.page > this.pagesCount)
+          this.setPage(this.pagesCount);
+      }
     },
   }
 </script>

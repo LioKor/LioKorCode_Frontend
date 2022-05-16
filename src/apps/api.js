@@ -10,14 +10,14 @@ export default class Api extends ApiRequest {
     updateAvatar = (avatarUrl) => this.put('/user/avatar', {avatarUrl});
 
     createTask = (taskData) => this.post(`/tasks`, taskData);
-    getTasks = (page=1, countOnPage=30) => this.get(`/tasks`, {page, count: countOnPage});
-    getSearchTasks = (text='', page=1, countOnPage=30) => this.get(`/tasks/search`, {find: text, page, count: countOnPage});
+    getFullSearchTasks = (text, countOnPage, isMine, solved, page) => this.get(`/tasks/fullsearch`, {
+        find: text,
+        count: countOnPage,
+        mine: isMine,
+        solved: solved,
+        page: page,
+    });
     getTask = (id) => this.get(`/tasks/${id}`);
-    getMyTasks = () => this.get(`/tasks/user`);
-    getSolvedTasks = () => this.get(`/tasks/solved`);
-    getUnsolvedTasks = () => this.get(`/tasks/unsolved`);
-    getTasksPagesCount = (count) => this.get(`/tasks/pages`, {count});
-    getUserTasks = (userId) => this.get(`/tasks/user/${userId}`);
     updateTask = (id, taskData) => this.put(`/tasks/${id}`, taskData);
     deleteTask = (id) => this.delete(`/tasks/${id}`);
 

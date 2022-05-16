@@ -157,10 +157,10 @@
         <div>
           <input class="input-with-clear" @input="updateSearch" v-model="searchText" ref="inputSearch" type="text" placeholder="Поиск...">
           <div class="input-bg"></div>
-          <svg class="input-clear svg-button" @click="searchText = ''" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12 10.5857864 4.7928932-4.79289318c.3905243-.39052429 1.0236893-.39052429 1.4142136 0s.3905243 1.02368927 0 1.41421356l-4.7928932 4.79289322 4.7928932 4.7928932c.3905243.3905243.3905243 1.0236893 0 1.4142136s-1.0236893.3905243-1.4142136 0l-4.7928932-4.7928932-4.79289322 4.7928932c-.39052429.3905243-1.02368927.3905243-1.41421356 0s-.39052429-1.0236893 0-1.4142136l4.79289318-4.7928932-4.79289318-4.79289322c-.39052429-.39052429-.39052429-1.02368927 0-1.41421356s1.02368927-.39052429 1.41421356 0z"/></svg>
+          <svg class="input-clear svg-button" @click="searchText = ''; updateSearch();" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12 10.5857864 4.7928932-4.79289318c.3905243-.39052429 1.0236893-.39052429 1.4142136 0s.3905243 1.02368927 0 1.41421356l-4.7928932 4.79289322 4.7928932 4.7928932c.3905243.3905243.3905243 1.0236893 0 1.4142136s-1.0236893.3905243-1.4142136 0l-4.7928932-4.7928932-4.79289322 4.7928932c-.39052429.3905243-1.02368927.3905243-1.41421356 0s-.39052429-1.0236893 0-1.4142136l4.79289318-4.7928932-4.79289318-4.79289322c-.39052429-.39052429-.39052429-1.02368927 0-1.41421356s1.02368927-.39052429 1.41421356 0z"/></svg>
         </div>
       </div>
-      <Paginator class="paginator" :get-pages-foo="$store.state.api.getTasksPagesCount" elements-on-page="10" @change-page="(data) => $emit('change-page', data)"></Paginator>
+      <Paginator class="paginator" ref="paginator" @change-page="throwEventNext"></Paginator>
       <div class="checkboxes-group">
         <input id="my-tasks" @change="toggleSolved('my'); updateSearch()" v-model="searchOptions.my" type="checkbox" value="yes">
         <label for="my-tasks">Созданные мной</label>
@@ -229,6 +229,10 @@
 
       expandRooms() {
         this.$store.state.eventBus.emit('expandRooms');
+      },
+
+      throwEventNext(data) {
+        this.$emit('change-page', data);
       }
     },
   }

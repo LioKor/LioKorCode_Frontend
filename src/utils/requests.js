@@ -28,7 +28,16 @@ export function request(method, url, data = {}) {
     });
 }
 
+function cleanupObject(obj = {}) {
+    for (const key of Object.keys(obj)) {
+        if (obj[key] === undefined) {
+            delete obj[key];
+        }
+    }
+}
+
 function toArgs(data) {
+    cleanupObject(data);
     let str = Object.keys(data).map(key =>
         encodeURIComponent(key) + '=' + encodeURIComponent(data[key])
     ).join('&');
@@ -56,6 +65,7 @@ export default class ApiRequests {
     }
 
     request(method, path, data = {}) {
+        cleanupObject(data);
         return request(method, this.apiUrl + path, data);
     }
 

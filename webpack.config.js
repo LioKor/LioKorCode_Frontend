@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = env => {
-    const proxyTo = (env.local)? 'http://localhost:9091': 'https://code.liokor.com/'
+    const proxyTo = (env.local)? 'http://localhost:9091': 'http://178.62.57.180/'
 
     return {
         entry: './src/index.js',
@@ -35,7 +35,7 @@ module.exports = env => {
             historyApiFallback: {
                 rewrites: [
                     {
-                        from: /.(js|png|ico|mp3)$/,
+                        from: /.(js|png|ico|svg|gif|mp3)$/,
                         to: (context) => {
                             const path = context.parsedUrl.pathname.split('/')
                             return `/${path[path.length - 1]}`
@@ -71,11 +71,7 @@ module.exports = env => {
                     ],
                 },
                 {
-                    test: /\.png$/,
-                    loader: 'file-loader'
-                },
-                {
-                    test: /\.mp3$/,
+                    test: /\.(png|mp3|svg|gif)$/,
                     loader: 'file-loader'
                 },
                 {
