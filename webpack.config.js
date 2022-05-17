@@ -35,7 +35,7 @@ module.exports = env => {
             historyApiFallback: {
                 rewrites: [
                     {
-                        from: /.(js|png|ico|mp3)$/,
+                        from: /.(js|png|ico|svg|gif|mp3)$/,
                         to: (context) => {
                             const path = context.parsedUrl.pathname.split('/')
                             return `/${path[path.length - 1]}`
@@ -46,6 +46,11 @@ module.exports = env => {
             },
             proxy: {
                 '/api/v1': {
+                    target: proxyTo,
+                    secure: false,
+                    changeOrigin: true
+                },
+                '/media': {
                     target: proxyTo,
                     secure: false,
                     changeOrigin: true
@@ -71,11 +76,7 @@ module.exports = env => {
                     ],
                 },
                 {
-                    test: /\.png$/,
-                    loader: 'file-loader'
-                },
-                {
-                    test: /\.mp3$/,
+                    test: /\.(png|mp3|svg|gif)$/,
                     loader: 'file-loader'
                 },
                 {

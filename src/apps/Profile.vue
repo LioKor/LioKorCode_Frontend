@@ -15,7 +15,7 @@
         border-radius (size / 2 - 1) // to fix avatar outside of div
         margin 0 auto
         color textColor1
-        background-color clBackground
+        background mix(black, transparent, 70%)
         opacity 0
         cursor pointer
         transition all 0.2s ease
@@ -37,8 +37,8 @@
 
           <div class="title">
               <div class="avatar">
-                  <img :src="avatarUrl" alt="">
-                  <div class="cover">
+                  <img :src="avatarDataUrl || avatarUrl" alt="">
+                  <div class="cover" @click="loadAvatar">
                       Изменить
                   </div>
               </div>
@@ -101,6 +101,7 @@
 <script>
   import Logo from './Logo.vue'
   import {closeRoll, isClosedRoll, openRoll} from "../utils/show-hide";
+  import getImageAsDataURL from "@korolion/get-image-as-dataurl";
 
   export default {
     components: { Logo },
@@ -109,6 +110,7 @@
       return {
         username: this.$store.state.user.username,
         email: this.$store.state.user.email,
+        avatarDataUrl: '',
         avatarUrl: this.$store.state.user.avatarUrl,
         fullname: this.$store.state.user.fullname,
 
@@ -129,78 +131,90 @@
         const response = await this.$store.state.api.updateUser({
           email: this.email,
           fullname: this.fullname,
-        })
+        });
 
         if (response.ok_) {
-          this.$store.state.popups.success("Данные успешно изменены")
-          // todo: update data without getting user
-          await this.$store.dispatch('GET_USER')
-          return
+          this.$store.state.popups.success("Данные успешно изменены");
+          return;
         }
 
         const status = response.status_;
         if (status === 400) {
-          this.errorsInfo.fullname = 'Некорректное полное имя!'
-          this.errorsInfo.email = 'Или некорректный email... Мы точно не знаем)'
+          this.errorsInfo.fullname = 'Некорректное полное имя!';
+          this.errorsInfo.email = 'Или некорректный email... Мы точно не знаем)';
         } else {
-          this.$store.state.popups.error('Не удалось изменить данные', 'Произошла непредвиденная ошибка!')
+          this.$store.state.popups.error('Не удалось изменить данные', 'Произошла непредвиденная ошибка!');
         }
+      },
+      async __updateUserAvatarAction() {
+        if (this.avatarDataUrl === undefined)
+          return;
+
+        const response = await this.$store.state.api.updateAvatar(this.avatarDataUrl);
+        if (response.ok_) {
+          this.avatarDataUrl = undefined;
+          return;
+        }
+        this.$store.state.popups.error("Не удалось обновить аватар");
       },
 
 
       async updateUserInfo() {
         if (!this.enabledInfo) {
-          return
+          return;
         }
-        this.enabledInfo = false
+        this.enabledInfo = false;
 
-        this.errorsInfo = {}
-        await this.__updateUserInfoAction()
+        this.errorsInfo = {};
+        await this.__updateUserInfoAction();
+        await this.__updateUserAvatarAction();
+        // todo: update data without getting user
+        await this.$store.dispatch('GET_USER');
 
-        this.enabledInfo = true
+        this.enabledInfo = true;
       },
 
 
       async signOut() {
-        const response = await this.$store.state.api.signOut()
+        const response = await this.$store.state.api.signOut();
         if (!response.ok_) {
-          this.$store.state.popups.error("Не удалось выйти из аккаунта", 'Произошла непредвиденная ошибка')
-          return
+          this.$store.state.popups.error("Не удалось выйти из аккаунта", 'Произошла непредвиденная ошибка');
+          return;
         }
 
-        await this.$store.dispatch('DELETE_USER')
-        await this.$router.push('/signin')
-        this.$store.state.popups.success('Вы успешно вышли из аккаунта')
+        await this.$store.dispatch('DELETE_USER');
+        await this.$router.push('/signin');
+        this.$store.state.popups.success('Вы успешно вышли из аккаунта');
       },
 
 
       async __changePasswordAction() {
         if (this.newPassword.length === 0) {
-          this.errorsPassword.newPassword = 'Пароль не может быть пустым'
-          return
+          this.errorsPassword.newPassword = 'Пароль не может быть пустым';
+          return;
         }
         if (this.newPassword !== this.confirmPassword) {
-          const error = 'Пароли не совпадают'
-          this.errorsPassword.newPassword = error
-          this.errorsPassword.confirmPassword = error
-          return
+          const error = 'Пароли не совпадают';
+          this.errorsPassword.newPassword = error;
+          this.errorsPassword.confirmPassword = error;
+          return;
         }
 
         const response = await this.$store.state.api.updatePassword(this.oldPassword, this.newPassword);
         if (response.ok_) {
-          this.oldPassword = ''
-          this.newPassword = ''
-          this.confirmPassword = ''
-          this.$store.state.popups.success("Пароль успешно изменен")
-          closeRoll(this.$refs.changePasswordFields)
-          return
+          this.oldPassword = '';
+          this.newPassword = '';
+          this.confirmPassword = '';
+          this.$store.state.popups.success("Пароль успешно изменен");
+          closeRoll(this.$refs.changePasswordFields);
+          return;
         }
 
         const status = response.status_
         if (status === 400) {
-          this.errorsPassword.oldPassword = 'Неверный старый пароль'
+          this.errorsPassword.oldPassword = 'Неверный старый пароль';
         } else {
-          this.$store.state.popups.error('Не удалось изменить пароль', 'Произошла непредвиденная ошибка')
+          this.$store.state.popups.error('Не удалось изменить пароль', 'Произошла непредвиденная ошибка');
         }
       },
 
@@ -212,14 +226,18 @@
         }
 
         if (!this.enabledPassword) {
-          return
+          return;
         }
-        this.enabledPassword = false
+        this.enabledPassword = false;
 
-        this.errorsPassword = {}
-        await this.__changePasswordAction()
+        this.errorsPassword = {};
+        await this.__changePasswordAction();
 
-        this.enabledPassword = true
+        this.enabledPassword = true;
+      },
+
+      async loadAvatar() {
+        this.avatarDataUrl = await getImageAsDataURL();
       }
     },
   }
