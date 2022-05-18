@@ -1,20 +1,19 @@
 <style lang="stylus">
-  size = 96px
+  avatar-size = 96px
   .profile
     .avatar
       position relative
-      width size
+      width avatar-size
       margin 0 auto
       margin-bottom 5px
       .cover
         position absolute
         top 0
-        width size
-        height size
-        line-height size
-        border-radius (size / 2 - 1) // to fix avatar outside of div
+        width avatar-size
+        height avatar-size
+        line-height avatar-size
+        border-radius 50%
         margin 0 auto
-        color textColor1
         background mix(black, transparent, 70%)
         opacity 0
         cursor pointer
@@ -22,9 +21,9 @@
       .cover:hover
         opacity 0.9
       img
-        border-radius size
-        width size
-        height size
+        border-radius 50%
+        width avatar-size
+        height avatar-size
 </style>
 
 <template>
@@ -110,7 +109,7 @@
       return {
         username: this.$store.state.user.username,
         email: this.$store.state.user.email,
-        avatarDataUrl: '',
+        avatarDataUrl: undefined,
         avatarUrl: this.$store.state.user.avatarUrl,
         fullname: this.$store.state.user.fullname,
 
