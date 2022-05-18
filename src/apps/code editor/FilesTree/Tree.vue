@@ -169,12 +169,16 @@
       this.sortFilesRecursive();
 
       await nextTick();
-      const path = localStorage.getItem('openedFilePath');
-      if (path !== null) {
-        this.openFile(this.getElByPath(path.split(',')));
-      } else {
-        this.openFile(this.$refs.root.children[1]);
+      const lastOpenedFilePath = localStorage.getItem('openedFilePath');
+      if (lastOpenedFilePath !== null) {
+        const lastOpenedFileEl = this.getElByPath(lastOpenedFilePath.split(','));
+        if (lastOpenedFileEl !== undefined) {
+          this.openFile(lastOpenedFileEl);
+          return;
+        }
       }
+      // Open first file in can't open last saved path
+      this.openFile(this.$refs.root.children[1]);
     },
 
     methods: {

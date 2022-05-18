@@ -129,26 +129,26 @@
     },
 
     async mounted() {
-      await import('/src/lib/ot.exec.js')
-      await import('/src/lib/ot-addon.exec.js')
+      await import('/src/lib/ot.exec.js');
+      await import('/src/lib/ot-addon.exec.js');
     },
 
     methods: {
       openTemplate(items) {
-        this.closeSolution()
-        this.$refs.tree.loadTree(items)
-        this.openTreeFile(this.$refs.tree.reactiveItems[0])
+        this.closeSolution();
+        this.$refs.tree.loadTree(items);
+        this.openTreeFile(this.$refs.tree.reactiveItems[0]);
       },
 
       editorSetText(text) {
-        this.$refs.editor.setText(text)
+        this.$refs.editor.setText(text);
       },
 
-      getDefaultFiles: function() {
-        return Object.values(SolutionTemplates)[0]
+      getDefaultFiles() {
+        return Object.values(SolutionTemplates)[0];
       },
 
-      checkSolution: async function() {
+      async checkSolution() {
         if (!this.$store.state.user.isLogined) {
           this.$refs.header.checkError();
           return;
@@ -157,9 +157,7 @@
         this.$refs.header.checkBegin();
         const solutionUid = this.$refs.solutions.addEmptySolution();
         const source = this.$refs.tree.getSource();
-        const preCheckInfo = await this.$store.state.api.sendSolution(this.taskId, {
-          sourceCode: source
-        });
+        const preCheckInfo = await this.$store.state.api.sendSolution(this.taskId, { sourceCode: source });
         if (!preCheckInfo.ok_) {
           this.$store.state.popups.error("Не удалось отправить решение");
           this.$refs.header.checkDone();
@@ -177,7 +175,7 @@
           action: () => {this.$refs.tree.openFileByItem(treeItem)},
           uniqueValue: treeItem,
         });
-        this.$refs.editor.setReadOnly(false)
+        this.$refs.editor.setReadOnly(false);
         this.$refs.editor.setText(treeItem.value, treeItem.name);
       },
       updateOpenedFileText(text) {
@@ -248,7 +246,7 @@
         // todo: check for errors
         const checkInfo = await this.$store.state.api.getSolution(this.taskId, solutionId)
 
-        this.closeSolution()
+        this.closeSolution();
 
         // opening new solution
         const fileList = this.parseSourceCode(checkInfo.sourceCode);
