@@ -78,55 +78,55 @@
 <template>
   <div class="tree-container">
     <ul class="tree context-tree-root root scrollable" ref="root"
-      @keyup.delete="proxyFileFoo(deleteItem, true)"
-      @keyup.ctrl.c="proxyFileFoo(copyItem)"
-      @keyup.ctrl.x="proxyFileFoo(cutItem)"
-      @keyup.ctrl.v="proxyFileFoo(pasteItem)"
-      @keyup.alt.shift.d="proxyFileFoo(duplicateItem)"
+      @keyup.delete="proxyFileFoo(deleteItemByHtmlElement, true)"
+      @keyup.ctrl.c="proxyFileFoo(copyItemByHtmlElement)"
+      @keyup.ctrl.x="proxyFileFoo(cutItemByHtmlElement)"
+      @keyup.ctrl.v="proxyFileFoo(pasteItemByHtmlElement)"
+      @keyup.alt.shift.d="proxyFileFoo(duplicateItemByHtmlElement)"
       @keyup.f2.prevent="proxyFileFoo(renameItem)"
-      @keyup.ctrl.insert.prevent="proxyFileFooNotNull(addFile)"
-      @keyup.alt.insert.prevent="proxyFileFooNotNull(addFolder)"
+      @keyup.ctrl.insert.prevent="proxyFileFooNotNull(addFileByHtmlElement)"
+      @keyup.alt.insert.prevent="proxyFileFooNotNull(addFolderByHtmlElement)"
       @keydown.up.prevent="selectPrevious"
       @keydown.down.prevent="selectNext"
       @keydown.right.prevent="expandSelected"
       @keydown.left.prevent="collapseSelected"
-      @keydown.enter="proxyFileFoo(openFile)"
+      @keydown.enter="proxyFileFoo(openFileByHtmlElement)"
       >
       <li tabindex="1" class="name root context-tree-root" data-idx-path="">{{name}}</li>
-      <Item v-for="(item, idx) in reactiveItems" :item="item" :idx-path="[idx]" @open-file="openFile" @select-file="selectFile"></Item>
+      <Item v-for="(item, idx) in reactiveItems" :item="item" :idx-path="[idx]" @open-file="openFileByHtmlElement" @select-file="selectFileByHtmlElement"></Item>
     </ul>
 
     <ContextMenu :menus="[
           {
             targets: 'context-tree-file',
             items: [
-              {name: 'Копировать', hint: 'Ctrl+C', action: copyItem},
-              {name: 'Вырезать', hint: 'Ctrl+X', action: cutItem},
-              {name: 'Вставить', hint: 'Ctrl+V', action: pasteItem},
-              {name: 'Дублировать', hint: 'Alt+Shift+D', action: duplicateItem},
+              {name: 'Копировать', hint: 'Ctrl+C', action: copyItemByHtmlElement},
+              {name: 'Вырезать', hint: 'Ctrl+X', action: cutItemByHtmlElement},
+              {name: 'Вставить', hint: 'Ctrl+V', action: pasteItemByHtmlElement},
+              {name: 'Дублировать', hint: 'Alt+Shift+D', action: duplicateItemByHtmlElement},
               {name: 'Переименовать', hint: 'F2', action: renameItem},
-              {name: 'Удалить', hint: 'Delete', action: deleteItem},
+              {name: 'Удалить', hint: 'Delete', action: deleteItemByHtmlElement},
               ]
           },
           {
             targets: 'context-tree-folder',
             items: [
-              {name: 'Копировать', hint: 'Ctrl+C', action: copyItem},
-              {name: 'Вырезать', hint: 'Ctrl+X', action: cutItem},
-              {name: 'Вставить', hint: 'Ctrl+V', action: pasteItem},
-              {name: 'Дублировать', hint: 'Alt+Shift+D', action: duplicateItem},
-              {name: 'Создать файл', hint: 'Ctrl+Insert', action: addFile},
-              {name: 'Создать папку', hint: 'Alt+Insert', action: addFolder},
+              {name: 'Копировать', hint: 'Ctrl+C', action: copyItemByHtmlElement},
+              {name: 'Вырезать', hint: 'Ctrl+X', action: cutItemByHtmlElement},
+              {name: 'Вставить', hint: 'Ctrl+V', action: pasteItemByHtmlElement},
+              {name: 'Дублировать', hint: 'Alt+Shift+D', action: duplicateItemByHtmlElement},
+              {name: 'Создать файл', hint: 'Ctrl+Insert', action: addFileByHtmlElement},
+              {name: 'Создать папку', hint: 'Alt+Insert', action: addFolderByHtmlElement},
               {name: 'Переименовать', hint: 'F2', action: renameItem},
-              {name: 'Удалить', hint: 'Delete', action: deleteItem},
+              {name: 'Удалить', hint: 'Delete', action: deleteItemByHtmlElement},
               ]
           },
           {
             targets: 'context-tree-root',
             items: [
-              {name: 'Вставить', hint: 'Ctrl+V', action: pasteItem},
-              {name: 'Создать файл', hint: 'Ctrl+Insert', action: addFile},
-              {name: 'Создать папку', hint: 'Alt+Insert', action: addFolder},
+              {name: 'Вставить', hint: 'Ctrl+V', action: pasteItemByHtmlElement},
+              {name: 'Создать файл', hint: 'Ctrl+Insert', action: addFileByHtmlElement},
+              {name: 'Создать папку', hint: 'Alt+Insert', action: addFolderByHtmlElement},
               ]
           },
           ]"></ContextMenu>
@@ -171,14 +171,14 @@
       await nextTick();
       const lastOpenedFilePath = localStorage.getItem('openedFilePath');
       if (lastOpenedFilePath !== null) {
-        const lastOpenedFileEl = this.getElByPath(lastOpenedFilePath.split(','));
+        const lastOpenedFileEl = this.getHtmlElementByPath(lastOpenedFilePath.split(','));
         if (lastOpenedFileEl !== undefined) {
-          this.openFile(lastOpenedFileEl);
+          this.openFileByHtmlElement(lastOpenedFileEl);
           return;
         }
       }
       // Open first file in can't open last saved path
-      this.openFile(this.$refs.root.children[1]);
+      this.openFileByHtmlElement(this.$refs.root.children[1]);
     },
 
     methods: {
@@ -223,14 +223,14 @@
         }
         return null;
       },
-      getElByPath(path) {
+      getHtmlElementByPath(path) {
         let curRoot = this.$refs.root;
         path.forEach(idx => {
           curRoot = curRoot.children[Number(idx) + 1];
         });
         return curRoot;
       },
-      getItemPath(el) {
+      getHtmlElementPath(el) {
         if (!el)
           return [];
         let attr = el.getAttribute('data-idx-path');
@@ -239,7 +239,7 @@
           return [];
         return attr = attr.split(',');
       },
-      getItem(path) {
+      getItemByPath(path) {
         let list = this.reactiveItems;
         if (!path.length) {
           return {list: [{name: "ROOT", value: this.reactiveItems}], idx: 0};
@@ -250,19 +250,19 @@
         return {list: list, idx: path[path.length - 1]};
       },
 
-      async addSomething(el, promptMsg, itemValue) {
+      async addFileOrFolder(el, promptMsg, itemValue) {
         const name = await this.$store.state.modal.prompt(promptMsg);
         if (name === null)
           return;
 
-        const path = this.getItemPath(el);
+        const path = this.getHtmlElementPath(el);
         if (!path.length) { // add to root
           this.reactiveItems.push({name: name, value: itemValue})
           this.sortFiles();
           return;
         }
         // add into some folder
-        const {list, idx} = this.getItem(this.getItemPath(el));
+        const {list, idx} = this.getItemByPath(this.getHtmlElementPath(el));
         let toPush = list[idx].value;
         if (typeof toPush === 'string') // selected item is a file
           toPush = list; // let's push to item's folder
@@ -270,8 +270,8 @@
         this.sortFiles(toPush);
       },
 
-      async deleteItem(el) {
-        const {list, idx} = this.getItem(this.getItemPath(el));
+      async deleteItemByHtmlElement(el) {
+        const {list, idx} = this.getItemByPath(this.getHtmlElementPath(el));
 
         const conf = await this.$store.state.modal.confirm('Точно удаляем?', list[idx].name);
         if (!conf)
@@ -285,15 +285,15 @@
         return true;
       },
 
-      addFile(el) {
-        this.addSomething(el, 'Введите имя файла', "");
+      addFileByHtmlElement(el) {
+        this.addFileOrFolder(el, 'Введите имя файла', "");
       },
-      addFolder(el) {
-        this.addSomething(el, 'Введите имя папки', []);
+      addFolderByHtmlElement(el) {
+        this.addFileOrFolder(el, 'Введите имя папки', []);
       },
 
       async renameItem(el) {
-        const {list, idx} = this.getItem(this.getItemPath(el));
+        const {list, idx} = this.getItemByPath(this.getHtmlElementPath(el));
         const name = await this.$store.state.modal.prompt('Во что переименуем?', 'Было: ' + list[idx].name, list[idx].name);
         if (name === null)
           return;
@@ -304,19 +304,19 @@
         this.$emit('renameFile', list[idx]);
       },
 
-      copyItem(el) {
+      copyItemByHtmlElement(el) {
         this.copyedItem.el = el;
         this.copyedItem.mode = 'copy';
       },
-      cutItem(el) {
+      cutItemByHtmlElement(el) {
         this.copyedItem.el = el;
         this.copyedItem.mode = 'cut';
       },
-      pasteItem(el) {
+      pasteItemByHtmlElement(el) {
         if (this.copyedItem.el === null)
           return;
-        const {list: listPaste, idx: idxPaste} = this.getItem(this.getItemPath(el));
-        const {list: listCopy, idx: idxCopy} = this.getItem(this.getItemPath(this.copyedItem.el));
+        const {list: listPaste, idx: idxPaste} = this.getItemByPath(this.getHtmlElementPath(el));
+        const {list: listCopy, idx: idxCopy} = this.getItemByPath(this.getHtmlElementPath(this.copyedItem.el));
 
         let toPush = listPaste[idxPaste].value;
         if (typeof toPush === 'string') // selected item is a file
@@ -329,8 +329,8 @@
           this.copyedItem.el = null; // drop selection
         }
       },
-      duplicateItem(el) {
-        const {list, idx} = this.getItem(this.getItemPath(el));
+      duplicateItemByHtmlElement(el) {
+        const {list, idx} = this.getItemByPath(this.getHtmlElementPath(el));
         list.push(deepClone(list[idx]));
         this.sortFiles(list);
       },
@@ -342,21 +342,21 @@
         }
         el.classList.add(className);
         if (list === undefined || idx === undefined) {
-          const res = this.getItem(this.getItemPath(el));
+          const res = this.getItemByPath(this.getHtmlElementPath(el));
           list = res.list; idx = res.idx;
         }
         toSave.el = el;
         toSave.item = list[idx];
       },
-      selectFile(el) {
+      selectFileByHtmlElement(el) {
         this.toggleAndSaveFileClass(el, this.selectedItem, 'selected');
       },
-      openFile(el) {
+      openFileByHtmlElement(el) {
         if (!this.canOpenFiles)
           return;
 
-        const path = this.getItemPath(el);
-        const {list, idx} = this.getItem(path);
+        const path = this.getHtmlElementPath(el);
+        const {list, idx} = this.getItemByPath(path);
         if (typeof list[idx].value !== 'string') { // el is a folder
           this.toggleExpandEl(el);
           return;
@@ -366,10 +366,10 @@
         this.$emit("openFileText", this.openedItem.item);
       },
       openFileByItem(item) {
-        this.openFile(this.getElByPath(this.getPathByItem(item)));
+        this.openFileByHtmlElement(this.getHtmlElementByPath(this.getPathByItem(item)));
       },
 
-      getSource(prefix = "", list = this.reactiveItems) {
+      getSourceCode(prefix = "", list = this.reactiveItems) {
         const source = {};
         if (prefix !== '')
           prefix += '/';
@@ -384,10 +384,51 @@
 
             source[prefix + item.name] = item.value;
           } else {
-            Object.assign(source, this.getSource(prefix + item.name, item.value));
+            Object.assign(source, this.getSourceCode(prefix + item.name, item.value));
           }
         });
         return source;
+      },
+      parseSourceCode(sourceCode) {
+        const filesList = [];
+
+        for (const [strPath, content] of Object.entries(sourceCode)) {
+          const path = strPath.split('/');
+
+          function recursiveCreate(list = filesList) {
+            const el = list.find(file => file.name === path[0]);
+
+            if (el !== undefined) { // file already exists
+              if (typeof el.value !== 'string') { // existing file is directory
+                if (path.length === 1) // we're trying to add file instead directory
+                  throw Error('Trying to add file instead existing directory');
+                // go into existing directory
+                path.splice(0, 1);
+                recursiveCreate(el.value);
+                return;
+              }
+              // existing file is a file
+              if (path.length > 1) // we're trying to add directory instead file
+                throw Error('Trying to add directory instead existing file');
+              // create file and exit
+              list.push({name: path[0], value: content});
+              return;
+            }
+            // file not exists
+            if (path.length > 1) { // add directory and go inside it
+              const newDir = {name: path[0], value: []};
+              list.push(newDir);
+              path.splice(0, 1);
+              recursiveCreate(newDir.value);
+              return;
+            }
+            // create file and exit
+            list.push({name: path[0], value: content});
+          }
+
+          recursiveCreate();
+        }
+        return filesList;
       },
 
       // --- Local storage work
@@ -452,7 +493,7 @@
         }
 
         el.focus();
-        this.selectFile(el);
+        this.selectFileByHtmlElement(el);
       },
       selectNext() {
         let el = this.selectedItem.el;
@@ -480,7 +521,7 @@
           el = el.firstElementChild;
 
         el.focus();
-        this.selectFile(el);
+        this.selectFileByHtmlElement(el);
       },
       toggleExpandEl(el) {
         el.classList.toggle('expanded');

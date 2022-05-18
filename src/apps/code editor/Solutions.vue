@@ -134,7 +134,7 @@
       },
 
       __solutionNToBr(solution) {
-        solution.checkMessage = solution.checkMessage.replaceAll('\n', '<br>')
+        solution.checkMessage = solution.checkMessage.replaceAll('\n', '<br>');
       },
 
       replaceSolution(uid, solution) {
@@ -142,14 +142,14 @@
         if (idx === -1) {
           return;
         }
-        this.__solutionNToBr(solution)
+        this.__solutionNToBr(solution);
         this.solutions[idx].set(solution);
       },
 
       async getSolutions(id) {
         const solutions = await this.$store.state.api.getSolutions(id);
         for (const solution of solutions) {
-          this.__solutionNToBr(solution)
+          this.__solutionNToBr(solution);
         }
 
         if (!solutions.ok_) {

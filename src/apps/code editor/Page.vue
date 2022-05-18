@@ -114,6 +114,7 @@
   import LiveEditor from "./LiveEditor/LiveEditor";
 
   import SolutionTemplates from "../../utils/solution-templates";
+  import Solution from "../../models/solution";
 
   const DEV_SOCKET_URL = 'ws://178.62.57.180';
 
@@ -156,7 +157,7 @@
 
         this.$refs.header.checkBegin();
         const solutionUid = this.$refs.solutions.addEmptySolution();
-        const source = this.$refs.tree.getSource();
+        const source = this.$refs.tree.getSourceCode();
         const preCheckInfo = await this.$store.state.api.sendSolution(this.taskId, { sourceCode: source });
         if (!preCheckInfo.ok_) {
           this.$store.state.popups.error("Не удалось отправить решение");
@@ -165,6 +166,7 @@
         }
 
         const checkInfo = await this.$store.state.api.getSolution(this.taskId, preCheckInfo.id);
+        this.handleErrorsIntoSolution(checkInfo);
         this.$refs.header.checkDone();
         this.$refs.solutions.replaceSolution(solutionUid, checkInfo);
       },
@@ -194,48 +196,6 @@
         this.$refs.tabs.deleteTabByItem(treeItem);
       },
 
-      parseSourceCode(sourceCode) {
-        const filesList = [];
-
-        for (const [strPath, content] of Object.entries(sourceCode)) {
-          const path = strPath.split('/');
-
-          function recursiveCreate(list = filesList) {
-            const el = list.find(file => file.name === path[0]);
-
-            if (el !== undefined) { // file already exists
-              if (typeof el.value !== 'string') { // existing file is directory
-                if (path.length === 1) // we're trying to add file instead directory
-                  throw Error('Trying to add file instead existing directory');
-                // go into existing directory
-                path.splice(0, 1);
-                recursiveCreate(el.value);
-                return;
-              }
-              // existing file is a file
-              if (path.length > 1) // we're trying to add directory instead file
-                throw Error('Trying to add directory instead existing file');
-              // create file and exit
-              list.push({name: path[0], value: content});
-              return;
-            }
-            // file not exists
-            if (path.length > 1) { // add directory and go inside it
-              const newDir = {name: path[0], value: []};
-              list.push(newDir);
-              path.splice(0, 1);
-              recursiveCreate(newDir.value);
-              return;
-            }
-            // create file and exit
-            list.push({name: path[0], value: content});
-          }
-
-          recursiveCreate();
-        }
-        return filesList;
-      },
-
       closeSolution() {
         this.$refs.tree.loadTree([]);
         this.$refs.tabsVertical.selectTabIndex(1);
@@ -249,7 +209,7 @@
         this.closeSolution();
 
         // opening new solution
-        const fileList = this.parseSourceCode(checkInfo.sourceCode);
+        const fileList = this.$refs.tree.parseSourceCode(checkInfo.sourceCode);
         this.$refs.tree.loadTree(fileList);
       },
 
@@ -262,6 +222,19 @@
         }
         this.$refs.editor.setReadOnly(false);
         this.isAllFilesClosed = false;
+      },
+
+      handleErrorsIntoSolution(checkInfo) {
+        const solution = new Solution();
+        solution.set(checkInfo);
+        // solution passed
+        if (solution.isOk) {
+          this.$store.state.popups.success("Задача успешно решена!", "Поздравляем!");
+          return;
+        }
+
+        // check for makefile exists
+        //if (this.$refs.tree.)
       },
 
       // --- WebSockets live editor
