@@ -7,11 +7,11 @@
 
   messageWidth = 225px
 
-  clBgPrimarySuccess = #28A745
+  clBgPrimarySuccess = colorSuccess
   clBgSecondarySuccess = #218838
-  clBgPrimaryAlert = #d9d23f
+  clBgPrimaryAlert = colorAlert
   clBgSecondaryAlert = #b89f24
-  clBgPrimaryError = #E54D42
+  clBgPrimaryError = colorError
   clBgSecondaryError = #B82E24
 
   borderRadius = 2px
