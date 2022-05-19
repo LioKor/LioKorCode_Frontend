@@ -85,7 +85,7 @@
                     <svg class="svg-button save" @click="saveAvatar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="M42 13.85V39Q42 40.2 41.1 41.1Q40.2 42 39 42H9Q7.8 42 6.9 41.1Q6 40.2 6 39V9Q6 7.8 6.9 6.9Q7.8 6 9 6H34.15ZM39 15.2 32.8 9H9Q9 9 9 9Q9 9 9 9V39Q9 39 9 39Q9 39 9 39H39Q39 39 39 39Q39 39 39 39ZM24 35.75Q26.15 35.75 27.675 34.225Q29.2 32.7 29.2 30.55Q29.2 28.4 27.675 26.875Q26.15 25.35 24 25.35Q21.85 25.35 20.325 26.875Q18.8 28.4 18.8 30.55Q18.8 32.7 20.325 34.225Q21.85 35.75 24 35.75ZM11.65 18.8H29.55V11.65H11.65ZM9 15.2V39Q9 39 9 39Q9 39 9 39Q9 39 9 39Q9 39 9 39V9Q9 9 9 9Q9 9 9 9Z"/></svg>
                     <svg class="svg-button cancel" @click="cancelAvatar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="M12.45 37.65 10.35 35.55 21.9 24 10.35 12.45 12.45 10.35 24 21.9 35.55 10.35 37.65 12.45 26.1 24 37.65 35.55 35.55 37.65 24 26.1Z"/></svg>
                   </div>
-                  <img :src="avatarDataUrl || avatarUrl" alt="">
+                  <img :src="avatarDataUrl || $store.state.user.avatarUrl" alt="">
                   <div class="cover" @click="loadAvatar">
                       Изменить
                   </div>
@@ -160,7 +160,6 @@
         username: this.$store.state.user.username,
         email: this.$store.state.user.email,
         avatarDataUrl: undefined,
-        avatarUrl: this.$store.state.user.avatarUrl,
         fullname: this.$store.state.user.fullname,
 
         oldPassword: '',
@@ -219,8 +218,8 @@
 
         const response = await this.$store.state.api.updateAvatar(this.avatarDataUrl);
         if (response.ok_) {
-          this.avatarDataUrl = undefined;
           await this.updateUserData();
+          this.avatarDataUrl = undefined;
           return;
         }
         this.$store.state.popups.error("Не удалось обновить аватар");
