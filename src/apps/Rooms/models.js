@@ -4,7 +4,12 @@ export class Message {
     constructor(username, content, avatarUrl) {
         this.avatarUrl = avatarUrl;
         this.username = username;
-        this.content = stripTags(content).replaceAll('\n', '<br />');
+        this.content = stripTags(content)
+          .replaceAll('\n', '<br />');
+        this.content = this.content.replace(
+          /((?:https:\/\/)?code\.liokor\.com(\/task\/[^ \n\t]+))/gm,
+          `<a href="$2">$1</a>`
+        );
         this.date = new Date();
     }
 }
@@ -39,8 +44,6 @@ export class Room {
     }
 
     deleteUser(id) {
-        console.log(id);
-        console.log(this.users);
         for (let i = 0; i < this.users.length; i++) {
             const user = this.users[i];
 

@@ -163,9 +163,17 @@ import {nextTick, toRaw} from "vue";
           return null;
         return {item: this.reactiveItems[idx], idx: idx};
       },
-      deleteTabByIdx(idx) {
-        this.reactiveItems.splice(idx, 1);
-        //this.$emit('deleteTab', item, idx);
+      deleteTabByIdx(idx, el = null) {
+        const item = this.reactiveItems.splice(idx, 1);
+        if (item.length === 0)
+          return;
+        this.$emit('deleteTab', item[0], idx);
+
+        el = el || this.getElByIdx(idx);
+        if (this.selectedEl === el) {
+          console.log(el, el.previousElementSibling, el.nextElementSibling)
+          this.selectTabEl(el.previousElementSibling || el.nextElementSibling, true);
+        }
 
         this.$emit('tabsCountChange', this.reactiveItems.length);
       },
@@ -184,10 +192,7 @@ import {nextTick, toRaw} from "vue";
           el = el.parentElement;
 
         const idx = el.getAttribute('data-idx');
-        if (this.selectedEl === el)
-            this.selectTabEl(el.previousElementSibling || el.nextElementSibling, true);
-
-        this.deleteTabByIdx(idx);
+        this.deleteTabByIdx(idx, el);
       },
       async addTab(item = {name: "", action: () => {}, closable: true, uniqueValue: undefined}, setSelected = true) {
         const existingItemIdx = this.reactiveItems.findIndex(it => it.uniqueValue === item.uniqueValue);
@@ -202,6 +207,9 @@ import {nextTick, toRaw} from "vue";
         this.selectTabEl(this.$refs.items[this.$refs.items.length-1]);
 
         this.$emit('tabsCountChange', this.reactiveItems.length);
+      },
+      getElByIdx(idx) {
+        return this.$refs.items[idx];
       },
       getSelected() {
         if (!this.selectedEl)

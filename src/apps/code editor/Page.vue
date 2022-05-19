@@ -169,7 +169,11 @@
         }
 
         const checkInfo = await this.$store.state.api.getSolution(this.taskId, preCheckInfo.id);
-        this.handleErrorsIntoSolution(checkInfo);
+        try {
+          this.handleErrorsIntoSolution(checkInfo);
+        } catch {
+          this.$store.state.popups.error("Неизвестная ошибка в решении", "Не удалось обработать ответ сервера");
+        }
         this.$refs.header.checkDone();
         this.$refs.solutions.replaceSolution(solutionUid, checkInfo);
       },

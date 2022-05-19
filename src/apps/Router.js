@@ -13,7 +13,7 @@ export default function createVueRouter(Store) {
     const routes = [
         {path: '/', component: TaskList},
         {path: '/task/create', component: TaskCreate},
-        {path: '/task/:taskId', component: Task},
+        {path: '/task/:taskId', component: Task, name: 'Task'},
         {path: '/task/edit/:taskId', component: TaskEdit},
         {path: '/signin', component: SignIn, meta: {noLoginRequired: true}},
         {path: '/signup', component: SignUp, meta: {noLoginRequired: true}},

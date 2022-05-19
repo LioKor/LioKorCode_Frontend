@@ -88,7 +88,7 @@ div.chat
 
 <template>
   <div class="chat">
-    <div id="messagesDiv" ref="messagesList" class="messages scrollable">
+    <div id="messagesDiv" ref="messagesList" class="messages scrollable" @click.capture.prevent="checkClickOnLink">
       <div v-for="message in messages" class="message">
         <div class="avatar">
           <img alt="" :src="message.avatarUrl">
@@ -127,6 +127,8 @@ div.chat
 
 <script>
 
+import {nextTick} from "vue";
+
 export default {
   data() {
     return {
@@ -163,6 +165,22 @@ export default {
       this.message += "@" + username + " ";
 
       this.$refs.input.focus();
+    },
+
+    async checkClickOnLink(e) {
+      const el = e.target;
+      if (el.tagName !== 'A')
+        return;
+
+      const href = el.getAttribute('href');
+
+      // send event to this component if it opened already
+      this.$store.state.eventBus.emit('connect-to-editor', location.protocol + '//' + location.host + href);
+
+      // load editor component if it's not opened and set search params
+      this.$router.push('/');
+      await nextTick();
+      this.$router.push(href);
     }
   }
 }

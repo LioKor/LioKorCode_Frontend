@@ -86,17 +86,24 @@
         }
       });
 
-      const url = new URL(location.href);
-      const sessionId = url.searchParams.get(queryParamsName.sessionId);
-      //const taskId = url.searchParams.get(queryParamsName.taskId);
-      const filename = url.searchParams.get(queryParamsName.filename);
-      if (sessionId !== null) {
-        this.connectToSession(sessionId, filename);
-        this.redactorJoinLink = location.href;
-      }
+      this.tryToLinkToURL(location.href);
+      this.$store.state.eventBus.on('connect-to-editor', this.tryToLinkToURL);
+    },
+    unmounted() {
+      this.$store.state.eventBus.off('connect-to-editor', this.tryToLinkToURL);
     },
 
     methods: {
+      tryToLinkToURL(url) {
+        url = new URL(url);
+        const sessionId = url.searchParams.get(queryParamsName.sessionId);
+        //const taskId = url.searchParams.get(queryParamsName.taskId);
+        const filename = url.searchParams.get(queryParamsName.filename);
+        if (sessionId !== null) {
+          this.connectToSession(sessionId, filename);
+          this.redactorJoinLink = location.href;
+        }
+      },
       showVersion() {
         this.$store.state.popups.alert(`Build date: ${this.buildDate}`)
       },
