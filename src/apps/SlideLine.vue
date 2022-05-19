@@ -162,10 +162,15 @@
       },
 
       applySlideSmothly(slideValue) {
+        let prevTime;
+        requestAnimationFrame((time) => prevTime = time);
+
         const animate = (time) => {
-          const frameSlide = (slideValue - this.slideValue) * 0.015 * time/1000 + Number(this.slideValue);
+          const frameSlide = (slideValue - this.slideValue) * 0.015 * (time - prevTime) + Number(this.slideValue);
+
           if (Math.abs(slideValue - frameSlide) > 0.5) {
             this.applySlide(frameSlide);
+            prevTime = time;
             requestAnimationFrame(animate);
           } else {
             this.endSlide(true);
