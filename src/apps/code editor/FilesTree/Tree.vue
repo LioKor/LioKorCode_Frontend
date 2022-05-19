@@ -208,7 +208,13 @@
         this.saveToLocalStorage();
       },
 
-      // --- Controls by clicks on context menu
+      /** --- Get entities by other entities. We have:
+        path: [2, 3, 1, ...] - it is indexes of folders from the root
+        stringPath: "folder1/folder2/folder3/item.txt" - equivalent of indexes path
+        item: {name: "file.txt", value: "file text"} or
+              {name: "folder", value: [<array of items>]}
+        HtmlElement: HtmlElement that is linked to some item. Always has attribute data-path="<indexes path>"
+      **/
       getPathByItem(item, where = this.reactiveItems, pathPrefix = []) {
         for (let i = where.length-1; i >= 0; i--) {
           const curItem = where[i];
@@ -222,6 +228,26 @@
           }
         }
         return null;
+      },
+      getPathAndItemByStringPath(stringPath, where = this.reactiveItems) {
+        stringPath = stringPath.split('/');
+        const nullRes = {path: [], item: null};
+        const res = {path: [], item: null};
+
+        for (const curName of stringPath) {
+          if (typeof where === 'string') {
+            throw Error("String path trying to go inside file like as folder");
+          }
+
+          const curIdx = where.findIndex(curItem => curItem.name === curName);
+          if (curIdx === -1) {
+            return nullRes;
+          }
+
+          res.path = res.path.concat([curIdx]);
+          res.item = where[curIdx];
+        }
+        return res;
       },
       getHtmlElementByPath(path) {
         let curRoot = this.$refs.root;
@@ -249,7 +275,20 @@
         });
         return {list: list, idx: path[path.length - 1]};
       },
+      getStringPathByPath(path) {
+        let list = this.reactiveItems;
+        let res = '';
+        path.forEach((idx) => {
+          res += '/' + list[idx].name;
+          list = list[idx].value;
+        });
+        return res.length ? res.slice(1) : res;
+      },
+      getOpenedItemStringPath() {
+        return this.getStringPathByPath(this.getHtmlElementPath(this.openedItem.el));
+      },
 
+      // --- Controls by clicks on context menu
       async addFileOrFolder(el, promptMsg, itemValue) {
         const name = await this.$store.state.modal.prompt(promptMsg);
         if (name === null)

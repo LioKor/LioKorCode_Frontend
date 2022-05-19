@@ -47,6 +47,7 @@
         z-index 10
         inset 0
         background color2
+        color textColor4
         display flex
         flex-direction column
         align-items center
@@ -126,6 +127,8 @@
         taskId: parseInt(this.$route.params.taskId),
         openedTab: 0,
         isAllFilesClosed: false,
+
+        annotations: [],
       }
     },
 
@@ -179,6 +182,7 @@
         });
         this.$refs.editor.setReadOnly(false);
         this.$refs.editor.setText(treeItem.value, treeItem.name);
+        this.updateErrors();
       },
       updateOpenedFileText(text) {
         let item = this.$refs.tabs.getSelected();
@@ -225,20 +229,145 @@
       },
 
       handleErrorsIntoSolution(checkInfo) {
+        this.clearAllErrors();
+
         const solution = new Solution();
         solution.set(checkInfo);
-        // solution passed
+        const message = solution.checkMessage;
+
+        // Solution passed
         if (solution.isOk) {
           this.$store.state.popups.success("Задача успешно решена!", "Поздравляем!");
           return;
         }
 
-        // check for makefile exists
-        //if (this.$refs.tree.)
+        // Check for makefile exists
+        const makeFileNames = ['GNUmakefile', 'makefile', 'Makefile'];
+        let makefilePathItem = {};
+        for (let i = 0; !makefilePathItem.item && i < makeFileNames.length; i++) {
+          makefilePathItem = this.$refs.tree.getPathAndItemByStringPath(makeFileNames[i]);
+        }
+        if (!makefilePathItem.item || message === "No Makefile found!") {
+          this.$store.state.popups.error("Ошибка структуры", "Отсутствует Makefile");
+          return;
+        }
+
+        // Set error setters
+        const handleMakefileError = (name, desc, force = false) => {
+          // Handle makefile errors
+          const makefileErrorLine = message.match(/Makefile:(\d+):/);
+          if (makefileErrorLine !== null || force) {
+            this.$store.state.popups.error(name, desc);
+          }
+          if (makefileErrorLine !== null && makefileErrorLine.length >= 2) {
+            let description = "Неизвестная ошибка";
+            if (/missing separator/.test(message))
+              description = "Пропущен отступ. Допустима только табуляция";
+            else if (/No such file or directory/.test(message))
+              description = "Неизвестная команда";
+            this.addError(makefileName, makefileErrorLine[1] - 1, 0, description);
+            return true;
+          }
+        }
+
+        // Get makefile language
+        const makefile = makefilePathItem.item.value;
+        const makefileName = makefilePathItem.item.name;
+        let chosenLang = null;
+        for (const [lang, regExp] of Object.entries({
+          gcc: /build:[^:]*\n\t(gcc|cc|g\+\+) /,
+          python: /run:[^:]*\n\tpython3? /,
+          lua: /run:[^:]*\n\tlua /,
+          pascal: /build:[^:]*\n\tfpc /,
+          go: /build:[^:]*\n\tgo build /,
+          nasm: /build:[^:]*\n\tnasm -felf64 .*\n\tld /,
+        })) {
+          if (regExp.test(makefile)) {
+            chosenLang = lang;
+            break;
+          }
+        }
+        if (chosenLang === null) {
+          handleMakefileError("Ошибка структуры", "Неизвестная конфигурация языка в makefile", true)
+          return;
+        }
+
+        // Check - is it really error from compilator. Not from other commands in makefile
+        if (!{
+          gcc: /^(gcc|cc|g\+\+)/,
+          python: /.*/,
+          lua: /^lua/,
+          pascal: /^fpc/,
+          go: /^go build/,
+          nasm: /nasm/,
+        }[chosenLang]?.test(message))
+          chosenLang = null;
+
+        // Message "For ... ... expected ... but got ..."
+        if (/^For ".*" expected ".*", but got ".*"$/.test(message)) {
+          this.$store.state.popups.error("Тест не прошёл", message);
+          return;
+        }
+
+        // If error not in any language
+        if (chosenLang === null) {
+          // Handle other makefile errors
+          if (handleMakefileError("Ошибка консоли", "Неизвестная команда в makefile"))
+            return;
+        }
+
+        // Handle other languages errors
+        // Note: ([^<>:"/\\|?*]+) is a filename without deprecated symbols
+        const langErrorMessageParseRegExp = {
+          gcc: /(?:gcc|cc|g\+\+) (?:(?:(?!error).)*\n)+([^<>:"/\\|?*\n]+):(\d+):(?:\d+): (.+)\n/,
+          python: /File "\/root\/source_w\/([^<>:"/\\|?*\n]+)", line (\d+).*(?:.*\n)+(\w+:[^:]*)\n/,
+          lua: /lua: ([^<>:"/\\|?*\n]+):(\d+):(.*)\n/,
+          pascal: /([^<>:"/\\|?*\n]+)\((\d+)\) Fatal: (.*)\n/,
+          go: /\.\/([^<>:"/\\|?*\n]+):(\d+):(?:\d+): (.*)\n/,
+          nasm: /([^<>:"/\\|?*\n]+):(\d+): (.*)\n/,
+        }[chosenLang];
+
+        const tokens = message.match(langErrorMessageParseRegExp);
+        console.log(tokens);
+        if (tokens === null || tokens.length < 4) {
+          this.$store.state.popups.error("Решение не сработало", "Подробности смотрите в консоли решений");
+          return;
+        }
+        console.log("Filepath: ", tokens[1]);
+        console.log("Line: ", tokens[2]);
+        console.log("Error text: ", tokens[3]);
+        this.$store.state.popups.error("Ошибка в коде", "В файле " + tokens[1]);
+        this.addError(tokens[1], tokens[2] - 1, 0, tokens[3]);
+      },
+
+      addError(filepath, line, sym = 0, description = 'error') {
+        this.annotations.push({
+          filepath: filepath,
+          row: line,
+          column: sym,
+          text: description,
+          type: "error",
+        });
+        this.updateErrors();
+      },
+      clearAllErrors() {
+        this.annotations = [];
+        this.updateErrors();
+      },
+      updateErrors() {
+        const openedFilePath = this.$refs.tree.getOpenedItemStringPath();
+        const openedFileAnnotations = this.annotations.filter(ann => ann.filepath === openedFilePath);
+        this.$refs.editor.setAnnotations(openedFileAnnotations);
+
+        // opened file without errors and some errors in other files
+        if (openedFileAnnotations.length === 0 || this.annotations.length !== 0) {
+          this.$refs.tabsVertical.selectTabIndex(1);
+        }
       },
 
       // --- WebSockets live editor
       async connectSession(uid, filename = undefined) {
+        // Проверка существования комнаты перед тем, как пытаться подключиться по webSocket'у.
         // const response = await this.$store.state.api.checkRedactorSession(uid);
         // if (!response.ok_) {
         //   this.$store.state.popups.error('Не удалось подключиться к сессии', uid);
@@ -248,10 +377,6 @@
         this.$refs.tree.lockOpeningFiles();
         this.$refs.tabs.lockChangeTabs();
         this.createLiveEditor(uid, filename);
-
-        // if (taskId !== undefined) {
-        //   this.$refs.taskInfo.getTask(taskId);
-        // }
       },
       leaveSession() {
         this.$refs.tree.unlockOpeningFiles();
