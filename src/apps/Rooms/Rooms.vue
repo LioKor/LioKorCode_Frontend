@@ -15,12 +15,14 @@ padding = 20px
   color textColor1
   width 100%
 
+  > *
+    padding padding
+
   .room-join-or-create
     display flex
     flex-direction column
     max-width max-width
     height 100%
-    padding padding
     .title
       margin-top 0
       margin-bottom 20px
@@ -77,7 +79,7 @@ padding = 20px
   <div class="rooms scrollable">
     <div v-if="!this.$store.state.user.isLogined">
       <h1 class="title">Комнаты</h1>
-      <h2><router-link to="/signin">Авторизуйтесь</router-link>, чтобы создать или присоединиться к комнате</h2>
+      <h2><router-link to="/signin">Авторизируйтесь</router-link>, чтобы создать или присоединиться к комнате</h2>
     </div>
     <div v-else-if="!connected">
       <h1>Комнаты</h1>
@@ -144,7 +146,7 @@ padding = 20px
     <div v-else class="room-users">
       <h1>{{ joinedRoom.name }}</h1>
       <button class="btn btn-danger" @click="roomLeave">
-        <span v-if="joinedRoom.host">Закончить конференцию</span>
+        <span v-if="joinedRoom.host">Завершить конференцию</span>
         <span v-else>Покинуть</span>
       </button>
       <h2>Участники {{ joinedRoom.users.length }} / {{ joinedRoom.maxUsers }}</h2>

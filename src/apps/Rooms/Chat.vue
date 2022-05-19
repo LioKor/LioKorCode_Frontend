@@ -72,6 +72,8 @@ div.chat
         box-shadow none
         outline none
         overflow hidden
+      textarea::placeholder
+        white-space nowrap
     .send-button
       button
         font-size 1rem
@@ -86,14 +88,14 @@ div.chat
 
 <template>
   <div class="chat">
-    <div id="messagesDiv" ref="messagesList" class="messages scrollable">
+    <div id="messagesDiv" ref="messagesList" class="messages scrollable" @click.capture.prevent="checkClickOnLink">
       <div v-for="message in messages" class="message">
         <div class="avatar">
           <img alt="" :src="message.avatarUrl">
         </div>
         <div class="body">
           <div class="title">
-            <a href="#" class="username" target="_blank">{{ message.username }}</a>
+            <router-link to="#" class="username" @click="clickUsername(message.username)">{{ message.username }}</router-link>
             <span class="datetime">{{ message.date.toLocaleString() }}</span>
           </div>
           <div class="content" v-html="message.content"></div>
@@ -106,6 +108,7 @@ div.chat
         <textarea
             rows="1"
             v-model="message"
+            ref="input"
             @keydown.ctrl.enter.prevent="sendMessage"
             placeholder="Ваше сообщение... (Ctrl+Enter для отправки)"
         >
@@ -123,6 +126,8 @@ div.chat
 </template>
 
 <script>
+
+import {nextTick} from "vue";
 
 export default {
   data() {
@@ -153,6 +158,29 @@ export default {
       this.messages.push(message);
       await this.$nextTick();
       this.scrollToBottom();
+    },
+
+    clickUsername(username) {
+      this.$emit('username-click', username);
+      this.message += "@" + username + " ";
+
+      this.$refs.input.focus();
+    },
+
+    async checkClickOnLink(e) {
+      const el = e.target;
+      if (el.tagName !== 'A')
+        return;
+
+      const href = el.getAttribute('href');
+
+      // send event to this component if it opened already
+      this.$store.state.eventBus.emit('connect-to-editor', location.protocol + '//' + location.host + href);
+
+      // load editor component if it's not opened and set search params
+      this.$router.push('/');
+      await nextTick();
+      this.$router.push(href);
     }
   }
 }
