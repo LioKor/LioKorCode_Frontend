@@ -58,7 +58,10 @@ padding = 20px
         color textColor3
 
   .room-users
-    max-width width
+    h1
+      margin-top 0
+    padding padding
+    max-width max-width
     .user
       margin-bottom 10px
       video
@@ -154,7 +157,7 @@ padding = 20px
         </div>
       </div>
 
-      <h2>Chat</h2>
+      <h2>Чат</h2>
       <Chat ref="chat" class="chat-component" @sendMessage="sendMessage" />
     </div>
   </div>
@@ -174,9 +177,9 @@ import { Room, User, Message } from './models'
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const WS_ADDR = (isLocal)? 'localhost:9090': `${window.location.hostname}/ws`
 let WS_ROOMS_URL = `${(window.location.protocol === 'http:')? 'ws': 'wss'}://${WS_ADDR}`
-if (isLocal) {
-  WS_ROOMS_URL = 'wss://code.liokor.com/ws';
-}
+// if (isLocal) {
+//   WS_ROOMS_URL = 'wss://code.liokor.com/ws';
+// }
 
 let ws = null
 
