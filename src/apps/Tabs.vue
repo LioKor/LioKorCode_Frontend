@@ -171,7 +171,6 @@ import {nextTick, toRaw} from "vue";
 
         el = el || this.getElByIdx(idx);
         if (this.selectedEl === el) {
-          console.log(el, el.previousElementSibling, el.nextElementSibling)
           this.selectTabEl(el.previousElementSibling || el.nextElementSibling, true);
         }
 

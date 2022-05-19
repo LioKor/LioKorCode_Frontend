@@ -94,7 +94,10 @@
     },
 
     methods: {
-      tryToLinkToURL(url) {
+      async tryToLinkToURL(url) {
+        if (this.redatorSessionUid)
+          await this.leaveSession();
+
         url = new URL(url);
         const sessionId = url.searchParams.get(queryParamsName.sessionId);
         //const taskId = url.searchParams.get(queryParamsName.taskId);
