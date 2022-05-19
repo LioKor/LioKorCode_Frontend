@@ -402,13 +402,18 @@ export default {
 
       let messageSent = false;
       for (const user of this.joinedRoom.users) {
-        if (user.id !== this.uid && (targetUsername.toLowerCase() === user.username.toLowerCase() || !targetUsername)) {
+        if (user.id === this.uid) {
+          messageSent = true
+          continue
+        }
+
+        if (user.dc) {
           user.dc.send(message)
           messageSent = true;
         }
       }
 
-      if (messageSent || this.joinedRoom.users.length === 1) {
+      if (messageSent) {
         this.addMessage(currentUser, message);
       } else {
         this.$refs.chat.setMessage(message);
