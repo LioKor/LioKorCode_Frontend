@@ -382,11 +382,11 @@
         this.$refs.tabs.lockChangeTabs();
         this.createLiveEditor(uid, filename);
       },
-      leaveSession() {
+      async leaveSession() {
         this.$refs.tree.unlockOpeningFiles();
         this.$refs.tabs.unlockChangeTabs();
         this.removeLiveEditor();
-        this.$refs.header.leaveSession();
+        await this.$refs.header.leaveSession(false, true);
       },
 
       createLiveEditor(id, filename = undefined) {

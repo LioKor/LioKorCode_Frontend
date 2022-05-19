@@ -135,6 +135,10 @@
   .paginator
     margin-top 16px
     margin-left 33px
+
+  .opacity-0
+    opacity 0
+    pointer-events none
 </style>
 
 <template>
