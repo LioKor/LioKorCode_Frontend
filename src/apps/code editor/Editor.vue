@@ -18,6 +18,11 @@
     left 50%
     top 30%
     transform translate(-50%, -50%)
+
+  .errorHighlight
+    position absolute
+    z-index 20
+    background-color mix(colorError, transparent)
 </style>
 
 <template>
@@ -33,6 +38,8 @@
 </template>
 
 <script>
+  let ace;
+
   export default {
     data() {
       return {
@@ -41,11 +48,13 @@
         isMounted: false,
         textWhenMounted: "",
         onMountAction: () => {},
+
+        errorHighLightMarkers: [],
       }
     },
 
     async mounted() {
-      const ace = await this.importAce()
+      ace = await this.importAce()
 
       this.aceEditor = ace.edit('aceEditor');
       this.isMounted = true;
@@ -112,6 +121,7 @@
         await this.waitForAce()
         const text = this.aceEditor.getValue();
         this.$emit('editorChange', text);
+        this.clearMarkers();
       },
       async setText(text, name = null, disableChangeEmit = true) {
         await this.waitForAce()
@@ -167,6 +177,24 @@
 
       setOnMountAction(callback) {
         this.onMountAction = callback;
+      },
+
+      async setAnnotations(annotations) {
+        await this.waitForAce();
+        this.aceEditor.session.setAnnotations(annotations);
+        this.clearMarkers();
+        for (const ann of annotations) {
+          this.errorHighLightMarkers.push(this.aceEditor.session.addMarker(new ace.Range(ann.row, 0, ann.row, 144),"errorHighlight","fullLine"));
+        }
+      },
+      clearAnnotations(annotations) {
+        this.aceEditor.session.clearAnnotations();
+
+      },
+      clearMarkers() {
+        for (const marker of this.errorHighLightMarkers) {
+          this.aceEditor.session.removeMarker(marker);
+        }
       }
     }
   }

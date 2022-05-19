@@ -187,7 +187,7 @@
         this.tasks = tasks.tasks;
 
         let pages = tasks.num / this.onPageCount;
-        if (tasks.num % this.onPageCount !== 0)
+        if (tasks.num % this.onPageCount !== 0 || pages === 0)
           pages += 1;
         this.$refs.header.$refs.paginator.setPagesCount(pages, true);
 

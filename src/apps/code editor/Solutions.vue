@@ -9,6 +9,11 @@
     .min-width
       width 1px
       white-space nowrap
+    .min-width.small
+      max-width 80px
+
+      white-space break-spaces
+      font-size 12px
     .action
       cursor pointer
     .action:hover
@@ -50,23 +55,23 @@
           <th class="min-width">id</th>
           <th class="min-width">Дата проверки</th>
           <th class="min-width">Тесты</th>
-          <th class="min-width">Время выполнения</th>
-          <th class="min-width">Время компиляции</th>
+          <th class="min-width small">Время выполнения</th>
+          <th class="min-width small">Время компиляции</th>
           <th>Сообщение</th>
-          <th class="min-width">Действия</th>
+          <th class="min-width small">Действия</th>
         </tr>
       </thead>
       <tr v-for="solution in solutions">
         <td class="min-width with-hint" :class="getStatusClass(solution.checkResult)" :data-hint="solution.message">{{ solution.id }}</td>
 
-        <td class="min-width">{{ solution.datetime }}</td>
+        <td class="min-width small">{{ solution.datetime }}</td>
         <td class="min-width">{{ solution.testsPassed }} / {{ solution.testsTotal }}</td>
         <td class="min-width">{{ solution.checkTime }} s</td>
         <td class="min-width">{{ solution.compileTime }} s</td>
 
         <td class="message" v-html="solution.checkMessage"></td>
 
-        <td class="min-width"><span class="action" @click="openSolution(solution.id)">Загрузить код</span></td>
+        <td class="min-width small"><span class="action" @click="openSolution(solution.id)">Загрузить код</span></td>
       </tr>
     </table>
   </div>
@@ -134,7 +139,7 @@
       },
 
       __solutionNToBr(solution) {
-        solution.checkMessage = solution.checkMessage.replaceAll('\n', '<br>')
+        solution.checkMessage = solution.checkMessage.replaceAll('\n', '<br>');
       },
 
       replaceSolution(uid, solution) {
@@ -142,14 +147,14 @@
         if (idx === -1) {
           return;
         }
-        this.__solutionNToBr(solution)
+        this.__solutionNToBr(solution);
         this.solutions[idx].set(solution);
       },
 
       async getSolutions(id) {
         const solutions = await this.$store.state.api.getSolutions(id);
         for (const solution of solutions) {
-          this.__solutionNToBr(solution)
+          this.__solutionNToBr(solution);
         }
 
         if (!solutions.ok_) {

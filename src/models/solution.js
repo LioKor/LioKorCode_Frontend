@@ -5,6 +5,7 @@ export default class Solution extends Model {
     id: null,
     receivedDatetime: Date.now(),
     checkedDatetime: Date.now(),
+    isOk: null,
     checkResult: -1,
     checkMessage: null,
     checkTime: null,
@@ -43,8 +44,10 @@ export default class Solution extends Model {
       9: 'draft'
     }
     this.message = checkResults[this.checkResult];
+    this.isOk = false;
     if (this.checkResult === 0) {
       cls = 'passed';
+      this.isOk = true;
     } else if (this.testsPassed > 0) {
       cls = 'notFull';
     }
