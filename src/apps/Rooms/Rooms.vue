@@ -179,9 +179,8 @@ import { Room, User, Message } from './models'
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const WS_ADDR = (isLocal)? 'localhost:9090': `${window.location.hostname}/ws`
 let WS_ROOMS_URL = `${(window.location.protocol === 'http:')? 'ws': 'wss'}://${WS_ADDR}`
-// if (isLocal) {
+// if (isLocal)
 //   WS_ROOMS_URL = 'wss://code.liokor.com/ws';
-// }
 
 let ws = null
 

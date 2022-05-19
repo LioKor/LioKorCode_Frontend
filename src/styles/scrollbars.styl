@@ -26,6 +26,8 @@ scrollbar-border = 0px
   background-color scroll-thumb-color
   border-radius (scrollbar-width / 2)
   border scrollbar-border solid scroll-bg-color
+.scrollable::-webkit-scrollbar-corner
+  background scroll-bg-color
 
 .scrollable-bg
   scrollbar-color scroll-thumb-color scroll-bg-color-2
@@ -35,3 +37,5 @@ scrollbar-border = 0px
   background scroll-bg-color-2
 .scrollable-bg::-webkit-scrollbar-thumb
   border scrollbar-border solid scroll-bg-color-2
+.scrollable-bg::-webkit-scrollbar-corner
+  background scroll-bg-color-2
