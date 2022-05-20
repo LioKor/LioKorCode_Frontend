@@ -63,7 +63,7 @@ export default class Solution extends Model {
     dt.minute = dt.getMinutes().toString().padStart(2, '0');
     dt.hour = dt.getHours().toString().padStart(2, '0');
     dt.day = dt.getDate().toString().padStart(2, '0');
-    dt.month = dt.getMonth().toString().padStart(2, '0');
+    dt.month = (dt.getMonth() + 1).toString().padStart(2, '0');
     dt.year = dt.getFullYear();
 
     if (curDate === nowDate) { // today
