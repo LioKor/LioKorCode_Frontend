@@ -321,14 +321,14 @@
         }
 
         // Handle other languages errors
-        // Note: ([^<>:"/\\|?*]+) is a filename without deprecated symbols
+        // Note: ([^<>:"\\|?*\n]+) is a filename without deprecated symbols
         const langErrorMessageParseRegExp = {
-          gcc: /(?:gcc|cc|g\+\+) (?:(?:(?!error).)*\n)+([^<>:"/\\|?*\n]+):(\d+):(?:\d+): (.+)\n/,
-          python: /File "\/root\/source_w\/([^<>:"/\\|?*\n]+)", line (\d+).*(?:.*\n)+(\w+:[^:]*)\n/,
-          lua: /lua: ([^<>:"/\\|?*\n]+):(\d+):(.*)\n/,
-          pascal: /([^<>:"/\\|?*\n]+)\((\d+)\) Fatal: (.*)\n/,
-          go: /\.\/([^<>:"/\\|?*\n]+):(\d+):(?:\d+): (.*)\n/,
-          nasm: /([^<>:"/\\|?*\n]+):(\d+): (.*)\n/,
+          gcc: /(?:gcc|cc|g\+\+) (?:(?:(?!error).)*\n)+([^<>:"\\|?*\n]+):(\d+):(?:\d+): (.+)\n/,
+          python: /File "\/root\/source_w\/([^<>:"\\|?*\n]+)", line (\d+).*(?:.*\n)+(\w+:[^:]*)\n/,
+          lua: /lua: ([^<>:"\\|?*\n]+):(\d+):(.*)\n/,
+          pascal: /([^<>:"\\|?*\n]+)\((\d+)\) Fatal: (.*)\n/,
+          go: /\.\/([^<>:"\\|?*\n]+):(\d+):(?:\d+): (.*)\n/,
+          nasm: /([^<>:"\\|?*\n]+):(\d+): (.*)\n/,
         }[chosenLang];
 
         const tokens = message.match(langErrorMessageParseRegExp);
