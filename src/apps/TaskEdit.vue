@@ -18,19 +18,19 @@
         </div>
         <div class="form-group">
           <label>ОПИСАНИЕ<span class="error-text"></span></label>
-          <textarea class="form-control" v-model="task.description"></textarea>
+          <textarea class="form-control scrollable" v-model="task.description"></textarea>
         </div>
         <div class="form-group">
           <label>ОПИСАНИЕ ВХОДНЫХ ДАННЫХ<span class="error-text"></span></label>
-          <textarea class="form-control" v-model="task.stdinDescription"></textarea>
+          <textarea class="form-control scrollable" v-model="task.stdinDescription"></textarea>
         </div>
         <div class="form-group">
           <label>ОПИСАНИЕ ВЫХОДНЫХ ДАННЫХ<span class="error-text"></span></label>
-            <textarea class="form-control" v-model="task.stdoutDescription"></textarea>
+            <textarea class="form-control scrollable" v-model="task.stdoutDescription"></textarea>
         </div>
         <div class="form-group">
           <label>ОСОБЫЕ УКАЗАНИЯ<span class="error-text"></span></label>
-          <textarea class="form-control" v-model="task.hints"></textarea>
+          <textarea class="form-control scrollable" v-model="task.hints"></textarea>
         </div>
         <div class="form-group">
           <label>ТЕСТЫ<span class="error-text"></span></label>

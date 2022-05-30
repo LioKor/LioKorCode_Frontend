@@ -50,12 +50,19 @@
     background color4
 </style>
 
+<style lang="stylus" scoped>
+  textarea:last-child
+    margin-left 3px
+  textarea
+    min-height 40px
+</style>
+
 <template>
   <span class="orderid">{{ idx }}</span>
   <div class="btn delete" @click="$emit('deleteListItem', idx)"><span class="cross"></span></div>
-  <input type="text" placeholder="Входные данные" class="form-control" ref="input1" :value="modelValue[0]" @input="updateVModel">
-  <input type="text" placeholder="Выходные данные" class="form-control" ref="input2" :value="modelValue[1]" @input="updateVModel"
-    @keydown.tab="addItemIfLast">
+  <textarea placeholder="Входные данные" rows="1" class="form-control scrollable" ref="input1" :value="modelValue[0]" @input="updateVModel"></textarea>
+  <textarea placeholder="Выходные данные" rows="1" class="form-control scrollable" ref="input2" :value="modelValue[1]" @input="updateVModel"
+            @keydown.tab="addItemIfLast"></textarea>
 </template>
 
 <script>

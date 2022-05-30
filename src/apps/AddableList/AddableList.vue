@@ -4,6 +4,7 @@
   .addable-list
     padding 0
     list-style none
+    overflow-y scroll
     > li
       margin-top 10px
       margin-bottom 10px
@@ -84,7 +85,7 @@
 </style>
 
 <template>
-  <ul class="addable-list roll-closed" @input="">
+  <ul class="addable-list roll-closed scrollable" @input="">
     <li v-for="(item, idx) in modelValue">
       <ListItem v-model="modelValue[idx]" :idx="idx + 1" @deleteListItem="deleteItem" @mounted="updateHeight"></ListItem>
     </li>

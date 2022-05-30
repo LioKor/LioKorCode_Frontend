@@ -43,7 +43,6 @@ export function adjustRoll(element) {
     let height = 0;
     for (const child of Array.from(element.children)) {
         const style = getComputedStyle(child);
-        console.log(child.offsetHeight, parseInt(style.marginTop))
         height += child.offsetHeight + parseInt(style.marginTop);// + parseInt(style.marginBottom);
     }
     if (height === 0) {
