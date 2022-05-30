@@ -84,16 +84,17 @@
 </style>
 
 <template>
-  <ul class="addable-list" @input="">
+  <ul class="addable-list roll-closed" @input="">
     <li v-for="(item, idx) in modelValue">
-      <ListItem v-model="modelValue[idx]" :idx="idx + 1" @deleteListItem="deleteItem"></ListItem>
+      <ListItem v-model="modelValue[idx]" :idx="idx + 1" @deleteListItem="deleteItem" @mounted="updateHeight"></ListItem>
     </li>
   </ul>
 </template>
 
 <script>
-  import {openRoll} from "../../utils/show-hide";
+import {adjustRoll, openRoll} from "../../utils/show-hide";
   import ListItem from "./ListItem.vue";
+  import {nextTick} from "vue";
 
   export default {
     components: {ListItem},
@@ -102,23 +103,28 @@
     },
 
     mounted() {
-      //openRoll(this.$el);
     },
 
     methods: {
-      addItem() {
+      async addItem() {
         this.modelValue.push(["", ""]);
-        //openRoll(this.$el);
         this.updateVModel();
+        this.updateHeight();
       },
 
-      deleteItem(idx) {
+      async deleteItem(idx) {
         this.modelValue.splice(idx - 1, 1);
         this.updateVModel();
+        await nextTick();
+        adjustRoll(this.$el);
       },
 
       updateVModel() {
         this.$emit('update:modelValue', this.modelValue);
+      },
+
+      updateHeight() {
+        openRoll(this.$el);
       }
     }
   }

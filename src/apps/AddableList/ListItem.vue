@@ -65,6 +65,10 @@
       modelValue: [], // aka "item"
     },
 
+    mounted() {
+      this.$emit("mounted");
+    },
+
     methods: {
       updateVModel() {
         this.$emit('update:modelValue', [this.$refs.input1.value,this.$refs.input2.value]);

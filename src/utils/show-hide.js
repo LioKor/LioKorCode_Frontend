@@ -39,6 +39,20 @@ export function openRoll(element) {
     element.setAttribute('data-open-roll', '');
     element.style.height = element.scrollHeight + "px";
 }
+export function adjustRoll(element) {
+    let height = 0;
+    for (const child of Array.from(element.children)) {
+        const style = getComputedStyle(child);
+        console.log(child.offsetHeight, parseInt(style.marginTop))
+        height += child.offsetHeight + parseInt(style.marginTop);// + parseInt(style.marginBottom);
+    }
+    if (height === 0) {
+        closeRoll(element);
+        return;
+    }
+    element.setAttribute('data-open-roll', '');
+    element.style.height = height + "px";
+}
 export function toggleRoll(element) {
     if (isClosedRoll(element)) {
         closeRoll(element);
