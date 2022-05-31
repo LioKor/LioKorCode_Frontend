@@ -12,6 +12,11 @@
         </div>
         <div class="form" @keydown.enter.prevent="signUp">
           <form novalidate>
+            <div class="form-bg">
+              <div></div>
+              <div></div>
+            </div>
+
             <div class="form-group" :class="{ error: errors.username }" @input="errors.username = ''">
               <label>ЛОГИН*<span class="error-text">{{ errors.username }}</span></label>
               <input v-model="username" type="text" class="form-control" required autocomplete="on">

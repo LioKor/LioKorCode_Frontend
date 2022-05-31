@@ -1,4 +1,5 @@
-@require './constants.styl'
+@require 'constants.styl'
+@require 'header.styl'
 
 logo-height = 100px
 image-height = 60px
@@ -145,6 +146,7 @@ textarea.form-control
     color textColor3
   textarea
     resize vertical
+
 .form-group.error
   label
     color clError
@@ -152,3 +154,113 @@ textarea.form-control
 .standalone-form.fullwidth
   max-width unset
   width 90%
+
+
+.relative-container
+  position relative
+
+.input-air
+  width 100%
+  background none
+  font-size 16px
+  border none
+  outline none
+  overflow hidden
+  text-overflow ellipsis
+  color textColor1
+  transition all ease 0.2s
+.input-air:focus
+  padding 5px
+  margin-left 5px
+
+.input-air::placeholder
+  color textColor5
+.input-air:focus::placeholder
+  color textColor3
+
+.input-with-clear ~ .input-clear
+  position absolute
+  right 15px
+  top 12px
+  width 24px
+  height 24px
+  max-width 0
+  transition all ease-out 0.4s
+  opacity 0
+  transform rotate(45deg)
+.input-with-clear:focus ~ .input-clear
+  max-width 100px // to delay move after rotation
+  opacity 1
+  transform rotate(0)
+
+input ~ .input-bg
+  position absolute
+  inset 0
+  z-index -1
+  border-color color2
+  background none
+  transform skewX(degree)
+  transition all ease 0.2s
+input:focus ~ .input-bg
+  margin 5px
+  margin-left 10px
+  background color2lighter
+  border-width 0 2px
+  border-color color4
+  border-style double
+
+.bg-decColor1::before
+  content ""
+  position absolute
+  inset 0
+  background decColor2
+  transform skewX(degree)
+  z-index -1
+
+.form-bg
+  bgModifier = mix(color2, black)
+  div
+    position absolute
+    inset 0
+    z-index -1
+    transform skewX(degree)
+    border-width 0 4px
+    border-style solid
+    opacity 0.5
+  div:nth-child(1)
+    left -5%
+    right 20%
+    border none
+    background mix(gradColor1lighter, bgModifier, 10%)
+    clip-path polygon(0 0, 100% 0, 100% 100%, 0 100%)
+    animation 0.5s ease-out from-left
+  div:nth-child(2)
+    left 85%
+    right -10%
+    border-color mix(gradColor2lighter, bgModifier, 30%)
+    transform skewX(-1 * degree)
+    background decColor2
+    clip-path polygon(0 0, 100% 0, 100% 100%, 0 100%)
+    animation 0.6s ease-out from-bottom
+  div:nth-child(3)
+    left 103%
+    right -20%
+    border none
+    background decColor1
+    animation 0.5s ease-out from-right
+
+@keyframes from-left
+  from
+    left -100%
+    right 150%
+    top 0
+    bottom 0
+@keyframes from-bottom
+  from
+    clip-path polygon(0 100%, 100% 100%, 100% 100%, 0 100%)
+@keyframes from-right
+  from
+    left 150%
+    right -100%
+    top 0
+    bottom 0

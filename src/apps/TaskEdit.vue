@@ -1,4 +1,21 @@
 <style lang="stylus">
+  .btn-contoured
+    padding-top 7px
+    padding-bottom 7px
+    margin-left 15px
+    margin-right 10px
+    svg
+      margin-top 2px
+      height 18px
+      opacity 0.7
+      transition all 0.2s
+  .btn-contoured:hover
+    svg
+      opacity 1
+      transform scale(1.1)
+
+  .addable-list
+    margin-bottom 0
 </style>
 
 <template>
@@ -12,6 +29,12 @@
     </div>
     <div class="form">
       <form novalidate>
+        <div class="form-bg">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+
         <div class="form-group">
           <label>НАЗВАНИЕ<span class="error-text"></span></label>
           <input type="text" class="form-control" v-model="task.name">
