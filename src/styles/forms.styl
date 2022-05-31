@@ -18,6 +18,9 @@ border-radius = 3px
 big-border-radius = 3px
 back-btn-size = 40px
 
+clContoured = mix(clDisabled, transparent, 5%)
+clContouredHover = mix(clDisabled, transparent, 30%)
+clContouredActive = mix(clDisabled, transparent, 50%)
 
 .btn
   -webkit-appearance none
@@ -32,18 +35,25 @@ back-btn-size = 40px
   border-radius border-radius
   cursor pointer
   transition all 0.3s ease
+.btn.btn-contoured
+  border dashed 2px clDisabled
+  //background-image url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='gray' stroke-width='5' stroke-dasharray='5%2c 15' stroke-dashoffset='3' stroke-linecap='square'/%3e%3c/svg%3e")
+  background-color clContoured
 .btn.btn-danger
   background-color clError
 .btn.btn-disabled
   cursor not-allowed
   background-color clDisabled
-.btn.btn-disabled:hover
-  background-color clDisabled
 .btn:hover
   color textColor1
   background-color clHighlight
-linkButton.btn:hover
-  color textColor1
+.btn.btn-disabled:hover
+  background-color clDisabled
+.btn.btn-contoured:hover
+  background-color clContouredHover
+.btn.btn-contoured:active
+  transition all 0.1s ease
+  background-color clContouredActive
 
 textarea.form-control
   resize none

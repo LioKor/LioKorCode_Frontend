@@ -35,7 +35,9 @@
         <div class="form-group">
           <label>ТЕСТЫ<span class="error-text"></span></label>
           <AddableList v-model="task.tests" ref="list"></AddableList>
-          <div class="btn" @click="addTestToList">Добавить тест</div>
+          <div class="btn btn-contoured" @click="addTestToList">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="10 10 28 28"><path d="M22.5 38V25.5H10V22.5H22.5V10H25.5V22.5H38V25.5H25.5V38Z"/></svg>
+          </div>
         </div>
         <div class="form-group">
           <div class="btn" @click="updateTaskInfo($route.params.taskId, task.toNetwork())">Сохранить</div>
