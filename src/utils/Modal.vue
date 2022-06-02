@@ -61,6 +61,11 @@
       </div>
 
       <div class="form">
+        <div class="form-bg">
+          <div></div>
+          <div></div>
+        </div>
+
         <div v-if="type === 'prompt'" class="form-group">
           <input v-if="!password" type="text" v-model="text" ref="inputText" class="form-control">
           <input v-else type="password" v-model="text" ref="inputText" class="form-control">

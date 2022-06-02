@@ -364,6 +364,7 @@
         this.sortFiles(toPush);
 
         if (this.copyedItem.mode === 'cut') {
+          this.$emit('deleteFile', listCopy[idxCopy]);
           listCopy.splice(idxCopy, 1); // delete selected element
           this.copyedItem.el = null; // drop selection
         }
