@@ -37,6 +37,7 @@
   <div class="slide-line"
        @mousedown="startSlide"
        @touchstart="startSlide"
+       @dragstart="() => false"
   ></div>
 </template>
 
@@ -89,10 +90,16 @@
 
       window.addEventListener('mouseup', this.endSlide);
       window.addEventListener('touchend', this.endSlide);
-      window.addEventListener('mousemove', this.slideEvent);
-      window.addEventListener('touchmove', this.slideEvent);
+      window.addEventListener('mousemove', this.onMouseMove);
+      window.addEventListener('touchmove', this.onTouchMove);
 
       this.applySlide(window.localStorage.getItem(this.uid + '-slide-value') || this.initialValue)
+    },
+    unmounted() {
+      window.removeEventListener('mouseup', this.endSlide);
+      window.removeEventListener('touchend', this.endSlide);
+      window.removeEventListener('mousemove', this.onMouseMove);
+      window.removeEventListener('touchmove', this.onTouchMove);
     },
     methods: {
       applySlide(leftPercentage) {
@@ -123,6 +130,7 @@
       },
       startSlide() {
         this.isInSlide = true;
+        console.log("START");
         document.body.style.setProperty('user-select', 'none');
       },
       endSlide(forceSlideState = false) {
@@ -140,20 +148,26 @@
           window.localStorage.setItem(this.uid + '-slide-value', leftPercentage.toString());
         }
       },
-      slideEvent(e) {
+      onMouseMove(e) {
+        this.slideEvent(e.pageX, e.pageY);
+      },
+      onTouchMove(e) {
+        this.slideEvent(e.targetTouches[0].pageX, e.targetTouches[0].pageY);
+      },
+      slideEvent(cursorX, cursorY) {
         if (this.isInSlide) {
           let percPos, offset, cursorPos;
           switch (this.mode) {
             case 'width':
               const maxWidth = this.leftBlock.clientWidth + this.el.clientWidth + this.rightBlock.clientWidth;
               offset = this.isLeftCollapsed ? this.$el.offsetLeft : this.leftBlock.offsetLeft;
-              cursorPos = (e.pageX - offset);
+              cursorPos = (cursorX - offset);
               percPos = cursorPos / maxWidth * 100;
               break;
             case 'height':
               const maxHeight = this.leftBlock.clientHeight + this.el.clientHeight + this.rightBlock.clientHeight;
               offset = this.isLeftCollapsed ? this.$el.offsetTop : this.leftBlock.offsetTop;
-              cursorPos = (e.pageY - offset);
+              cursorPos = (cursorY - offset);
               percPos = cursorPos / maxHeight * 100;
               break;
           }
