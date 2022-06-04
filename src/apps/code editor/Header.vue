@@ -29,16 +29,15 @@
   .logo
     padding 0 10px
     margin-right 15px
-    @media screen and (max-width: $mobileWidth) {
+    @media screen and ({mobile})
       margin-right 0
-    }
 </style>
 
 <template>
   <div class="header header-editor">
     <div class="topLine">
-      <router-link to="/" class="mobile-hide"><div class="logo"><strong>LioKor Code</strong> <span @contextmenu="showVersion">{{ version }}</span></div></router-link>
-      <router-link to="/" class="mobile-show"><div class="logo"><strong>LK Code</strong></div></router-link>
+      <router-link to="/" class="mobile-hide first-child"><div class="logo"><strong>LioKor Code</strong> <span @contextmenu="showVersion">{{ version }}</span></div></router-link>
+      <router-link to="/" class="desktop-hide first-child"><div class="logo"><strong>LK Code</strong></div></router-link>
       <router-link to="/">Задания</router-link>
       <div class="control-button" v-show="!isCheckInProgress && !isCheckError" @click=checkStartEmit>Проверить<span class="mobile-hide"> (F9)</span></div>
       <div class="control-button warning" v-show="isCheckInProgress" :disabled="isCheckInProgress">Проверяем...</div>

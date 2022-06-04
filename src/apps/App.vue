@@ -10,7 +10,7 @@
     <router-view></router-view>
   </div>
 
-  <SlideLine class="vertical" el1="router" el2="rooms" uid="rooms" initial-value="100"
+  <SlideLine class="vertical rooms-slide-line" el1="router" el2="rooms" uid="rooms" initial-value="100" :is-user-interactive="!$store.state.isMobile"
              @slider-moved="emitSliderMoved" ref="slider"/>
 
   <Rooms id="rooms"/>
@@ -27,6 +27,7 @@
   import Rooms from './Rooms/Rooms.vue';
   import EventBus from "./EventBus";
 
+  const MOBILE_WIDTH = 700;
 
   export default {
     components: { Modal, Popups, SlideLine, Rooms },
@@ -37,9 +38,13 @@
       this.$store.state.eventBus = new EventBus();
 
       this.$store.state.eventBus.on('expandRooms', this.expandRooms);
+
+      this.checkMobileWidth();
+      window.addEventListener('resize', this.checkMobileWidth);
     },
     unmounted() {
       this.$store.state.eventBus.off('expandRooms', this.expandRooms);
+      window.removeEventListener('resize', this.checkMobileWidth);
     },
 
     methods: {
@@ -49,6 +54,13 @@
 
       expandRooms() {
         this.$refs.slider.applySlideSmothly(70);
+      },
+
+      checkMobileWidth() {
+        const mobileCopy = this.$store.state.isMobile;
+        this.$store.state.isMobile = window.innerWidth <= MOBILE_WIDTH;
+        if (mobileCopy !== this.$store.state.isMobile)
+          this.$store.state.eventBus?.emit('mobile', this.$store.state.isMobile);
       }
     }
   }

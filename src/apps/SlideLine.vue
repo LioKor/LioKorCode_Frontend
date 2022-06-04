@@ -34,10 +34,9 @@
 </style>
 
 <template>
-  <div class="slide-line"
+  <div class="slide-line" v-show="isUserInteractive"
        @mousedown="startSlide"
        @touchstart="startSlide"
-       @dragstart="() => false"
   ></div>
 </template>
 
@@ -74,7 +73,11 @@
         type: Number,
         validator: val => (0 <= val) && (val <= 100),
         default: 30,
-      }
+      },
+      isUserInteractive: {
+        type: Boolean,
+        default: true,
+      },
     },
     mounted() {
       this.leftBlock = document.getElementById(this.el1);
@@ -88,16 +91,20 @@
       this.isInSlide = false;
       this.el = this.$el;
 
-      window.addEventListener('mouseup', this.endSlide);
-      window.addEventListener('touchend', this.endSlide);
-      window.addEventListener('mousemove', this.onMouseMove);
-      window.addEventListener('touchmove', this.onTouchMove);
+      if (this.isUserInteractive) {
+        window.addEventListener('mouseup', this.endSlide);
+        window.addEventListener('touchend', this.endSlide);
+        window.addEventListener('touchcancel', this.endSlide);
+        window.addEventListener('mousemove', this.onMouseMove);
+        window.addEventListener('touchmove', this.onTouchMove);
+      }
 
       this.applySlide(window.localStorage.getItem(this.uid + '-slide-value') || this.initialValue)
     },
     unmounted() {
       window.removeEventListener('mouseup', this.endSlide);
       window.removeEventListener('touchend', this.endSlide);
+      window.removeEventListener('touchcancel', this.endSlide);
       window.removeEventListener('mousemove', this.onMouseMove);
       window.removeEventListener('touchmove', this.onTouchMove);
     },
@@ -130,7 +137,6 @@
       },
       startSlide() {
         this.isInSlide = true;
-        console.log("START");
         document.body.style.setProperty('user-select', 'none');
       },
       endSlide(forceSlideState = false) {
