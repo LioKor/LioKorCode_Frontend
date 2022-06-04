@@ -80,10 +80,6 @@ module.exports = env => {
                     loader: 'file-loader'
                 },
                 {
-                    test: /\.worker.js$/,
-                    use: { loader: 'worker-loader' }
-                },
-                {
                     test: /\.styl(us)?$/,
                     use: [
                         'style-loader',

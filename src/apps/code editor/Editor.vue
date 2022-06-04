@@ -40,6 +40,62 @@
 <script>
   let ace;
 
+  const rules = [
+    {
+      ends: ['.c', '.cpp', '.h', '.cc', '.c++', '.hpp', '.cxx', '.hxx', '.h++'],
+      mode: 'c_cpp'
+    },
+    {
+      ends: ['.py'],
+      mode: 'python'
+    },
+    {
+      ends: ['.lua'],
+      mode: 'lua'
+    },
+    {
+      ends: ['.pas', '.inc'],
+      mode: 'pascal'
+    },
+    {
+      ends: ['.go'],
+      mode: 'golang'
+    },
+    {
+      ends: ['.asm'],
+      mode: 'assembly_x86'
+    },
+    {
+      ends: ['.js'],
+      mode: 'javascript'
+    },
+    {
+      ends: ['.cs'],
+      mode: 'csharp'
+    },
+    {
+      ends: ['.java', '.class', '.jar', '.jad', '.jmod'],
+      mode: 'java'
+    },
+    {
+      ends: ['.php'],
+      mode: 'php'
+    },
+    {
+      ends: ['.sh', '.bash'],
+      mode: 'sh'
+    },
+    {
+      ends: ['.f90'],
+      mode: 'fortran'
+    },
+
+    {
+      ends: ['.json'],
+      mode: 'json'
+    },
+  ]
+
   export default {
     data() {
       return {
@@ -86,24 +142,11 @@
         const { default: ace } = await import('ace-builds')
 
         await import('ace-builds/src-noconflict/theme-ambiance')
-
-
         await import('ace-builds/src-noconflict/mode-makefile')
 
-        await import('ace-builds/src-noconflict/mode-c_cpp')
-        await import('ace-builds/src-noconflict/mode-python')
-        await import('ace-builds/src-noconflict/mode-lua')
-        await import('ace-builds/src-noconflict/mode-pascal')
-        await import('ace-builds/src-noconflict/mode-golang')
-        await import('ace-builds/src-noconflict/mode-assembly_x86')
-        await import('ace-builds/src-noconflict/mode-javascript')
-        await import('ace-builds/src-noconflict/mode-csharp')
-        await import('ace-builds/src-noconflict/mode-java')
-        await import('ace-builds/src-noconflict/mode-php')
-        await import('ace-builds/src-noconflict/mode-sh')
-        await import('ace-builds/src-noconflict/mode-fortran')
-
-        await import('ace-builds/src-noconflict/mode-json')
+        for (const rule of rules) {
+          await import(`ace-builds/src-noconflict/mode-${rule.mode}`)
+        }
 
         return ace
       },
@@ -156,22 +199,6 @@
         if (['GNUmakefile', 'makefile', 'Makefile'].find(el => el === name)) {
           mode = 'makefile';
         }
-        const rules = [
-          {ends: ['.c', '.cpp', '.h', '.cc', '.c++', '.hpp', '.cxx', '.hxx', '.h++'], mode: 'c_cpp'},
-          {ends: ['.py'], mode: 'python'},
-          {ends: ['.lua'], mode: 'lua'},
-          {ends: ['.pas', '.inc'], mode: 'pascal'},
-          {ends: ['.go'], mode: 'golang'},
-          {ends: ['.asm'], mode: 'assembly_x86'},
-          {ends: ['.js'], mode: 'javascript'},
-          {ends: ['.cs'], mode: 'csharp'},
-          {ends: ['.java', '.class', '.jar', '.jad', '.jmod'], mode: 'java'},
-          {ends: ['.php'], mode: 'php'},
-          {ends: ['.sh', '.bash'], mode: 'sh'},
-          {ends: ['.f90'], mode: 'fortran'},
-
-          {ends: ['.json'], mode: 'json'},
-        ];
         const rule = rules.find(rule => rule.ends.find(end => name.endsWith(end)) !== undefined);
         if (rule)
           mode = rule.mode;
