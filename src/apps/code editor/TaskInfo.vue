@@ -8,6 +8,9 @@
     td
     th
       border 1px solid monokai-bg-lightest
+    tr
+      td
+        white-space pre
 </style>
 
 <template>
