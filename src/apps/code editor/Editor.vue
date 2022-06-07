@@ -85,19 +85,23 @@
       async importAce() {
         const { default: ace } = await import('ace-builds')
 
-        await import('ace-builds/src-noconflict/theme-ambiance')
+        await import('ace-builds/src-min-noconflict/theme-ambiance')
 
 
-        await import('ace-builds/src-noconflict/mode-makefile')
+        await import('ace-builds/src-min-noconflict/mode-makefile')
 
-        await import('ace-builds/src-noconflict/mode-c_cpp')
-        await import('ace-builds/src-noconflict/mode-python')
-        await import('ace-builds/src-noconflict/mode-golang')
-        await import('ace-builds/src-noconflict/mode-java')
-        await import('ace-builds/src-noconflict/mode-pascal')
-        await import('ace-builds/src-noconflict/mode-lua')
+        await import('ace-builds/src-min-noconflict/mode-c_cpp')
+        await import('ace-builds/src-min-noconflict/mode-python')
+        await import('ace-builds/src-min-noconflict/mode-golang')
+        await import('ace-builds/src-min-noconflict/mode-java')
+        await import('ace-builds/src-min-noconflict/mode-pascal')
+        await import('ace-builds/src-min-noconflict/mode-lua')
 
-        await import('ace-builds/src-noconflict/mode-json')
+        await import('ace-builds/src-min-noconflict/mode-json')
+
+        await import('ace-builds/src-min-noconflict/ext-searchbox')
+        await import('ace-builds/src-min-noconflict/ext-prompt')
+        await import('ace-builds/src-min-noconflict/ext-settings_menu')
 
         return ace
       },
