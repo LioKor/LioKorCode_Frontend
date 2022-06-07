@@ -34,10 +34,9 @@
 </style>
 
 <template>
-  <div class="slide-line"
+  <div class="slide-line" v-show="isUserInteractive"
        @mousedown="startSlide"
        @touchstart="startSlide"
-       @dragstart="() => false"
   ></div>
 </template>
 
@@ -55,6 +54,8 @@
         isLeftCollapsed: false,
         isRightCollapsed: false,
         slideValue: this.initialValue,
+
+        isUserInteractive: this.userInteractive,
       }
     },
     props: {
@@ -74,7 +75,11 @@
         type: Number,
         validator: val => (0 <= val) && (val <= 100),
         default: 30,
-      }
+      },
+      userInteractive: {
+        type: Boolean,
+        default: true,
+      },
     },
     mounted() {
       this.leftBlock = document.getElementById(this.el1);
@@ -88,31 +93,28 @@
       this.isInSlide = false;
       this.el = this.$el;
 
-      window.addEventListener('mouseup', this.endSlide);
-      window.addEventListener('touchend', this.endSlide);
-      window.addEventListener('mousemove', this.onMouseMove);
-      window.addEventListener('touchmove', this.onTouchMove);
+      if (this.userInteractive)
+        this.userInteractiveOn();
 
       this.applySlide(window.localStorage.getItem(this.uid + '-slide-value') || this.initialValue)
     },
     unmounted() {
-      window.removeEventListener('mouseup', this.endSlide);
-      window.removeEventListener('touchend', this.endSlide);
-      window.removeEventListener('mousemove', this.onMouseMove);
-      window.removeEventListener('touchmove', this.onTouchMove);
+      this.userInteractiveOff();
     },
+
     methods: {
       applySlide(leftPercentage) {
+        const bigWidth = this.isUserInteractive ? lineBigWidth : 0;
         if (leftPercentage <= 2) { // due to padding can't hide if only width is 0
           this.leftBlock.style.display = 'none';
-          this.rightBlock.style[this.mode] = `calc(100% - ${lineBigWidth}px)`;
-          this.el.style[this.mode] = lineBigWidth + 'px';
+          this.rightBlock.style[this.mode] = `calc(100% - ${bigWidth}px)`;
+          this.el.style[this.mode] = bigWidth + 'px';
           this.isLeftCollapsed = true;
 
         } else if (leftPercentage >= 98) {
-          this.leftBlock.style[this.mode] = `calc(100% - ${lineBigWidth}px)`;
+          this.leftBlock.style[this.mode] = `calc(100% - ${bigWidth}px)`;
           this.rightBlock.style.display = 'none';
-          this.el.style[this.mode] = lineBigWidth + 'px';
+          this.el.style[this.mode] = bigWidth + 'px';
           this.isRightCollapsed = true;
 
         } else {
@@ -130,7 +132,6 @@
       },
       startSlide() {
         this.isInSlide = true;
-        console.log("START");
         document.body.style.setProperty('user-select', 'none');
       },
       endSlide(forceSlideState = false) {
@@ -175,7 +176,7 @@
         }
       },
 
-      applySlideSmothly(slideValue) {
+      applySlideSmoothly(slideValue) {
         let prevTime;
         requestAnimationFrame((time) => prevTime = time);
 
@@ -192,6 +193,26 @@
         };
 
         requestAnimationFrame(animate);
+      },
+
+      userInteractiveOn() {
+        this.isUserInteractive = true;
+        window.addEventListener('mouseup', this.endSlide);
+        window.addEventListener('touchend', this.endSlide);
+        window.addEventListener('touchcancel', this.endSlide);
+        window.addEventListener('mousemove', this.onMouseMove);
+        window.addEventListener('touchmove', this.onTouchMove);
+        this.applySlide(this.slideValue);
+      },
+
+      userInteractiveOff() {
+        this.isUserInteractive = false;
+        window.removeEventListener('mouseup', this.endSlide);
+        window.removeEventListener('touchend', this.endSlide);
+        window.removeEventListener('touchcancel', this.endSlide);
+        window.removeEventListener('mousemove', this.onMouseMove);
+        window.removeEventListener('touchmove', this.onTouchMove);
+        this.applySlide(this.slideValue);
       }
     }
   }

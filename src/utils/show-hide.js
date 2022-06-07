@@ -45,6 +45,7 @@ export function adjustRoll(element) {
         const style = getComputedStyle(child);
         height += child.offsetHeight + parseInt(style.marginTop);// + parseInt(style.marginBottom);
     }
+    height += 11; // fixme: лютый костыль
     if (height === 0) {
         closeRoll(element);
         return;

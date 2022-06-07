@@ -19,7 +19,7 @@ shadow = shadow1
   width 100%
   left 0
   top 0
-  .topLine
+  .top-line
     display flex
     margin 0
     padding 0
@@ -43,6 +43,7 @@ shadow = shadow1
       user-select none
       transition all 0.3s ease
     > *:first-child
+    > *.first-child
       padding-left (betweenItems + marginFirstElLeft)
       margin-left (- betweenItems)
     > *.right
@@ -83,7 +84,7 @@ shadow = shadow1
         margin-right 10px
 
 
-  .sidePart
+  .side-part
     z-index 2
     position relative
     margin-left auto
@@ -92,7 +93,7 @@ shadow = shadow1
     padding-right 20%
     height sidePartHeight
     right 0
-  .sidePart::before
+  .side-part::before
     content ""
     background headerBG
     box-shadow shadow
@@ -104,7 +105,7 @@ shadow = shadow1
     transform skewX(degree)
     z-index -1
 
-  .sidePart
+  .side-part
     position relative
     padding-top 50px
 
@@ -114,7 +115,7 @@ shadow = shadow1
     padding 0
     margin 0
     top 0
-    height sidePartHeight
+    height 100%
     pointer-events none
 
   .top-decoration > div
@@ -222,6 +223,7 @@ shadow = shadow1
       animation 0.8s width-from-0-2
 
 
+
 @keyframes height-from-0
   0%
     height 0
@@ -244,3 +246,68 @@ shadow = shadow1
 @keyframes right-from-80px-1
   0%, 50%
     right calc(100% - 80px)
+
+
+.header
+  .top-line
+    .burger-menu
+      display none
+      padding-top 5px
+      padding-left 50px
+      svg
+        height 20px
+        stroke-width 8px
+        opacity 0.9
+@media screen and ({mobile})
+  .header
+    .top-line
+      .burger-menu
+        display block
+      .burger-menu ~ *
+        display none
+
+    .top-decoration
+      display none
+
+    mobileSidePartDecrease = 150px
+    .side-part
+      height (sidePartHeight - mobileSidePartDecrease)
+      width "calc(60% + %s)" % (mobileSidePartDecrease / 3)
+      .top-decoration
+      .bottom-decoration
+        margin-left (- mobileSidePartDecrease / 3 + 13px)
+      .bottom-decoration
+        > div:nth-child(1)
+          right 20%
+        > div:nth-child(4)
+          width 20%
+        > div:nth-child(5)
+          width 30%
+      .checkboxes-group
+        margin-top -100px
+        margin-left -10px
+
+      .search-group
+        transform translate(calc(-60vw + 145px), -72.5px)
+        height (headerHeight - 10px)
+        width calc(95vw - 200px)
+        .input-bg
+        > div::before
+          transform skewX(- degree)
+          right 0
+        svg
+          height (30px - 10px)
+
+      .paginator
+        transform translate(calc(35vw - 70px), -122.5px)
+        width 75px
+        > *:not(.button):not(.selected)
+          display none
+        .selected::before
+        .button::before
+          transform skewX(- degree)
+        .selected::before
+          background decColor2
+      .paginator::before
+        content none
+

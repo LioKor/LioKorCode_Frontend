@@ -141,11 +141,14 @@
       async importAce() {
         const { default: ace } = await import('ace-builds')
 
-        await import('ace-builds/src-noconflict/theme-ambiance')
-        await import('ace-builds/src-noconflict/mode-makefile')
+        await import('ace-builds/src-min-noconflict/theme-ambiance')
+
+        await import('ace-builds/src-min-noconflict/ext-searchbox')
+        await import('ace-builds/src-min-noconflict/ext-prompt')
+        await import('ace-builds/src-min-noconflict/ext-settings_menu')
 
         for (const rule of rules) {
-          await import(`ace-builds/src-noconflict/mode-${rule.mode}`)
+          await import(`ace-builds/src-min-noconflict/mode-${rule.mode}`)
         }
 
         return ace
