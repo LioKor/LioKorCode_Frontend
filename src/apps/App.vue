@@ -66,7 +66,7 @@
       },
 
       expandRooms() {
-        this.$refs.slider.applySlideSmothly(70);
+        this.$refs.slider.applySlideSmoothly(70);
       },
 
       checkMobileWidth() {
@@ -81,7 +81,7 @@
       changeMobileCallback() {
         if (this.$store.state.isMobile) {
           this.$refs.slider.userInteractiveOff();
-          this.$refs.slider.applySlideSmothly(100);
+          this.$refs.slider.applySlideSmoothly(100);
           this.isMobileRoomsOpened = false;
         } else {
           this.$refs.slider.userInteractiveOn();
@@ -90,11 +90,11 @@
 
       openRooms() {
         this.isMobileRoomsOpened = true;
-        this.$refs.slider.applySlideSmothly(0);
+        this.$refs.slider.applySlideSmoothly(0);
       },
       closeRooms() {
         this.isMobileRoomsOpened = false;
-        this.$refs.slider.applySlideSmothly(100);
+        this.$refs.slider.applySlideSmoothly(100);
       }
     }
   }

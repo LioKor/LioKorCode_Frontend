@@ -95,7 +95,7 @@
         </div>
       </div>
 
-      <SlideLine el1="task-block" el2="solutions" uid="editor-horizontal" initial-value="80" class="horizontal" @sliderMoved="this.$refs.editor.resize()" />
+      <SlideLine el1="task-block" el2="solutions" uid="editor-horizontal" initial-value="80" class="horizontal" @sliderMoved="this.$refs.editor?.resize()" />
 
       <Solutions ref="solutions" :id="taskId" @openSolution="(id) => this.openSolution(id)"/>
     </div>

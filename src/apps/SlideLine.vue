@@ -176,7 +176,7 @@
         }
       },
 
-      applySlideSmothly(slideValue) {
+      applySlideSmoothly(slideValue) {
         let prevTime;
         requestAnimationFrame((time) => prevTime = time);
 

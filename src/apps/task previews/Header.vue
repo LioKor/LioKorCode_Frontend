@@ -1,4 +1,4 @@
-<style lang="stylus">
+<style lang="stylus" scoped>
   @require '../../styles/constants.styl'
   @require '../../styles/header.styl'
 
@@ -85,19 +85,19 @@
 
 <template>
   <div class="header">
-    <div class="topLine" style="z-index: 10">
-<!--      <router-link to="#">Туда</router-link>-->
-<!--      <router-link to="#">Сюда</router-link>-->
-
-      <router-link class="profile-button" v-if="$store.state.user.isLogined" to="/profile">
+    <div class="top-line" style="z-index: 10">
+<!--      <div class="burger-menu">-->
+<!--        <svg xmlns="http://www.w3.org/2000/svg" stroke="white" viewBox="0 0 130 100" stroke-width="5" stroke-linecap="round"><path d="M5,5 L125,5  M5,50 L105,50  M5,95 L85,95"/></svg>-->
+<!--      </div>-->
+      <router-link class="profile-button" :class="{'first-child': !$store.state.isMobile}" v-if="$store.state.user.isLogined" to="/profile">
         <img class="avatar-preview gif-hover-activate" :src="$store.state.user.avatarUrl" alt="">
-        <span class="username">{{$store.state.user.username}}</span>
+        <span class="username mobile-hide">{{$store.state.user.username}}</span>
       </router-link>
       <router-link v-else to="/signin">Войти</router-link>
 
-      <div :class="{'opacity-0': isRoomsOpened}" @click="expandRooms">Развернуть комнаты</div>
+      <div class="mobile-hide" :class="{'opacity-0': isRoomsOpened}" @click="expandRooms">Развернуть комнаты</div>
     </div>
-    <div class="sidePart" style="z-index: 5">
+    <div class="side-part" style="z-index: 5">
       <div class="search-group">
         <div class="bg-decColor1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520"><g><path d="M506.141,477.851L361.689,333.399c65.814-80.075,61.336-198.944-13.451-273.73c-79.559-79.559-209.01-79.559-288.569,0    s-79.559,209.01,0,288.569c74.766,74.766,193.62,79.293,273.73,13.451l144.452,144.452c7.812,7.812,20.477,7.812,28.289,0    C513.953,498.328,513.953,485.663,506.141,477.851z M319.949,319.948c-63.96,63.96-168.03,63.959-231.99,0    c-63.96-63.96-63.96-168.03,0-231.99c63.958-63.957,168.028-63.962,231.99,0C383.909,151.918,383.909,255.988,319.949,319.948z"></path></g></svg></div>
         <div class="relative-container bg-decColor1">

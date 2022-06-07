@@ -2,7 +2,7 @@
   @require "../../styles/constants.styl"
 
   .header-editor
-    .topLine
+    .top-line
       > a
       > div
         letter-spacing 1px
@@ -35,7 +35,7 @@
 
 <template>
   <div class="header header-editor">
-    <div class="topLine">
+    <div class="top-line">
       <router-link to="/" class="mobile-hide first-child"><div class="logo"><strong>LioKor Code</strong> <span @contextmenu="showVersion">{{ version }}</span></div></router-link>
       <router-link to="/" class="desktop-hide first-child"><div class="logo"><strong>LK Code</strong></div></router-link>
       <router-link to="/">Задания</router-link>
