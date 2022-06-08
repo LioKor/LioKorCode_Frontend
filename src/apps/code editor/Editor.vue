@@ -40,6 +40,62 @@
 <script>
   let ace;
 
+  const rules = [
+    {
+      ends: ['.c', '.cpp', '.h', '.cc', '.c++', '.hpp', '.cxx', '.hxx', '.h++'],
+      mode: 'c_cpp'
+    },
+    {
+      ends: ['.py'],
+      mode: 'python'
+    },
+    {
+      ends: ['.lua'],
+      mode: 'lua'
+    },
+    {
+      ends: ['.pas', '.inc'],
+      mode: 'pascal'
+    },
+    {
+      ends: ['.go'],
+      mode: 'golang'
+    },
+    {
+      ends: ['.asm'],
+      mode: 'assembly_x86'
+    },
+    {
+      ends: ['.js'],
+      mode: 'javascript'
+    },
+    {
+      ends: ['.cs'],
+      mode: 'csharp'
+    },
+    {
+      ends: ['.java', '.class', '.jar', '.jad', '.jmod'],
+      mode: 'java'
+    },
+    {
+      ends: ['.php'],
+      mode: 'php'
+    },
+    {
+      ends: ['.sh', '.bash'],
+      mode: 'sh'
+    },
+    {
+      ends: ['.f90'],
+      mode: 'fortran'
+    },
+
+    {
+      ends: ['.json'],
+      mode: 'json'
+    },
+  ]
+
   export default {
     data() {
       return {
@@ -87,21 +143,13 @@
 
         await import('ace-builds/src-min-noconflict/theme-ambiance')
 
-
-        await import('ace-builds/src-min-noconflict/mode-makefile')
-
-        await import('ace-builds/src-min-noconflict/mode-c_cpp')
-        await import('ace-builds/src-min-noconflict/mode-python')
-        await import('ace-builds/src-min-noconflict/mode-golang')
-        await import('ace-builds/src-min-noconflict/mode-java')
-        await import('ace-builds/src-min-noconflict/mode-pascal')
-        await import('ace-builds/src-min-noconflict/mode-lua')
-
-        await import('ace-builds/src-min-noconflict/mode-json')
-
         await import('ace-builds/src-min-noconflict/ext-searchbox')
         await import('ace-builds/src-min-noconflict/ext-prompt')
         await import('ace-builds/src-min-noconflict/ext-settings_menu')
+
+        for (const rule of rules) {
+          await import(`ace-builds/src-min-noconflict/mode-${rule.mode}`)
+        }
 
         return ace
       },
@@ -154,16 +202,6 @@
         if (['GNUmakefile', 'makefile', 'Makefile'].find(el => el === name)) {
           mode = 'makefile';
         }
-        const rules = [
-          {ends: ['.c', '.cpp', '.h', '.cc', '.c++', '.hpp', '.cxx', '.hxx', '.h++'], mode: 'c_cpp'},
-          {ends: ['.py'], mode: 'python'},
-          {ends: ['.go'], mode: 'golang'},
-          {ends: ['.java', '.class', '.jar', '.jad', '.jmod'], mode: 'java'},
-          {ends: ['.pas', '.inc'], mode: 'pascal'},
-          {ends: ['.lua'], mode: 'lua'},
-
-          {ends: ['.json'], mode: 'json'},
-        ];
         const rule = rules.find(rule => rule.ends.find(end => name.endsWith(end)) !== undefined);
         if (rule)
           mode = rule.mode;
