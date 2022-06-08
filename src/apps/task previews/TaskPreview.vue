@@ -200,6 +200,8 @@
     .preview:nth-child(2n + 1)
       width (taskWidth * 2)
       margin-right 60px
+      @media screen and ({mobile})
+        padding-left 0
     .preview:nth-child(2n + 1)::before
       left (- taskHeight / 2)
     .preview:nth-child(2n + 2)
@@ -209,7 +211,10 @@
       right -300%
     .preview:nth-child(1)
       margin-right 50%
+      padding-left 0
 
+  .preview:nth-child(1)
+    transition padding-left 0.2s ease
   .previews-container.width-1080
     .preview:nth-child(2n + 2)
       padding-left 0
@@ -222,6 +227,8 @@
     .preview:nth-child(1)
       margin-right 50%
       width (taskWidth * 2)
+      @media screen and ({mobile})
+        padding-left 0
     .preview:nth-child(1)::before
       right 0
       left (- taskHeight / 2)

@@ -22,7 +22,7 @@
       touch-action none
       .task
         padding 10px
-        overflow-x hidden
+        overflow-x scroll
         overflow-y auto
         width 30%
         table
