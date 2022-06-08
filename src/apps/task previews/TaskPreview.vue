@@ -12,9 +12,9 @@
   border-title-color = wheat
   border-title-width = 1px
 
-  degree = -30deg
-
   preview-background = linear-gradient(60deg, gradColor2 0%, mix(color4, transparent) 50%, colorHover 50%, color5 100%)
+
+  previews-degree = 30deg
 
   .preview
     overflow visible
@@ -32,6 +32,7 @@
       right 0
       z-index 10
 
+    .text-container
     .text-container
       display block
       width 100%
@@ -68,7 +69,7 @@
     content ""
     position absolute
     inset 0
-    transform skewX(degree)
+    transform skewX(- previews-degree)
     background preview-background
     background-size 300% 100%
     background-position-x 0
@@ -87,7 +88,7 @@
       inset 1px
       opacity 1
       transition all 0.3s cubic-bezier(0.57, 0.17, 0, 0.9)
-      transform skewX(degree)
+      transform skewX(- previews-degree)
       animation 0.4s inset-from--10px
       > *
         position absolute

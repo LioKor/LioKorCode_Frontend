@@ -5,7 +5,7 @@
 
   #solutions
     background background
-    overflow-y scroll
+    overflow scroll
     .min-width
       width 1px
       white-space nowrap
@@ -45,7 +45,7 @@
         td.message
           max-width 200px
           text-align left
-          white-space pre
+          white-space break-spaces
 </style>
 
 <template>
