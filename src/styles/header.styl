@@ -10,8 +10,9 @@ border-color = color4
 
 borderRadiusTop = 40px
 borderRadiusBottom = 20px
-degree = 26.5deg
 shadow = shadow1
+
+header-degree = 30deg
 
 .header
   height headerHeight
@@ -59,7 +60,7 @@ shadow = shadow1
       right 0
       top 0
       bottom 0
-      transform skew(-30deg)
+      transform skewX(- header-degree)
       z-index -1
     > *:after
       background linear-gradient(transparent 0, border-color 50%, transparent 70%) 100% 50% / 2px 200% no-repeat, linear-gradient(transparent 0%, border-color 50%, transparent 80%) 0% 50% / 2px 200% no-repeat
@@ -293,7 +294,7 @@ shadow = shadow1
         width calc(95vw - 200px)
         .input-bg
         > div::before
-          transform skewX(- degree)
+          transform skewX(- header-degree)
           right 0
         svg
           height (30px - 10px)
@@ -305,7 +306,7 @@ shadow = shadow1
           display none
         .selected::before
         .button::before
-          transform skewX(- degree)
+          transform skewX(- header-degree)
         .selected::before
           background decColor2
       .paginator::before

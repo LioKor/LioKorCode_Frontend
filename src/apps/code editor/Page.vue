@@ -22,7 +22,7 @@
       touch-action none
       .task
         padding 10px
-        overflow-x hidden
+        overflow-x scroll
         overflow-y auto
         width 30%
         table
@@ -139,7 +139,7 @@
 
     methods: {
       openTemplate(items) {
-        this.closeSolution();
+        this.closeAllFiles();
         this.$refs.tree.loadTree(items);
         this.openTreeFile(this.$refs.tree.reactiveItems[0]);
       },
@@ -204,7 +204,7 @@
         this.$refs.tabs.deleteTabByItem(treeItem);
       },
 
-      closeSolution() {
+      closeAllFiles() {
         this.$refs.tree.loadTree([]);
         this.$refs.tabsVertical.selectTabIndex(1);
         this.$refs.tabs.closeAllTabs();
@@ -214,7 +214,7 @@
         // todo: check for errors
         const checkInfo = await this.$store.state.api.getSolution(this.taskId, solutionId)
 
-        this.closeSolution();
+        this.closeAllFiles();
 
         // opening new solution
         const fileList = this.$refs.tree.parseSourceCode(checkInfo.sourceCode);
@@ -364,8 +364,9 @@
         this.$refs.editor.setAnnotations(openedFileAnnotations);
 
         // opened file without errors and some errors in other files
-        if (openedFileAnnotations.length === 0 || this.annotations.length !== 0) {
+        if (openedFileAnnotations.length === 0 && this.annotations.length !== 0) {
           this.$refs.tabsVertical.selectTabIndex(1);
+          console.log(openedFileAnnotations, this.annotations)
         }
       },
 

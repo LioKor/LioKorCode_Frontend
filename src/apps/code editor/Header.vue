@@ -112,7 +112,6 @@
 
     methods: {
       async tryToLinkToURL(url) {
-        console.log(this.redactorSessionUid);
         if (this.redactorSessionUid)
           await this.leaveSession();
 

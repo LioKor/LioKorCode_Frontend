@@ -10,7 +10,7 @@
       border 1px solid monokai-bg-lightest
     tr
       td
-        white-space pre
+        white-space break-spaces
 </style>
 
 <template>

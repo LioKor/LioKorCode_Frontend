@@ -7,6 +7,9 @@
   .side-button
     opacity 0
     transition opacity 0.3s ease
+    pointer-events none
+  .side-button.show
+    pointer-events all
 </style>
 
 <template>
