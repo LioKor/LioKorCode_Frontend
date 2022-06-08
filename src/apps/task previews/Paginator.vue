@@ -7,6 +7,7 @@
   paginator-number-background = linear-gradient(60deg, transparent 50%, colorHover 50%, color5 100%)
   paginator-number-selected-background = headerBG
   paginator-button-background = linear-gradient(90deg, #a26c1e 0%, #4c2c79 50%, colorHover 50%, #a26c1e 100%)
+  paginator-button-background-disabled = linear-gradient(90deg, #6c5c4d 0%, #4c3d60 50%, colorHover 50%, #6b5b4e 100%)
 
   .paginator
     display flex
@@ -22,6 +23,7 @@
       position relative
       color textColor4
       text-align center
+      user-select none
     div::before
       z-index -1
       content ""
@@ -56,6 +58,14 @@
       border-right 1px solid color2
     div.button:last-of-type::before
       border-left 1px solid color2
+    div.button.disabled
+      cursor default
+      pointer-events none
+    div.button.disabled::before
+      filter saturate(0.15) brightness(0.8)
+    div.button.disabled
+      svg
+        fill textColor4
 
     div.number
       cursor pointer
@@ -92,14 +102,14 @@
 
 <template>
   <div class="paginator">
-    <div class="button" @click="setPage(page - 1)"><svg style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+    <div class="button" :class="{disabled: page === 1}" @click="setPage(page - 1)"><svg style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
     </div>
     <div class="number" @click="setPage(firstPage)">{{ firstPage }}</div>
     <div>...</div>
     <div class="number selected">{{ page }}</div>
     <div>...</div>
     <div class="number" @click="setPage(pagesCount)">{{ pagesCount }}</div>
-    <div class="button" @click="setPage(page + 1)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+    <div class="button" :class="{disabled: page === pagesCount}" @click="setPage(page + 1)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
     </div>
   </div>
 </template>
