@@ -62,6 +62,13 @@
       + label
         color textColor1
         font-weight bold
+    input[type=checkbox][disabled]
+      + label::before
+        filter saturate(0.4)
+        border-color textColor6
+      + label
+        pointer-events none
+
 
     #my-solved-tasks
     label[for=my-solved-tasks]
@@ -108,13 +115,13 @@
       </div>
       <Paginator class="paginator" ref="paginator" @change-page="throwEventNext"></Paginator>
       <div class="checkboxes-group">
-        <input id="my-tasks" @change="toggleSolved('my'); updateSearch()" v-model="searchOptions.my" type="checkbox" value="yes">
+        <input id="my-tasks" :disabled="!$store.state.user.isLogined" @change="toggleSolved('my'); updateSearch()" v-model="searchOptions.my" type="checkbox" value="yes">
         <label for="my-tasks">Созданные мной</label>
 
-        <input id="my-solved-tasks" @change="toggleSolved('solved'); updateSearch()" v-model="searchOptions.solved" type="checkbox" value="yes">
+        <input id="my-solved-tasks" :disabled="!$store.state.user.isLogined" @change="toggleSolved('solved'); updateSearch()" v-model="searchOptions.solved" type="checkbox" value="yes">
         <label for="my-solved-tasks">Решённые</label>
 
-        <input id="my-unsolved-tasks" @change="toggleSolved('unsolved'); updateSearch()" v-model="searchOptions.unsolved" type="checkbox" value="yes">
+        <input id="my-unsolved-tasks" :disabled="!$store.state.user.isLogined" @change="toggleSolved('unsolved'); updateSearch()" v-model="searchOptions.unsolved" type="checkbox" value="yes">
         <label for="my-unsolved-tasks">Не решённые</label>
       </div>
 

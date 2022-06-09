@@ -93,7 +93,7 @@
         <TaskPreview v-for="task in tasks" :task="task" path-modifier=""></TaskPreview>
       </div>
 
-      <div v-if="!tasks.length && !searchMutex" class="standalone-form">
+      <div v-if="!tasks?.length && !searchMutex" class="standalone-form">
         <div class="title">
           <div v-if="!searchOptions.my || searchText !== ''" class="primary">Заданий по такому запросу не найдено</div>
           <div v-else class="primary">Вы пока не создали ни одного задания</div>

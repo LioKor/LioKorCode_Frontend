@@ -220,6 +220,7 @@
     .preview:nth-child(2n + 2)
       padding-left 0
     .preview:nth-child(2n + 2)::before
+    .preview:nth-child(2n + 2) .decoration
       left (- taskHeight / 2)
     .preview:nth-child(2n + 1)
       padding-right 0
