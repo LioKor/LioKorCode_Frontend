@@ -188,6 +188,7 @@
             prevTime = time;
             requestAnimationFrame(animate);
           } else {
+            this.applySlide(slideValue);
             this.endSlide(true);
           }
         };
