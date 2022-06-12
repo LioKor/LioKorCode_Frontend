@@ -89,8 +89,8 @@
     <div class="content-container scrollable scrollable-bg">
       <Header @search="updateSearch" ref="header" @change-page="changePaginatorPage"></Header>
 
-      <div class="previews-container" ref="previews">
-        <TaskPreview v-for="task in tasks" :task="task" path-modifier=""></TaskPreview>
+      <div class="previews-container" ref="previewsContainer">
+        <TaskPreview v-for="task in tasks" :task="task" path-modifier="" ref="previews"></TaskPreview>
       </div>
 
       <div v-if="!tasks?.length && !searchMutex" class="standalone-form">
@@ -113,6 +113,7 @@
 <script>
   import TaskPreview from "./TaskPreview.vue";
   import Header from "./Header.vue";
+  import {nextTick} from "vue";
 
   const taskHeight = 220;
   const headerHeight = 50;
@@ -158,7 +159,7 @@
 
         return tasks;
       },
-      async updateSearch(searchText, options) {
+      async updateSearch(searchText, options, withAnimations = false) {
         if (this.searchMutex) {
           this.gottenRequestWhileSearchMutex = {searchText, options};
           return;
@@ -191,20 +192,30 @@
           pages += 1;
         this.$refs.header.$refs.paginator.setPagesCount(pages, true);
 
+        if (withAnimations)
+          this.setTasksUpdateAnimations();
+
         this.searchMutex = false;
         if (this.gottenRequestWhileSearchMutex) {
-          this.updateSearch(this.gottenRequestWhileSearchMutex.searchText, this.gottenRequestWhileSearchMutex.options);
+          this.updateSearch(this.gottenRequestWhileSearchMutex.searchText, this.gottenRequestWhileSearchMutex.options, withAnimations);
           this.gottenRequestWhileSearchMutex = undefined;
         }
       },
       async changePaginatorPage(data) {
         this.currentPage = data.page;
         this.onPageCount = data.count;
-        await this.updateSearch();
+        await this.updateSearch(undefined, undefined, true);
       },
       setOnPageCount(onPage) {
         this.onPageCount = onPage;
         this.$refs.header.$refs.paginator.setOnPageCount(onPage, true);
+      },
+
+      setTasksUpdateAnimations() {
+        this.$refs.previewsContainer.classList.remove('animate-update');
+        setTimeout(() => {
+          this.$refs.previewsContainer.classList.add('animate-update');
+        }, 25); // fixme: Костыльная анимация через убирание класса и выставление его через 25 мс.
       },
 
       onResizeContainerQueriesPolyfill(sliderLeftPercentage) {
@@ -215,7 +226,7 @@
         if (typeof sliderLeftPercentage === 'number')
           this.$refs.header.isRoomsOpened = sliderLeftPercentage < 98;
 
-        const el = this.$refs.previews;
+        const el = this.$refs.previewsContainer;
         const width = el.clientWidth;
         const classes = ['width-720', 'width-1080', 'width-1440', 'width-1800', 'width-more-1800'];
         function setClass(idx, callback = ()=>{}) {

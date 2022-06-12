@@ -16,6 +16,9 @@
 
   previews-degree = 30deg
 
+  to-left = translateX(-50px)
+  to-right = translateX(100px)
+
   .preview
     overflow visible
     position relative
@@ -32,7 +35,6 @@
       right 0
       z-index 10
 
-    .text-container
     .text-container
       display block
       width 100%
@@ -197,6 +199,9 @@
       opacity 0
 
 
+  .preview:nth-child(1)
+    transition padding-left 0.2s ease
+
   .previews-container.width-720
     .preview:nth-child(2n + 1)
       width (taskWidth * 2)
@@ -214,8 +219,6 @@
       margin-right 50%
       padding-left 0
 
-  .preview:nth-child(1)
-    transition padding-left 0.2s ease
   .previews-container.width-1080
     .preview:nth-child(2n + 2)
       padding-left 0
@@ -234,6 +237,16 @@
     .preview:nth-child(1)::before
       right 0
       left (- taskHeight / 2)
+  .previews-container.width-1080.animate-update
+    .preview:nth-child(1)
+    .preview:nth-child(2n + 2)
+      animation from-left 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
+    .preview:nth-child(2n + 1)
+      animation from-right 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
 
   .previews-container.width-1440
     .preview:nth-child(2)
@@ -278,6 +291,22 @@
       margin-right 'calc(%s + var(--additional-width) - %s)' % ((preview-margin + (taskWidth + preview-margin * 2) * 2) (taskWidth))
     .preview:nth-child(5n + 3)::before
       right calc(-100% - var(--additional-width))
+
+  .previews-container
+    .preview
+      .text-container
+        transition none
+
+
+  @keyframes from-left
+    from
+      transform to-left
+  @keyframes from-right
+    from
+      transform to-right
+  @keyframes opacity-in
+    from
+      opacity 0
 </style>
 
 <template>
