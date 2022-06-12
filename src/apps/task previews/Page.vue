@@ -215,7 +215,7 @@
         this.$refs.previewsContainer.classList.remove('animate-update');
         setTimeout(() => {
           this.$refs.previewsContainer.classList.add('animate-update');
-        }, 25); // fixme: Костыльная анимация через убирание класса и выставление его через 25 мс.
+        }, 20); // fixme: Костыльная анимация через убирание класса и выставление его через 20 мс.
       },
 
       onResizeContainerQueriesPolyfill(sliderLeftPercentage) {

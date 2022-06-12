@@ -218,6 +218,15 @@
     .preview:nth-child(1)
       margin-right 50%
       padding-left 0
+  .previews-container.width-720.animate-update
+    .preview:nth-child(2n + 1)
+      animation from-left 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
+    .preview:nth-child(2n + 2)
+      animation from-right 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
 
   .previews-container.width-1080
     .preview:nth-child(2n + 2)
@@ -238,7 +247,6 @@
       right 0
       left (- taskHeight / 2)
   .previews-container.width-1080.animate-update
-    .preview:nth-child(1)
     .preview:nth-child(2n + 2)
       animation from-left 0.3s ease forwards
       .text-container
@@ -261,6 +269,16 @@
       padding-right 0
     .preview:nth-child(3n + 2)::before
       right -300%
+  .previews-container.width-1440.animate-update
+    .preview:nth-child(1)
+    .preview:nth-child(3n + 3)
+      animation from-left 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
+    .preview:nth-child(3n + 2)
+      animation from-right 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
 
   .previews-container.width-1800
     .preview:nth-child(2)
@@ -275,6 +293,16 @@
       padding-right 0
     .preview:nth-child(4n + 2)::before
       right -300%
+  .previews-container.width-1800.animate-update
+    .preview:nth-child(1)
+    .preview:nth-child(4n + 3)
+      animation from-left 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
+    .preview:nth-child(4n + 2)
+      animation from-right 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
 
   .previews-container.width-more-1800
     --additional-width 0
@@ -291,6 +319,16 @@
       margin-right 'calc(%s + var(--additional-width) - %s)' % ((preview-margin + (taskWidth + preview-margin * 2) * 2) (taskWidth))
     .preview:nth-child(5n + 3)::before
       right calc(-100% - var(--additional-width))
+  .previews-container.width-more-1800.animate-update
+    .preview:nth-child(1)
+    .preview:nth-child(5n + 4)
+      animation from-left 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
+    .preview:nth-child(5n + 3)
+      animation from-right 0.3s ease forwards
+      .text-container
+        animation opacity-in 0.3s ease forwards
 
   .previews-container
     .preview
