@@ -1,0 +1,266 @@
+@require 'constants.styl'
+@require 'header.styl'
+
+logo-height = 100px
+image-height = 60px
+logo-width = 180px
+logo-padding = 20px
+
+
+form-button-padding = 10px
+form-button-margin = 10px
+form-padding-left = 20px
+form-padding-top = 30px
+form-margin = 75px
+form-width = 460px
+form-top-margin = 8px
+border-width = 1px
+border-radius = 3px
+big-border-radius = 3px
+back-btn-size = 40px
+
+clContoured = mix(clDisabled, transparent, 5%)
+clContouredHover = mix(clDisabled, transparent, 30%)
+clContouredActive = mix(clDisabled, transparent, 50%)
+
+.btn
+  -webkit-appearance none
+  text-decoration none
+  display block
+  text-align center
+  background-color clPrimary
+  color textColor1
+  border-width 0
+  font-size 1.1rem
+  padding form-button-padding form-button-padding*2
+  border-radius border-radius
+  cursor pointer
+  transition all 0.3s ease
+.btn.btn-contoured
+  border dashed 2px clDisabled
+  //background-image url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='gray' stroke-width='5' stroke-dasharray='5%2c 15' stroke-dashoffset='3' stroke-linecap='square'/%3e%3c/svg%3e")
+  background-color clContoured
+.btn.btn-danger
+  background-color clError
+.btn.btn-disabled
+  cursor not-allowed
+  background-color clDisabled
+.btn:hover
+  color textColor1
+  background-color clHighlight
+.btn.btn-disabled:hover
+  background-color clDisabled
+.btn.btn-contoured:hover
+  background-color clContouredHover
+.btn.btn-contoured:active
+  transition all 0.1s ease
+  background-color clContouredActive
+
+textarea.form-control
+  resize none
+  width 100%
+  font-family Arial
+.form-control
+  padding form-button-padding
+  font-size 1rem
+  color textColor1
+  background-color clSecondary
+  border border-width solid clFormBorder
+  border-radius border-radius
+  transition border 0.3s ease
+.form-control:focus
+  outline 0
+  border 1px solid clHighlight
+.form-control::placeholder
+  color textColor3
+.form-control.error,
+.error .form-control
+  border border-width solid clError !important
+
+.standalone-form
+  box-shadow 0 0 10px clFormShadow
+  padding form-padding-left form-padding-top
+
+  max-width form-width
+  margin form-margin auto
+  border-radius big-border-radius
+  overflow hidden
+
+  background-color clFormBackground
+
+  position relative
+
+  z-index 1
+
+  .router-link
+    color clPrimary
+  .router-link:hover
+    color clHighlight
+
+  .back-btn
+    position absolute
+    color #CCC
+    left form-padding-left
+    top 10px
+    transition 0.2s ease color
+    display flex
+    svg
+      width back-btn-size
+    height back-btn-size
+  .back-btn:hover
+    color orange
+
+  .title
+    text-align center
+    color textColor1
+    .primary
+      font-size 1.5rem
+      font-weight bold
+    .secondary
+      margin-top form-button-margin
+      font-size 1.3rem
+      color textColor3
+  .form
+    margin-top form-button-margin*2
+
+.form-group
+  margin-bottom form-button-margin*2
+  label
+    color textColor3
+    display block
+    font-size 0.75rem
+    font-weight bold
+    margin-bottom form-button-margin
+    .error-text
+      font-style italic
+    .error-text:not(:empty)::before
+      content: " - "
+
+  input,
+  button
+    margin auto
+    width 100%
+  .muted
+    margin-top form-top-margin
+    font-size 0.9rem
+    color textColor3
+  textarea
+    resize vertical
+
+.form-group.error
+  label
+    color clError
+
+.standalone-form.fullwidth
+  max-width unset
+  width 90%
+
+
+.relative-container
+  position relative
+
+.input-air
+  width 100%
+  background none
+  font-size 16px
+  border none
+  outline none
+  overflow hidden
+  text-overflow ellipsis
+  color textColor1
+  transition all ease 0.2s
+.input-air:focus
+  padding 5px
+  margin-left 5px
+
+.input-air::placeholder
+  color textColor5
+.input-air:focus::placeholder
+  color textColor3
+
+.input-with-clear ~ .input-clear
+  position absolute
+  right 15px
+  top 12px
+  width 24px
+  height 24px
+  max-width 0
+  transition all ease-out 0.4s
+  opacity 0
+  transform rotate(45deg)
+.input-with-clear:focus ~ .input-clear
+  max-width 100px // to delay move after rotation
+  opacity 1
+  transform rotate(0)
+
+input ~ .input-bg
+  position absolute
+  inset 0
+  z-index -1
+  border-color color2
+  background none
+  transform skewX(degree)
+  transition all ease 0.2s
+input:focus ~ .input-bg
+  margin 5px
+  margin-left 10px
+  background color2lighter
+  border-width 0 2px
+  border-color color4
+  border-style double
+
+.bg-decColor1::before
+  content ""
+  position absolute
+  inset 0
+  background decColor2
+  transform skewX(degree)
+  z-index -1
+
+.form-bg
+  bgModifier = mix(color2, black)
+  div
+    position absolute
+    inset 0
+    z-index -1
+    transform skewX(degree)
+    border-width 0 4px
+    border-style solid
+    opacity 0.5
+  div:nth-child(1)
+    left -5%
+    right 20%
+    border none
+    background mix(gradColor1lighter, bgModifier, 10%)
+    clip-path polygon(0 0, 100% 0, 100% 100%, 0 100%)
+    animation 0.5s ease-out from-left
+  div:nth-child(2)
+    left 85%
+    right -10%
+    border-color mix(gradColor2lighter, bgModifier, 30%)
+    transform skewX(-1 * degree)
+    background decColor2
+    clip-path polygon(0 0, 100% 0, 100% 100%, 0 100%)
+    animation 0.6s ease-out from-bottom
+  div:nth-child(3)
+    left 103%
+    right -20%
+    border none
+    background decColor1
+    animation 0.5s ease-out from-right
+
+@keyframes from-left
+  from
+    left -100%
+    right 150%
+    top 0
+    bottom 0
+@keyframes from-bottom
+  from
+    clip-path polygon(0 100%, 100% 100%, 100% 100%, 0 100%)
+@keyframes from-right
+  from
+    left 150%
+    right -100%
+    top 0
+    bottom 0

@@ -1,64 +1,101 @@
 const path = require('path');
-const fs = require('fs');
+
 const webpack = require('webpack');
-const CopyPlugin = require('copy-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const jsObfuscator = require('webpack-obfuscator');
 
-fs.writeFileSync('./build_info.js', 'exports.BUILD_TIMESTAMP = ' + Date.now() + ';');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { VueLoaderPlugin } = require('vue-loader');
 
-let jsObfuscatorPlugin = new jsObfuscator({
-    compact: true,
-    deadCodeInjection: true,
-    deadCodeInjectionThreshold: 0.4,
-    rotateStringArray: true,
-    stringArrayEncoding: true,
-});
+module.exports = env => {
+    const proxyTo = (env.local)? 'http://localhost:9091': 'https://code.liokor.com/'
 
-module.exports = {
-    entry: './src/index.js',
-    mode: 'production',
-    output: {
-        filename: 'main.js',
-        path: path.resolve(__dirname, 'dist'),
-    },
-    plugins: [
-        jsObfuscatorPlugin,
-        new CleanWebpackPlugin(),
-        new webpack.DefinePlugin({
-            VERSION: JSON.stringify(require('./package.json').version)
-        }),
-        new CopyPlugin([
-            { from: 'static', to: './' }
-        ])
-    ],
-    devServer: {
-        contentBase: path.join(__dirname, 'dist'),
-        compress: true,
-        //host: '0.0.0.0',
-        port: 9000
-    },
-    module: {
-        rules: [
-            {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader',
-                ],
-            },
-            {
-                test: /\.worker.js$/,
-                use: { loader: 'worker-loader' }
-            },
-            {
-                test: /\.styl$/,
-                use: [
-                    'style-loader',
-                    'css-loader',
-                    'stylus-loader'
-                ]
-            }
+    return {
+        entry: './src/index.js',
+        output: {
+            filename: '[name].[contenthash].bundle.js',
+            path: path.resolve(__dirname, 'dist'),
+            publicPath: '/',
+            clean: true
+        },
+        performance: {
+            maxAssetSize: 368640
+        },
+        plugins: [
+            new HtmlWebpackPlugin({
+                template: 'src/index.html',
+                favicon: 'src/images/favicon.ico'
+            }),
+            new VueLoaderPlugin(),
+            new webpack.DefinePlugin({
+                BUILD_TIMESTAMP: Date.now(),
+                VERSION: JSON.stringify(require('./package.json').version)
+            })
         ],
+        devServer: {
+            port: 9000,
+            historyApiFallback: {
+                rewrites: [
+                    {
+                        from: /.(js|png|ico|svg|gif|mp3)$/,
+                        to: (context) => {
+                            const path = context.parsedUrl.pathname.split('/')
+                            return `/${path[path.length - 1]}`
+                        }
+                    },
+                    { from: /^\/#/, to: '/index.html' },
+                ]
+            },
+            proxy: {
+                '/api/v1': {
+                    target: proxyTo,
+                    secure: false,
+                    changeOrigin: true
+                },
+                '/media': {
+                    target: proxyTo,
+                    secure: false,
+                    changeOrigin: true
+                }
+            }
+        },
+        resolve: {
+            extensions: ['.ts', '.tsx', '.js'],
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.vue$/,
+                    use: [
+                        'vue-loader',
+                    ]
+                },
+                {
+                    test: /\.css$/,
+                    use: [
+                        'style-loader',
+                        'css-loader',
+                    ],
+                },
+                {
+                    test: /\.(png|mp3|svg|gif)$/,
+                    loader: 'file-loader'
+                },
+                {
+                    test: /\.styl(us)?$/,
+                    use: [
+                        'style-loader',
+                        'css-loader',
+                        'stylus-loader'
+                    ]
+                },
+                {
+                    test: /\.tsx?$/,
+                    loader: 'ts-loader',
+                },
+                {
+                    test :/\.exec\.js$/,
+                    use: 'script-loader'
+                }
+            ],
+        }
     }
 };

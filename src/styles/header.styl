@@ -1,0 +1,314 @@
+@require 'constants.styl'
+
+betweenItems = 30px
+headerHeight = 50px
+marginFirstElLeft = 10px
+marginLastElRight = 10px
+headerBG = color2lighter
+highLightColor = color4
+border-color = color4
+
+borderRadiusTop = 40px
+borderRadiusBottom = 20px
+shadow = shadow1
+
+header-degree = 30deg
+
+.header
+  height headerHeight
+  margin-bottom 10px
+  width 100%
+  left 0
+  top 0
+  .top-line
+    display flex
+    margin 0
+    padding 0
+    width 100%
+    height headerHeight
+    line-height headerHeight
+    overflow visible
+    background headerBG
+    box-shadow shadow
+    > *
+      color textColor1
+      text-decoration none
+      white-space nowrap
+      text-overflow clip
+      letter-spacing 2px
+      cursor pointer
+      padding 0 betweenItems
+      position relative
+      list-style none
+      z-index 0
+      user-select none
+      transition all 0.3s ease
+    > *:first-child
+    > *.first-child
+      padding-left (betweenItems + marginFirstElLeft)
+      margin-left (- betweenItems)
+    > *.right
+      margin-left auto
+    > *.right:last-child
+      padding-right (betweenItems + marginLastElRight)
+      margin-right (- betweenItems)
+    > *::before
+    > *:after
+      content ""
+      position absolute
+      left 0
+      right 0
+      top 0
+      bottom 0
+      transform skewX(- header-degree)
+      z-index -1
+    > *:after
+      background linear-gradient(transparent 0, border-color 50%, transparent 70%) 100% 50% / 2px 200% no-repeat, linear-gradient(transparent 0%, border-color 50%, transparent 80%) 0% 50% / 2px 200% no-repeat
+    > *::before
+      background linear-gradient(highLightColor, transparent) 0 100% / 100% 200% no-repeat
+      transition all 0.2s ease
+    > *:hover::before
+      background-position-y 0
+
+    .profile-button
+      display flex
+      align-items center
+      flex-wrap nowrap
+      .avatar-preview
+        width (headerHeight - 10px)
+        height (headerHeight - 10px)
+        border-radius 50%
+        overflow hidden
+        border solid 1px color4
+      .username
+        margin-left 10px
+        margin-right 10px
+
+
+  .side-part
+    z-index 2
+    position relative
+    margin-left auto
+    width 60%
+    margin-right -20%
+    padding-right 20%
+    height sidePartHeight
+    right 0
+  .side-part::before
+    content ""
+    background headerBG
+    box-shadow shadow
+    position absolute
+    left 0
+    right 0
+    top -1px
+    bottom 0
+    transform skewX(degree)
+    z-index -1
+
+  .side-part
+    position relative
+    padding-top 50px
+
+  .top-decoration
+  .bottom-decoration
+    position absolute
+    padding 0
+    margin 0
+    top 0
+    height 100%
+    pointer-events none
+
+  .top-decoration > div
+  .bottom-decoration > div
+    background decColor1
+    position absolute
+    transform skewX(degree)
+
+  .top-decoration
+    left (- sidePartHeight/4)
+    top (- headerHeight)
+    width (100% / 3 * 2)
+    > div
+      transform-origin 0 headerHeight
+
+    > div:nth-child(1)
+      left -45px
+      top 0
+      width 17px
+      height (sidePartHeight / 8 + headerHeight)
+      box-shadow shadow1
+      animation 0.6s height-from-0-2
+    > div:nth-child(2)
+      left -18px
+      top 0
+      width 10px
+      height (sidePartHeight / 3 * 2 + headerHeight)
+      background decColor2
+      box-shadow shadow2
+      animation 0.5s height-from-0-1
+    > div:nth-child(3)
+      left 100px
+      top 0
+      width 200px
+      height 10px
+      background decColor2
+      box-shadow shadow2
+      animation 0.8s width-from-0-2
+    > div:nth-child(4)
+      left (sidePartHeight / 4 + 5px + headerHeight / 2)
+      top (sidePartHeight / 2 + headerHeight)
+      width 50%
+      max-width 200px
+      height 2px
+      animation 0.5s width-from-0-1
+    > div:nth-child(5)
+      left 0
+      top 0
+      width 7px
+      height (sidePartHeight + headerHeight)
+      animation 0.3s height-from-0
+    > div:nth-child(6)
+      left 50px
+      top 0
+      width 60px
+      height (10px + headerHeight)
+      background decColor2
+      box-shadow shadow1
+      animation 0.7s height-from-0-2
+
+  .bottom-decoration
+    left (sidePartHeight / 4)
+    width (100% / 3 * 2)
+
+    > div
+      transform-origin 0 100%
+
+    > div:nth-child(1)
+      left 80px
+      bottom 0
+      right 30%
+      height 7px
+      background decColor2
+      box-shadow shadow2
+      animation 0.6s right-from-80px-1
+    > div:nth-child(2)
+      left 0
+      bottom 0
+      width 25px
+      height (sidePartHeight / 3)
+      animation 0.7s height-from-0-2
+    > div:nth-child(3)
+      left 55px
+      bottom 0
+      width 25px
+      height (sidePartHeight / 8)
+      background decColor2
+      box-shadow shadow2
+      animation 0.3s height-from-0
+    > div:nth-child(4)
+      right 0
+      bottom 60px
+      width 40%
+      max-width 200px
+      height 4px
+      box-shadow shadow2
+      animation 0.7s width-from-0-2
+    > div:nth-child(5)
+      right 0
+      bottom 80px
+      width 50%
+      max-width 250px
+      height 2px
+      background decColor2
+      animation 0.8s width-from-0-2
+
+
+
+@keyframes height-from-0
+  0%
+    height 0
+@keyframes height-from-0-1
+  0%, 50%
+    height 0
+@keyframes height-from-0-2
+  0%, 70%
+    height 0
+@keyframes width-from-0
+  0%
+    width 0
+@keyframes width-from-0-1
+  0%, 50%
+    width 0
+@keyframes width-from-0-2
+  0%, 70%
+    width 0
+
+@keyframes right-from-80px-1
+  0%, 50%
+    right calc(100% - 80px)
+
+
+.header
+  .top-line
+    .burger-menu
+      display none
+      padding-top 5px
+      padding-left 50px
+      svg
+        height 20px
+        stroke-width 8px
+        opacity 0.9
+@media screen and ({mobile})
+  .header
+    .top-line
+      .burger-menu
+        display block
+      .burger-menu ~ *
+        display none
+
+    .top-decoration
+      display none
+
+    mobileSidePartDecrease = 150px
+    .side-part
+      height (sidePartHeight - mobileSidePartDecrease)
+      width "calc(60% + %s)" % (mobileSidePartDecrease / 3)
+      .top-decoration
+      .bottom-decoration
+        margin-left (- mobileSidePartDecrease / 3 + 13px)
+      .bottom-decoration
+        > div:nth-child(1)
+          right 20%
+        > div:nth-child(4)
+          width 20%
+        > div:nth-child(5)
+          width 30%
+      .checkboxes-group
+        margin-top -100px
+        margin-left -10px
+
+      .search-group
+        transform translate(calc(-60vw + 145px), -72.5px)
+        height (headerHeight - 10px)
+        width calc(95vw - 200px)
+        .input-bg
+        > div::before
+          transform skewX(- header-degree)
+          right 0
+        svg
+          height (30px - 10px)
+
+      .paginator
+        transform translate(calc(35vw - 70px), -122.5px)
+        width 75px
+        > *:not(.button):not(.selected)
+          display none
+        .selected::before
+        .button::before
+          transform skewX(- header-degree)
+        .selected::before
+          background decColor2
+      .paginator::before
+        content none
+
