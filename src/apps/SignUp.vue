@@ -2,54 +2,55 @@
 </style>
 
 <template>
-<!--  <Logo />-->
+  <div>
+  <!--  <Logo />-->
+    <div class="signup">
+      <div class="content">
+        <div class="standalone-form">
+          <div class="title">
+            <div class="primary">Регистрация</div>
+          </div>
+          <div class="form" @keydown.enter.prevent="signUp">
+            <form novalidate>
+              <div class="form-bg">
+                <div></div>
+                <div></div>
+              </div>
 
-  <div class="signup">
-    <div class="content">
-      <div class="standalone-form">
-        <div class="title">
-          <div class="primary">Регистрация</div>
-        </div>
-        <div class="form" @keydown.enter.prevent="signUp">
-          <form novalidate>
-            <div class="form-bg">
-              <div></div>
-              <div></div>
-            </div>
+              <div class="form-group" :class="{ error: errors.username }" @input="errors.username = ''">
+                <label>ЛОГИН*<span class="error-text">{{ errors.username }}</span></label>
+                <input v-model="username" type="text" class="form-control" required autocomplete="on">
+                <div class="muted">Минимум 3 символа, только буквы, цифры и _</div>
+              </div>
 
-            <div class="form-group" :class="{ error: errors.username }" @input="errors.username = ''">
-              <label>ЛОГИН*<span class="error-text">{{ errors.username }}</span></label>
-              <input v-model="username" type="text" class="form-control" required autocomplete="on">
-              <div class="muted">Минимум 3 символа, только буквы, цифры и _</div>
-            </div>
+              <div class="form-group" :class="{ error: errors.email }" @input="errors.email = ''">
+                <label>EMAIL*<span class="error-text">{{ errors.email }}</span></label>
+                <input v-model="email" type="email" class="form-control" placeholder="wolf@liokor.ru" autocomplete="on">
+                <div class="muted">Используется для восстановления пароля, если не указан - восстановить пароль крайне сложно</div>
+              </div>
 
-            <div class="form-group" :class="{ error: errors.email }" @input="errors.email = ''">
-              <label>EMAIL*<span class="error-text">{{ errors.email }}</span></label>
-              <input v-model="email" type="email" class="form-control" placeholder="wolf@liokor.ru" autocomplete="on">
-              <div class="muted">Используется для восстановления пароля, если не указан - восстановить пароль крайне сложно</div>
-            </div>
+              <div class="form-group" :class="{ error: errors.password }" @input="errors.password = ''">
+                <label>ПАРОЛЬ*<span class="error-text">{{ errors.password }}</span></label>
+                <input v-model="password" type="password" class="form-control" required autocomplete="off">
+                <div class="muted">В пароле должно быть много всяких символов, но его надо не забыть</div>
+              </div>
 
-            <div class="form-group" :class="{ error: errors.password }" @input="errors.password = ''">
-              <label>ПАРОЛЬ*<span class="error-text">{{ errors.password }}</span></label>
-              <input v-model="password" type="password" class="form-control" required autocomplete="off">
-              <div class="muted">В пароле должно быть много всяких символов, но его надо не забыть</div>
-            </div>
+              <div class="form-group" :class="{ error: errors.passwordConfirm }" @input="errors.passwordConfirm = ''">
+                <label>ПОДТВЕРЖДЕНИЕ ПАРОЛЯ*<span class="error-text">{{ errors.passwordConfirm }}</span></label>
+                <input v-model="passwordConfirm" type="password" class="form-control" required autocomplete="off">
+              </div>
 
-            <div class="form-group" :class="{ error: errors.passwordConfirm }" @input="errors.passwordConfirm = ''">
-              <label>ПОДТВЕРЖДЕНИЕ ПАРОЛЯ*<span class="error-text">{{ errors.passwordConfirm }}</span></label>
-              <input v-model="passwordConfirm" type="password" class="form-control" required autocomplete="off">
-            </div>
+              <div class="form-group" :class="{ error: errors.fullname }" @input="errors.fullname = ''">
+                <label>ПОЛНОЕ ИМЯ<span class="error-text">{{ errors.fullname }}</span></label>
+                <input v-model="fullname" type="text" class="form-control" placeholder="Иван Иванов" autocomplete="on">
+              </div>
 
-            <div class="form-group" :class="{ error: errors.fullname }" @input="errors.fullname = ''">
-              <label>ПОЛНОЕ ИМЯ<span class="error-text">{{ errors.fullname }}</span></label>
-              <input v-model="fullname" type="text" class="form-control" placeholder="Иван Иванов" autocomplete="on">
-            </div>
-
-            <div class="form-group">
-              <div class="btn" :class="{ 'btn-disabled': !enabled }" @click="signUp" >Создать</div>
-              <div class="muted">Уже с нами? <router-link to="/signin" class="router-link">Войти</router-link></div>
-            </div>
-          </form>
+              <div class="form-group">
+                <div class="btn" :class="{ 'btn-disabled': !enabled }" @click="signUp" >Создать</div>
+                <div class="muted">Уже с нами? <router-link to="/signin" class="router-link">Войти</router-link></div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

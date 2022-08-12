@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = env => {
-    const proxyTo = (env.local)? 'http://localhost:9091': 'https://code.liokor.com/'
+    const proxyTo = (env.local && false)? 'http://localhost:9091': 'https://code.liokor.com/'
 
     return {
         entry: './src/index.js',

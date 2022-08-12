@@ -117,7 +117,7 @@
   import SolutionTemplates from "../../utils/solution-templates";
   import Solution from "../../models/solution";
 
-  const DEV_SOCKET_URL = 'ws://178.62.57.180';
+  const DEV_SOCKET_URL = 'wss://code.liokor.com'; //'ws://178.62.57.180';
 
   export default {
     components: {Tabs, Tree, Header, Templates, TaskInfo, Editor, Solutions, SlideLine},

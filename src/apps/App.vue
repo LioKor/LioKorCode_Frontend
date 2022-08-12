@@ -3,6 +3,10 @@
     overflow-x hidden
     overflow-y auto
     height 100vh
+    position relative
+    > *
+      position absolute
+      width 100%
 
   .side-button
     opacity 0
@@ -14,7 +18,11 @@
 
 <template>
   <div id="router" class="scrollable">
-    <router-view></router-view>
+    <router-view v-slot="{ Component }">
+      <transition :name="transitionName">
+        <component :is="Component" />
+      </transition>
+    </router-view>
   </div>
 
   <SlideLine class="vertical rooms-slide-line" el1="router" el2="rooms" uid="rooms" initial-value="100" :user-interactive="!$store.state.isMobile"
@@ -28,6 +36,115 @@
   <SideButton class="right" :class="{show: !isMobileRoomsOpened && $store.state.isMobile}" @click="openRooms"/>
   <SideButton class="left" :class="{show: isMobileRoomsOpened && $store.state.isMobile}" @click="closeRooms"/>
 </template>
+
+<style scoped>
+.fade-left-enter-active {
+  transition: opacity 0.3s ease;
+}
+.fade-left-leave-active {
+  transition: all 0.5s ease;
+}
+.fade-left-enter-from {
+  opacity: 0;
+}
+.fade-left-enter-to {
+  opacity: 1;
+}
+.fade-left-leave-from {
+  left: 0%;
+}
+.fade-left-leave-to {
+  left: -100%;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: all 0.5s ease;
+}
+.slide-left-enter-to {
+  right: 0;
+}
+.slide-left-enter-from {
+  right: -100%;
+}
+.slide-left-leave-to {
+  left: -100%;
+  transform: scale(0.8);
+}
+.slide-left-leave-from {
+  left: 0;
+}
+
+
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.5s ease;
+}
+.slide-right-enter-to {
+  left: 0;
+}
+.slide-right-enter-from {
+  left: -100%;
+}
+.slide-right-leave-to {
+  right: -100%;
+  transform: scale(0.5);
+}
+.slide-right-leave-from {
+  right: 0;
+}
+
+
+.scale-slide-left-enter-active,
+.scale-slide-left-leave-active {
+  transition: all 0.5s ease;
+}
+.scale-slide-left-enter-from {
+  left: -100%;
+}
+.scale-slide-left-enter-to {
+  left: 0%;
+}
+.scale-slide-left-leave-from {
+  transform: scale(1);
+}
+.scale-slide-left-leave-to {
+  transform: scale(0.8);
+  opacity: 0;
+}
+
+
+.scale-slide-right-enter-active,
+.scale-slide-right-leave-active {
+  transition: all 0.5s ease;
+}
+.scale-slide-right-enter-from {
+  right: -100%;
+}
+.scale-slide-right-enter-to {
+  right: 0%;
+}
+.scale-slide-right-leave-from {
+  transform: scale(1);
+}
+.scale-slide-right-leave-to {
+  transform: scale(0.8);
+  opacity: 0;
+}
+</style>
 
 <script>
   import Modal from "../utils/Modal.vue";
@@ -45,6 +162,7 @@
     data() {
       return {
         isMobileRoomsOpened: false,
+        transitionName: 'scale-slide-left',
       }
     },
 
@@ -99,6 +217,29 @@
         this.isMobileRoomsOpened = false;
         this.$refs.slider.applySlideSmoothly(100);
       }
-    }
+    },
+
+    watch: {
+      $route(to, from) {
+        console.log(/\/task\/\d*/.test(to.path), to.path)
+        this.transitionName = 'scale-slide-right';
+        if (from.path === '/signin' && to.path === '/signup') {
+          this.transitionName = 'slide-right';
+        } else if (from.path === '/signup' && to.path === '/signin') {
+          this.transitionName = 'slide-left';
+
+        } else if (to.path === '/') {
+          this.transitionName = 'fade-left';
+          if (/\/task\/\d+/g.test(from.path))
+            this.transitionName = 'fade';
+        } else if (/\/task\/\d+/g.test(to.path)) {
+            this.transitionName = 'fade-left';
+            if (from.path === '/')
+              this.transitionName = 'fade';
+
+        } else if (to.path === '/profile')
+          this.transitionName = 'scale-slide-left';
+      }
+    },
   }
 </script>

@@ -1,5 +1,5 @@
-// To have var "ot" in global scope
-// you need to include "ot" firstly
+/*global ot */
+/*global ace */
 
 /*
  *    /\
@@ -11,6 +11,7 @@
  *   \  / (c) 2022 Sergey Tyapkin
  *    \/ This addon may be freely distributed under the MIT license.
  */
+
 ot.AceEditorAdapter = (function (global) {
     'use strict';
 
@@ -79,98 +80,97 @@ ot.AceEditorAdapter = (function (global) {
             var styleSheet = styleElement.sheet;
 
             return function (cssRules) {
-                cssRules.forEach(css => {
+                for (var i = 0; i < cssRules.length; i++) {
+                    var css = cssRules[i];
                     if (added[css])
                         return;
 
                     added[css] = true;
                     styleSheet.insertRule(css, (styleSheet.cssRules || styleSheet.rules).length);
-                });
+                }
             };
         }());
 
         var collapsedHintSize = 8;
         var hintFontSize = 14;
-        var rules = [
+        addStyleRules([
             // To make hint expanded when cursor moving
-            `@keyframes ot-ace-addon-keep-hint-open {
-                0%, 80% {
-                    content: attr(${clientNameAttributeName});
-                    width: unset;
-                    height: ${hintFontSize}px;
-                    top: -20px;
-                    padding: 4px;
-                    opacity: 0.7;
-                }
-                99% {
-                    top: ${-collapsedHintSize}px;
-                    height: ${collapsedHintSize}px;
-                    width: ${collapsedHintSize}px;
-                    color: black;
-                    opacity: 1;
-                    padding: 0;
-                    content: "";
-                }
-                100% {
-                }
-            }
-            `,
+            '@keyframes ot-ace-addon-keep-hint-open { \
+                0%, 80% { \
+                   content: attr(' + clientNameAttributeName + '); \
+             width: unset; \
+             height: ' + hintFontSize + 'px; \
+             top: -20px; \
+             padding: 4px; \
+             opacity: 0.7; \
+          } \
+          99% { \
+             top: ' + (-collapsedHintSize) + 'px; \
+             height: ' + collapsedHintSize + 'px; \
+             width: ' + collapsedHintSize + 'px; \
+             color: black; \
+             opacity: 1; \
+             padding: 0; \
+             content: ""; \
+          } \
+          100% { \
+          } \
+      }',
             // Make cursors
-            `.${otherCursorClassName} {
-                display: inline-block;
-                padding: 0px;
-                margin-right: -1px;
-                margin-left: -1px;
-                z-index: 0;
-                position: absolute;
-                border-left-width: 2px;
-                border-left-style: solid;
-            }`,
+            '.' + otherCursorClassName + ' { \
+          display: inline-block;  \
+          padding: 0px; \
+          margin-right: -1px; \
+          margin-left: -1px; \
+          z-index: 0; \
+          position: absolute; \
+          border-left-width: 2px; \
+          border-left-style: solid; \
+      }',
             // For make hover works in bigger area around cursor
-            `.${otherCursorClassName}::after {
-                content: "";
-                pointer-events: all;
-                position: absolute;
-                inset: -5px -5px -5px -10px;
-            }`,
+            '.' + otherCursorClassName + '::after { \
+          content: ""; \
+          pointer-events: all; \
+          position: absolute; \
+          inset: -5px -5px -5px -10px; \
+      }',
             // Make circle above the cursor
-            `.${otherCursorClassName}::before {
-                content: "";
-                position: absolute;
-                top: ${-collapsedHintSize}px;
-                left: ${-collapsedHintSize / 2 - 1}px;
-                height: ${collapsedHintSize}px;
-                width: ${collapsedHintSize}px;
-                background: inherit;
-                font-size: ${hintFontSize}px;
-                transition: all 0.2s ease;
-                line-height: ${hintFontSize}px;
-                border-radius: ${hintFontSize / 2}px;
-                color: black;
-                white-space: nowrap;
-
-                animation: 2s ease ot-ace-addon-keep-hint-open;
-            }`,
+            '.' + otherCursorClassName + '::before { \
+          content: ""; \
+          position: absolute; \
+          top: ' + (-collapsedHintSize) + 'px; \
+          left: ' + (-collapsedHintSize / 2 - 1) + 'px; \
+          height: ' + collapsedHintSize + 'px; \
+          width: ' + collapsedHintSize + 'px; \
+          background: inherit; \
+          font-size: ' + hintFontSize + 'px; \
+          transition: all 0.2s ease; \
+          line-height: ' + hintFontSize + 'px; \
+          border-radius: ' + (hintFontSize / 2) + 'px; \
+          color: black; \
+          white-space: nowrap; \
+          animation: 2s ease ot-ace-addon-keep-hint-open; \
+      }',
             // Transform circle into username hint
-            `.${otherCursorClassName}:hover::before {
-                content: attr(${clientNameAttributeName});
-                width: unset;
-                height: ${hintFontSize}px;
-                top: -20px;
-                padding: 4px;
-                opacity: 0.85;
-            }`,
+            '.' + otherCursorClassName + ':hover::before { \
+          content: attr(' + clientNameAttributeName + '); \
+          width: unset; \
+          height: ' + hintFontSize + 'px; \
+          top: -20px; \
+          padding: 4px; \
+          opacity: 0.85; \
+      }',
 
             // Make other selections
-            `.${otherSelectionClassName} {
-                display: inline-block;
-                padding: 0px;
-                z-index: 0;
-                position: absolute;
-                inset: 0;
-                opacity: 0.3;
-            }`];
-        addStyleRules(rules);
+            '.' + otherSelectionClassName + ' { \
+          display: inline-block; \
+          padding: 0px; \
+          z-index: 0; \
+          position: absolute; \
+          inset: 0; \
+          opacity: 0.3; \
+      }'
+        ]);
     }
 
     // Removes all event listeners from the AceEditor instance.
@@ -230,27 +230,27 @@ ot.AceEditorAdapter = (function (global) {
             restLength -= sumLengths(change.lines);
 
             operation = new TextOperation()
-                .retain(fromIndex)
-                .insert(change.lines.join('\n'))
-                .retain(restLength)
-                .compose(operation);
+              .retain(fromIndex)
+              .insert(change.lines.join('\n'))
+              .retain(restLength)
+              .compose(operation);
 
             inverse = inverse.compose(new TextOperation()
-                .retain(fromIndex)
-                ['delete'](sumLengths(change.lines))
-                .retain(restLength)
+              .retain(fromIndex)
+              ['delete'](sumLengths(change.lines))
+              .retain(restLength)
             );
         } else if (change.action === 'remove') {
             operation = new TextOperation()
-                .retain(fromIndex)
-                ['delete'](sumLengths(change.lines))
-                .retain(restLength)
-                .compose(operation);
+              .retain(fromIndex)
+              ['delete'](sumLengths(change.lines))
+              .retain(restLength)
+              .compose(operation);
 
             inverse = inverse.compose(new TextOperation()
-                .retain(fromIndex)
-                .insert(change.lines.join('\n'))
-                .retain(restLength)
+              .retain(fromIndex)
+              .insert(change.lines.join('\n'))
+              .retain(restLength)
             );
         }
 
@@ -259,7 +259,7 @@ ot.AceEditorAdapter = (function (global) {
 
     // Singular form for backwards compatibility.
     AceEditorAdapter.operationFromAceEditorChange =
-        AceEditorAdapter.operationFromAceEditorChanges;
+      AceEditorAdapter.operationFromAceEditorChanges;
 
     // Apply an operation to a AceEditor instance.
     AceEditorAdapter.applyOperationToAceEditor = function (operation, ae) {
@@ -297,14 +297,14 @@ ot.AceEditorAdapter = (function (global) {
     };
 
     AceEditorAdapter.prototype.onFocus =
-        AceEditorAdapter.prototype.onCursorActivity =
-            function () {
-                if (this.changeInProgress) {
-                    this.selectionChanged = true;
-                } else {
-                    this.trigger('selectionChange');
-                }
-            };
+      AceEditorAdapter.prototype.onCursorActivity =
+        function () {
+            if (this.changeInProgress) {
+                this.selectionChanged = true;
+            } else {
+                this.trigger('selectionChange');
+            }
+        };
 
     AceEditorAdapter.prototype.onBlur = function () {
         if (this.ae.selection.isEmpty()) { this.trigger('blur'); }
@@ -332,8 +332,8 @@ ot.AceEditorAdapter = (function (global) {
         for (var i = 0; i < selectionList.length; i++) {
             var sel = selectionList[i];
             ranges[i] = new Selection.Range(
-                ae.session.doc.positionToIndex({row: sel.start.row, column: sel.start.column}),
-                ae.session.doc.positionToIndex({row: sel.end.row, column: sel.end.column})
+              ae.session.doc.positionToIndex({row: sel.start.row, column: sel.start.column}),
+              ae.session.doc.positionToIndex({row: sel.end.row, column: sel.end.column})
             );
             if (ranges[i].isEmpty())
                 isAllRangesNotEmpty = false;
@@ -383,14 +383,16 @@ ot.AceEditorAdapter = (function (global) {
         selEl.classList.add(otherSelectionClassName);
         selEl.style.background = color;
         selEl.setAttribute(clientNameAttributeName, clientName);
-        var clipPathStart = `path('M ${this.SYMBOL_WIDTH * anchorPos.column} ${this.LINE_HEIGHT * anchorPos.row}` +
-            `v ${this.LINE_HEIGHT}`;
-        var clipPathEnd = `L ${this.SYMBOL_WIDTH * headPos.column} ${this.LINE_HEIGHT * headPos.row + this.LINE_HEIGHT} v ${-this.LINE_HEIGHT}  Z')`;
+        var clipPathStart = 'path("M ' + (this.SYMBOL_WIDTH * anchorPos.column) + ' ' + (this.LINE_HEIGHT * anchorPos.row) + '  ' +
+          'v ' + this.LINE_HEIGHT;
+        var clipPathCenter = '';
         for (var i = anchorPos.row + 1; i < headPos.row + 1; i++) {
-            clipPathStart += `h 10000 v ${-this.LINE_HEIGHT} ` +
-                `M 0 ${this.LINE_HEIGHT * i} v ${this.LINE_HEIGHT}`;
+            clipPathCenter += 'h 10000 v ' + -this.LINE_HEIGHT + '  ' +
+              'M 0 ' + (this.LINE_HEIGHT * i) + '  v ' + this.LINE_HEIGHT;
         }
-        selEl.style.clipPath = clipPathStart + clipPathEnd;
+        var clipPathEnd = 'L ' + (this.SYMBOL_WIDTH * headPos.column) + ' ' + (this.LINE_HEIGHT * headPos.row + this.LINE_HEIGHT) + ' v ' + -this.LINE_HEIGHT + '  Z")';
+        console.log(clipPathStart, clipPathCenter, clipPathEnd);
+        selEl.style.clipPath = clipPathStart + clipPathCenter + clipPathEnd;
         this.markersElement.appendChild(selEl);
 
         return selEl;
@@ -408,7 +410,9 @@ ot.AceEditorAdapter = (function (global) {
         }
         return {
             clear: function () {
-                selectionObjects.forEach(el => el.remove()); // Remove old selection HTML elements
+                for (var i = 0; i < selectionObjects.length; i++) {
+                    selectionObjects[i].remove(); // Remove old selection HTML elements
+                }
             }
         };
     };
